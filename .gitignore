@@ -43,3 +43,14 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+# ignore folder backup
+android.bak/
+
+# ignore các file .bak
+*.bak
+
+# ignore các file tạm
+*.log
+
+# nếu bạn không muốn commit script gỡ lỗi
+fix_agp.sh

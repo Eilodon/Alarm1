@@ -1,276 +1,229 @@
+import 'note_list_for_day_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import '../models/note.dart';
-import '../services/db_service.dart';
+import 'package:intl/intl.dart';
+import '../services/settings_service.dart';
+import 'settings_screen.dart';
 import '../services/notification_service.dart';
 import 'note_detail_screen.dart';
-import 'package:intl/intl.dart';
-import 'dart:math';
+
+class Note {
+  final String title;
+  final String content;
+  final DateTime? remindAt;
+  Note({required this.title, required this.content, this.remindAt});
+}
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final Function(Color) onThemeChanged;
+  const HomeScreen({super.key, required this.onThemeChanged});
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _db = DbService();
-  final _notif = NotificationService();
-  List<Note> _notes = [];
+  String _mascotPath = 'assets/lottie/mascot.json';
+  List<Note> notes = [];
+  DateTime today = DateTime.now();
 
   @override
   void initState() {
     super.initState();
-    _load();
+    _loadMascot();
   }
 
-  Future<void> _load() async {
-    final data = await _db.getNotes();
-    setState(() => _notes = data);
+  Future<void> _loadMascot() async {
+    _mascotPath = await SettingsService().loadMascotPath();
+    setState(() {});
   }
 
-  Future<void> _createNoteQuick() async {
+  void _addNote() {
     final titleCtrl = TextEditingController();
     final contentCtrl = TextEditingController();
-    TimeOfDay? pickedTime;
-    bool repeatDaily = false;
+    DateTime? remindAt;
 
-    await showModalBottomSheet(
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      builder: (_) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-          left: 16, right: 16, top: 16),
-        child: StatefulBuilder(builder: (ctx, setStateBS) {
-          return SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(height: 4, width: 40, margin: const EdgeInsets.only(bottom: 12),
-                    decoration: BoxDecoration(color: Colors.black12, borderRadius: BorderRadius.circular(2))),
-                TextField(controller: titleCtrl, decoration: const InputDecoration(labelText: 'Tiêu đề')),
-                const SizedBox(height: 8),
-                TextField(controller: contentCtrl, decoration: const InputDecoration(labelText: 'Nội dung'), maxLines: 4),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () async {
-                        final now = TimeOfDay.now();
-                        final t = await showTimePicker(context: context, initialTime: now);
-                        if (t != null) setStateBS(() => pickedTime = t);
-                      },
-                      child: Text(pickedTime == null ? 'Chọn giờ báo' : 'Giờ: ${pickedTime!.format(context)}')),
-                    const SizedBox(width: 12),
-                    Row(
-                      children: [
-                        Switch(
-                          value: repeatDaily,
-                          onChanged: (v) => setStateBS(() => repeatDaily = v),
-                        ),
-                        const Text('Nhắc hằng ngày'),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context, {
-                        'title': titleCtrl.text.trim(),
-                        'content': contentCtrl.text.trim(),
-                        'time': pickedTime,
-                        'daily': repeatDaily,
-                      });
-                    },
-                    child: const Text('Tạo ghi chú'),
-                  ),
-                ),
-                const SizedBox(height: 12),
-              ],
-            ),
-          );
-        }),
+      builder: (_) => AlertDialog(
+        title: const Text('Thêm ghi chú / nhắc lịch'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(controller: titleCtrl, decoration: const InputDecoration(labelText: 'Tiêu đề')),
+              TextField(controller: contentCtrl, decoration: const InputDecoration(labelText: 'Nội dung')),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () async {
+                  final now = DateTime.now();
+                  final picked = await showDatePicker(
+                    context: context,
+                    firstDate: now,
+                    lastDate: DateTime(now.year + 2),
+                    initialDate: now,
+                  );
+                  if (picked != null) {
+                    final time = await showTimePicker(
+                      context: context,
+                      initialTime: TimeOfDay.now(),
+                    );
+                    if (!mounted) return;
+                    if (time != null) {
+                      remindAt = DateTime(
+                        picked.year, picked.month, picked.day,
+                        time.hour, time.minute,
+                      );
+                    }
+                  }
+                },
+                child: const Text('Chọn thời gian nhắc'),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Hủy')),
+          ElevatedButton(
+            onPressed: () async {
+              final note = Note(
+                title: titleCtrl.text,
+                content: contentCtrl.text,
+                remindAt: remindAt,
+              );
+              setState(() => notes.add(note));
+
+              if (remindAt != null) {
+                await NotificationService().scheduleNotification(
+                  id: DateTime.now().millisecondsSinceEpoch % 100000,
+                  title: note.title,
+                  body: note.content,
+                  scheduledDate: remindAt!,
+                );
+              }
+    if (!mounted) return;
+              Navigator.pop(context); // FIX Lỗi 1: auto đóng dialog
+            },
+            child: const Text('Lưu'),
+          ),
+        ],
       ),
-    ).then((value) async {
-      if (value == null) return;
-      final id = DateTime.now().millisecondsSinceEpoch.toString() + Random().nextInt(999).toString();
-      final title = value['title'] as String;
-      final content = value['content'] as String;
-      final t = value['time'] as TimeOfDay?;
-      final daily = value['daily'] as bool;
-
-      DateTime? alarm;
-      if (t != null) {
-        final now = DateTime.now();
-        alarm = DateTime(now.year, now.month, now.day, t.hour, t.minute);
-      }
-
-      final n = Note(
-        id: id,
-        title: title.isEmpty ? 'No title' : title,
-        content: content,
-        alarmTime: alarm,
-        daily: daily,
-        active: t != null,
-      );
-      final list = [..._notes, n];
-      await _db.saveNotes(list);
-      setState(() => _notes = list);
-
-      if (n.active && n.alarmTime != null) {
-        if (n.daily) {
-          await _notif.scheduleDaily(
-            id: n.id.hashCode,
-            title: n.title,
-            body: 'Đến giờ: ${n.title}',
-            hour: n.alarmTime!.hour,
-            minute: n.alarmTime!.minute,
-          );
-        } else {
-          await _notif.scheduleOnce(
-            id: n.id.hashCode,
-            title: n.title,
-            body: 'Đến giờ: ${n.title}',
-            whenLocal: n.alarmTime!,
-          );
-        }
-      }
-    });
-  }
-
-  Future<void> _toggleActive(Note n) async {
-    final idx = _notes.indexWhere((e) => e.id == n.id);
-    if (idx < 0) return;
-    final updated = [..._notes];
-    final cur = updated[idx];
-    final newVal = !cur.active;
-    updated[idx] = Note(
-      id: cur.id,
-      title: cur.title,
-      content: cur.content,
-      alarmTime: cur.alarmTime,
-      daily: cur.daily,
-      active: newVal,
     );
-    await _db.saveNotes(updated);
-    setState(() => _notes = updated);
-
-    if (newVal) {
-      if (cur.alarmTime != null) {
-        if (cur.daily) {
-          await NotificationService().scheduleDaily(
-            id: cur.id.hashCode,
-            title: cur.title,
-            body: 'Đến giờ: ${cur.title}',
-            hour: cur.alarmTime!.hour,
-            minute: cur.alarmTime!.minute,
-          );
-        } else {
-          await NotificationService().scheduleOnce(
-            id: cur.id.hashCode,
-            title: cur.title,
-            body: 'Đến giờ: ${cur.title}',
-            whenLocal: cur.alarmTime!,
-          );
-        }
-      }
-    } else {
-      await NotificationService().cancel(cur.id.hashCode);
-    }
   }
 
-  Future<void> _delete(Note n) async {
-    final list = _notes.where((e) => e.id != n.id).toList();
-    await _db.saveNotes(list);
-    setState(() => _notes = list);
-    await NotificationService().cancel(n.id.hashCode);
+  List<Note> notesForDay(DateTime day) {
+    return notes.where((n) =>
+      n.remindAt != null &&
+      n.remindAt!.year == day.year &&
+      n.remindAt!.month == day.month &&
+      n.remindAt!.day == day.day
+    ).toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    final fmt = DateFormat('HH:mm, dd/MM');
+    final weekDays = List.generate(7, (i) => today.add(Duration(days: i)));
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Hello!'),
+        title: const Text('Notes & Reminders'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_active),
-            onPressed: () => NotificationService().showNow(
-              id: 9999,
-              title: 'Test',
-              body: 'Thông báo thử',
-            ),
+            icon: const Icon(Icons.settings),
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => SettingsScreen(onThemeChanged: widget.onThemeChanged),
+                ),
+              );
+              _loadMascot();
+            },
           )
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _createNoteQuick,
-        child: const Icon(Icons.add),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Create your daily task',
-                    style: Theme.of(context).textTheme.titleLarge,
+          const SizedBox(height: 8),
+          SizedBox(width: 140, height: 140, child: Lottie.asset(_mascotPath)),
+          const SizedBox(height: 8),
+          // Lịch 7 ngày - Lỗi 3
+          SizedBox(
+            height: 80,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: weekDays.length,
+              itemBuilder: (context, i) {
+                final d = weekDays[i];
+                final hasNotes = notesForDay(d).isNotEmpty;
+                return GestureDetector(
+                  onTap: () {
+                    final dayNotes = notesForDay(d);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => NoteListForDayScreen(date: d, notes: dayNotes),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    width: 60,
+                    margin: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: hasNotes ? Colors.orange : Colors.white,
+                      border: Border.all(color: Colors.black),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(DateFormat('E').format(d)),
+                        Text('${d.day}'),
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(
-                  width: 140,
-                  height: 140,
-                  child: Lottie.asset('assets/lottie/mascot.json', repeat: true),
-                ),
-              ],
+                );
+              },
             ),
           ),
-          const SizedBox(height: 16),
-          Text('You have ${_notes.length} task${_notes.length != 1 ? 's' : ''} today',
-              style: Theme.of(context).textTheme.labelLarge),
           const SizedBox(height: 8),
-          ..._notes.map((n) {
-            final subtitle = n.alarmTime != null
-                ? (n.daily
-                    ? 'Hằng ngày • ${DateFormat('HH:mm').format(n.alarmTime!)}'
-                    : 'Một lần • ${fmt.format(n.alarmTime!)}')
-                : 'Không đặt báo';
-            return Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              child: ListTile(
-                title: Text(n.title, maxLines: 1, overflow: TextOverflow.ellipsis),
-                subtitle: Text(subtitle),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Switch(value: n.active, onChanged: (_) => _toggleActive(n)),
-                    IconButton(icon: const Icon(Icons.delete_outline), onPressed: () => _delete(n)),
-                  ],
-                ),
-                onTap: () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => NoteDetailScreen(note: n)),
-                  );
-                  _load();
-                },
-              ),
-            );
-          }),
-          const SizedBox(height: 80),
+          Expanded(child: _buildNotesList()),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _addNote,
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget _buildNotesList() {
+    if (notes.isEmpty) return const Center(child: Text('Chưa có ghi chú nào'));
+    return ListView.builder(
+      itemCount: notes.length,
+      itemBuilder: (context, index) {
+        final note = notes[index];
+        return Card(
+          child: ListTile(
+            title: Text(note.title),
+            subtitle: Text(note.remindAt != null
+                ? '${note.content}\n⏰ ${note.remindAt}'
+                : note.content),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => NoteDetailScreen(note: note),
+                ),
+              );
+            },
+            trailing: IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: () => setState(() => notes.removeAt(index)),
+            ),
+          ),
+        );
+      },
     );
   }
 }
