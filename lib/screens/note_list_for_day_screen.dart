@@ -1,25 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
+ codex/verify-imports-and-clean-up-code
+import 'package:provider/provider.dart';
 
 import '../models/note.dart';
+import '../providers/note_provider.dart';
+
 import 'note_detail_screen.dart';
+import '../models/note.dart';
+ codex/expand-note-model-with-new-fields
+
 
 class NoteListForDayScreen extends StatelessWidget {
   final DateTime date;
-  final List<Note> notes;
 
   const NoteListForDayScreen({
     super.key,
     required this.date,
-    required this.notes,
   });
 
   @override
   Widget build(BuildContext context) {
+ codex/enable-flutter_localizations-and-update-ui
     final title = AppLocalizations.of(context)!
         .scheduleForDate(DateFormat('dd/MM/yyyy').format(date));
     if (notes.isEmpty) {
+
       return Scaffold(
         appBar: AppBar(title: Text(title)),
         body: Center(
@@ -27,30 +34,41 @@ class NoteListForDayScreen extends StatelessWidget {
         ),
       );
     }
-    final sorted = [...notes]
-      ..sort((a, b) {
-        final at = a.alarmTime?.millisecondsSinceEpoch ?? 0;
-        final bt = b.alarmTime?.millisecondsSinceEpoch ?? 0;
-        return at.compareTo(bt);
-      });
+ codex/verify-imports-and-clean-up-code
+
     return Scaffold(
       appBar: AppBar(title: Text(title)),
       body: ListView.builder(
-        itemCount: sorted.length,
+        itemCount: dayNotes.length,
         itemBuilder: (context, index) {
-          final note = sorted[index];
+          final note = dayNotes[index];
           final timeStr = note.alarmTime != null
               ? DateFormat('HH:mm').format(note.alarmTime!)
               : null;
           return Card(
             child: ListTile(
               title: Text(note.title),
-              subtitle: Text(
-                timeStr != null
-                    ? '${note.content}\n⏰ $timeStr'
-                    : note.content,
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    timeStr != null
+                        ? '${note.content}\n⏰ $timeStr'
+                        : note.content,
+                  ),
+                  if (note.tags.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Wrap(
+                      spacing: 4,
+                      runSpacing: 4,
+                      children:
+                          note.tags.map((t) => Chip(label: Text(t))).toList(),
+                    ),
+                  ]
+                ],
               ),
-              isThreeLine: timeStr != null,
+              isThreeLine: timeStr != null || note.tags.isNotEmpty,
               onTap: () {
                 Navigator.push(
                   context,

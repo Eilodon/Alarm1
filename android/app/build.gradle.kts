@@ -44,4 +44,5 @@ flutter {
 dependencies {
     // thư viện desugar để hỗ trợ Java 8+ cho AAR
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    implementation("androidx.preference:preference-ktx:1.2.1")
 }

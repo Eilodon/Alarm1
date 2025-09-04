@@ -1,14 +1,26 @@
 import 'package:flutter/material.dart';
+ codex/enable-flutter_localizations-and-update-ui
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import 'package:intl/intl.dart';
+ codex/expand-note-model-with-new-fields
 import 'package:lottie/lottie.dart';
+ codex/convert-notedetailscreen-to-statefulwidget
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:provider/provider.dart';
 
 import '../models/note.dart';
+import '../providers/note_provider.dart';
+
 import '../services/notification_service.dart';
 import '../services/settings_service.dart';
+import '../widgets/tag_selector.dart';
 import 'note_detail_screen.dart';
 import 'note_list_for_day_screen.dart';
+import 'note_search_delegate.dart';
 import 'settings_screen.dart';
+import 'voice_to_note_screen.dart';
+
 
 class HomeScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
@@ -24,28 +36,45 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  static const _platform = MethodChannel('notes_reminder_app/actions');
+
   String _mascotPath = 'assets/lottie/mascot.json';
-  List<Note> notes = [];
+ codex/convert-notedetailscreen-to-statefulwidget
+
   DateTime today = DateTime.now();
+  final _db = DbService();
+
 
   @override
   void initState() {
     super.initState();
     _loadMascot();
+ codex/implement-secure-storage-and-authentication
+    _loadNotes();
+
   }
 
   Future<void> _loadMascot() async {
     _mascotPath = await SettingsService().loadMascotPath();
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _loadNotes() async {
+    notes = await _db.getNotes();
     setState(() {});
   }
 
   void _addNote() {
+    final provider = context.read<NoteProvider>();
     final titleCtrl = TextEditingController();
-    final contentCtrl = TextEditingController();
+    final contentCtrl = TextEditingController(text: provider.draft);
     DateTime? alarmTime;
+ codex/implement-secure-storage-and-authentication
+    bool locked = false;
 
     showDialog(
       context: context,
+ codex/enable-flutter_localizations-and-update-ui
       builder: (_) => AlertDialog(
         title: Text(AppLocalizations.of(context)!.addNoteReminder),
         content: SingleChildScrollView(
@@ -70,22 +99,36 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                   if (picked != null) {
                     final time = await showTimePicker(
+
                       context: context,
-                      initialTime: TimeOfDay.now(),
+                      firstDate: now,
+                      lastDate: DateTime(now.year + 2),
+                      initialDate: now,
                     );
-                    if (!mounted) return;
-                    if (time != null) {
-                      alarmTime = DateTime(
-                        picked.year, picked.month, picked.day,
-                        time.hour, time.minute,
+ codex/implement-secure-storage-and-authentication
+                    if (picked != null) {
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+
                       );
+                      if (!mounted) return;
+                      if (time != null) {
+                        alarmTime = DateTime(
+                          picked.year, picked.month, picked.day,
+                          time.hour, time.minute,
+                        );
+                      }
                     }
+ codex/enable-flutter_localizations-and-update-ui
                   }
                 },
                 child: Text(AppLocalizations.of(context)!.selectReminderTime),
               ),
             ],
+
           ),
+ codex/refactor-note-id-and-alarm-time-formatting
         ),
         actions: [
           TextButton(
@@ -93,8 +136,9 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Text(AppLocalizations.of(context)!.cancel)),
           ElevatedButton(
             onPressed: () async {
+              final nowId = DateTime.now().millisecondsSinceEpoch;
               final note = Note(
-                id: DateTime.now().millisecondsSinceEpoch.toString(),
+                id: nowId.toString(),
                 title: titleCtrl.text,
                 content: contentCtrl.text,
                 alarmTime: alarmTime,
@@ -103,11 +147,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
               if (alarmTime != null) {
                 await NotificationService().scheduleNotification(
-                  id: DateTime.now().millisecondsSinceEpoch % 100000,
+                  id: nowId % 100000,
                   title: note.title,
                   body: note.content,
                   scheduledDate: alarmTime!,
+
                 );
+ codex/enable-flutter_localizations-and-update-ui
               }
               if (!mounted) return;
               Navigator.pop(context); // FIX Lỗi 1: auto đóng dialog
@@ -115,12 +161,16 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Text(AppLocalizations.of(context)!.save),
           ),
         ],
+
       ),
     );
   }
 
+ codex/convert-notedetailscreen-to-statefulwidget
   List<Note> notesForDay(DateTime day) {
+    final notes = context.read<NoteProvider>().notes;
     return notes
+
         .where((n) =>
             n.alarmTime != null &&
             n.alarmTime!.year == day.year &&
@@ -129,6 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .toList();
   }
 
+ codex/add-ask-ai-button-to-notedetailscreen
   @override
   Widget build(BuildContext context) {
     final weekDays = List.generate(7, (i) => today.add(Duration(days: i)));
@@ -137,6 +188,15 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.appTitle),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.mic),
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const VoiceToNoteScreen()),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             tooltip: AppLocalizations.of(context)!.settingsTooltip,
@@ -170,11 +230,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 final hasNotes = notesForDay(d).isNotEmpty;
                 return GestureDetector(
                   onTap: () {
-                    final dayNotes = notesForDay(d);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => NoteListForDayScreen(date: d, notes: dayNotes),
+                        builder: (_) => NoteListForDayScreen(date: d),
                       ),
                     );
                   },
@@ -210,20 +269,28 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+ codex/convert-notedetailscreen-to-statefulwidget
   Widget _buildNotesList() {
+ codex/enable-flutter_localizations-and-update-ui
     if (notes.isEmpty)
       return Center(child: Text(AppLocalizations.of(context)!.noNotes));
+
     return ListView.builder(
-      itemCount: notes.length,
+      itemCount: _notes.length,
       itemBuilder: (context, index) {
-        final note = notes[index];
+        final note = _notes[index];
         return Card(
           child: ListTile(
+            leading: note.locked ? const Icon(Icons.lock) : null,
             title: Text(note.title),
+ codex/expand-note-model-with-new-fields
+
             subtitle: Text(note.alarmTime != null
-                ? '${note.content}\n⏰ ${note.alarmTime}'
+ codex/refactor-note-id-and-alarm-time-formatting
+                ? '${note.content}\n⏰ ${DateFormat('HH:mm dd/MM/yyyy').format(note.alarmTime!)}'
                 : note.content),
             onTap: () {
+
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -233,12 +300,94 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             trailing: IconButton(
               icon: const Icon(Icons.delete),
+ codex/enable-flutter_localizations-and-update-ui
               tooltip: AppLocalizations.of(context)!.delete,
               onPressed: () => setState(() => notes.removeAt(index)),
+
             ),
           ),
         );
       },
     );
   }
+
+  Widget _buildCalendarTab() {
+    final weekDays = List.generate(7, (i) => _today.add(Duration(days: i)));
+    return Column(
+      children: [
+        const SizedBox(height: 8),
+        SizedBox(width: 140, height: 140, child: Lottie.asset(_mascotPath)),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 80,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: weekDays.length,
+            itemBuilder: (context, i) {
+              final d = weekDays[i];
+              final hasNotes = _notesForDay(d).isNotEmpty;
+              return GestureDetector(
+                onTap: () {
+                  final dayNotes = _notesForDay(d);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          NoteListForDayScreen(date: d, notes: dayNotes),
+                    ),
+                  );
+                },
+                child: Container(
+                  width: 60,
+                  margin: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: hasNotes ? Colors.orange : Colors.white,
+                    border: Border.all(color: Colors.black),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(DateFormat('E').format(d)),
+                      Text('${d.day}'),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final titles = ['Notes', 'Calendar', 'Settings'];
+    final pages = [
+      _buildNotesTab(),
+      _buildCalendarTab(),
+      SettingsScreen(onThemeChanged: widget.onThemeChanged),
+    ];
+    return Scaffold(
+      appBar: AppBar(title: Text(titles[_currentIndex])),
+      body: pages[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (i) => setState(() => _currentIndex = i),
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.note), label: 'Notes'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_today), label: 'Calendar'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.settings), label: 'Settings'),
+        ],
+      ),
+      floatingActionButton: _currentIndex == 0
+          ? FloatingActionButton(
+              onPressed: _addNote, child: const Icon(Icons.add))
+          : null,
+    );
+  }
 }
+

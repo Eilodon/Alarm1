@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../services/settings_service.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
   final Function(double) onFontScaleChanged;
   const SettingsScreen({
@@ -12,9 +12,10 @@ class SettingsScreen extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final _settings = SettingsService();
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
 
+ codex/enable-flutter_localizations-and-update-ui
     void _pickColor() async {
       final colors = [Colors.blue, Colors.green, Colors.red, Colors.purple, Colors.orange, Colors.teal];
       await showDialog(
@@ -54,15 +55,53 @@ class SettingsScreen extends StatelessWidget {
             return SimpleDialogOption(
               onPressed: () {
                 _settings.saveMascotPath(path);
+
                 Navigator.pop(context);
               },
-              child: Text(path.split('/').last),
+              child: Container(
+                width: 40,
+                height: 40,
+                margin: const EdgeInsets.all(4),
+                decoration: BoxDecoration(color: c, shape: BoxShape.circle),
+              ),
             );
           }).toList(),
         ),
-      );
-    }
+      ),
+    );
+  }
 
+  void _pickMascot() async {
+    final options = [
+      'assets/lottie/mascot.json',
+      'assets/lottie/mascot2.json',
+      'assets/lottie/mascot3.json'
+    ];
+    await showDialog(
+      context: context,
+      builder: (_) => SimpleDialog(
+        title: const Text('Chọn mascot'),
+        children: options.map((path) {
+          return SimpleDialogOption(
+            onPressed: () {
+              _settings.saveMascotPath(path);
+              Navigator.pop(context);
+            },
+            child: Text(path.split('/').last),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+ codex/implement-secure-storage-and-authentication
+  void _toggleAuth(bool v) {
+    setState(() => _requireAuth = v);
+    _settings.saveRequireAuth(v);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(AppLocalizations.of(context)!.settings)),
       body: ListView(
@@ -75,6 +114,7 @@ class SettingsScreen extends StatelessWidget {
             title: Text(AppLocalizations.of(context)!.changeMascot),
             onTap: _pickMascot,
           ),
+ codex/enable-flutter_localizations-and-update-ui
           ListTile(
             title: Text(AppLocalizations.of(context)!.fontSize),
             onTap: () async {
@@ -108,9 +148,11 @@ class SettingsScreen extends StatelessWidget {
                 ),
               );
             },
+
           ),
         ],
       ),
+
     );
   }
 }

@@ -1,23 +1,31 @@
 import 'package:flutter/material.dart';
+ codex/enable-flutter_localizations-and-update-ui
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import 'screens/home_screen.dart';
 import 'services/notification_service.dart';
 import 'services/settings_service.dart';
+import 'package:provider/provider.dart';
+import 'providers/note_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationService().init();
   final settings = SettingsService();
   final themeColor = await settings.loadThemeColor();
+ codex/enable-flutter_localizations-and-update-ui
   final fontScale = await settings.loadFontScale();
   runApp(MyApp(themeColor: themeColor, fontScale: fontScale));
+
 }
 
 class MyApp extends StatefulWidget {
   final Color themeColor;
+ codex/enable-flutter_localizations-and-update-ui
   final double fontScale;
   const MyApp({super.key, required this.themeColor, required this.fontScale});
+
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -46,6 +54,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+ codex/enable-flutter_localizations-and-update-ui
     return MaterialApp(
       onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
       localizationsDelegates: const [
@@ -67,6 +76,7 @@ class _MyAppState extends State<MyApp> {
         onThemeChanged: updateTheme,
         onFontScaleChanged: updateFontScale,
       ),
+
     );
   }
 }
