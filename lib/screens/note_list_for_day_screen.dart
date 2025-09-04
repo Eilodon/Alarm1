@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import '../models/note.dart';
 import 'note_detail_screen.dart';
-import 'home_screen.dart';
 
 class NoteListForDayScreen extends StatelessWidget {
   final DateTime date;
@@ -24,19 +25,20 @@ class NoteListForDayScreen extends StatelessWidget {
         ),
       );
     }
-    final sorted = [...notes]..sort((a, b) {
-      final at = a.remindAt?.millisecondsSinceEpoch ?? 0;
-      final bt = b.remindAt?.millisecondsSinceEpoch ?? 0;
-      return at.compareTo(bt);
-    });
+    final sorted = [...notes]
+      ..sort((a, b) {
+        final at = a.alarmTime?.millisecondsSinceEpoch ?? 0;
+        final bt = b.alarmTime?.millisecondsSinceEpoch ?? 0;
+        return at.compareTo(bt);
+      });
     return Scaffold(
       appBar: AppBar(title: Text(title)),
       body: ListView.builder(
         itemCount: sorted.length,
         itemBuilder: (context, index) {
           final note = sorted[index];
-          final timeStr = note.remindAt != null
-              ? DateFormat('HH:mm').format(note.remindAt!)
+          final timeStr = note.alarmTime != null
+              ? DateFormat('HH:mm').format(note.alarmTime!)
               : null;
           return Card(
             child: ListTile(
