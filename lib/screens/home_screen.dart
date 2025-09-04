@@ -227,11 +227,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 final hasNotes = notesForDay(d).isNotEmpty;
                 return GestureDetector(
                   onTap: () {
-                    final dayNotes = notesForDay(d);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => NoteListForDayScreen(date: d, notes: dayNotes),
+                        builder: (_) => NoteListForDayScreen(date: d),
                       ),
                     );
                   },

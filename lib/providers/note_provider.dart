@@ -1,18 +1,32 @@
- codex/add-ask-ai-button-to-notedetailscreen
+codex/verify-imports-and-clean-up-code
 import 'package:flutter/foundation.dart';
 
+import '../models/note.dart';
+import '../services/note_repository.dart';
+
 class NoteProvider extends ChangeNotifier {
-  String _draft = '';
+  final NoteRepository _repository;
+  List<Note> _notes = [];
 
-  String get draft => _draft;
+  List<Note> get notes => _notes;
 
-  void setDraft(String text) {
-    _draft = text;
+  NoteProvider({NoteRepository? repository})
+      : _repository = repository ?? NoteRepository();
+
+  Future<void> loadNotes() async {
+    _notes = await _repository.getNotes();
     notifyListeners();
   }
 
-  void clear() {
-    _draft = '';
+  Future<void> addNote(Note note) async {
+    _notes.add(note);
+    await _repository.saveNotes(_notes);
+    notifyListeners();
+  }
+
+  Future<void> removeNoteAt(int index) async {
+    _notes.removeAt(index);
+    await _repository.saveNotes(_notes);
     notifyListeners();
   }
 }
