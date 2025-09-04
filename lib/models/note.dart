@@ -5,12 +5,8 @@ class Note {
   DateTime? remindAt;
   bool daily;
   bool active;
- codex/expand-note-model-with-new-fields
-  List<String> tags;
-  List<String> attachments;
-  DateTime createdAt;
-  DateTime updatedAt;
-  bool isCompleted;
+ codex/implement-secure-storage-and-authentication
+  bool locked;
 
 
   Note({
@@ -20,16 +16,9 @@ class Note {
     this.remindAt,
     this.daily = false,
     this.active = false,
- codex/expand-note-model-with-new-fields
-    List<String>? tags,
-    List<String>? attachments,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    this.isCompleted = false,
-  })  : tags = tags ?? [],
-        attachments = attachments ?? [],
-        createdAt = createdAt ?? DateTime.now(),
-        updatedAt = updatedAt ?? DateTime.now();
+ codex/implement-secure-storage-and-authentication
+    this.locked = false,
+  });
 
 
   factory Note.fromJson(Map<String, dynamic> j) => Note(
@@ -41,11 +30,8 @@ codex/implement-note-repository-and-provider
  codex/expand-note-model-with-new-fields
         daily: j['daily'] ?? false,
         active: j['active'] ?? false,
-        tags: (j['tags'] as List?)?.cast<String>() ?? [],
-        attachments: (j['attachments'] as List?)?.cast<String>() ?? [],
-        createdAt: j['createdAt'] != null ? DateTime.parse(j['createdAt']) : DateTime.now(),
-        updatedAt: j['updatedAt'] != null ? DateTime.parse(j['updatedAt']) : DateTime.now(),
-        isCompleted: j['isCompleted'] ?? false,
+ codex/implement-secure-storage-and-authentication
+        locked: j['locked'] ?? false,
 
       );
 
@@ -57,10 +43,8 @@ codex/implement-note-repository-and-provider
         'remindAt': remindAt?.toIso8601String(),
         'daily': daily,
         'active': active,
-        'tags': tags,
-        'attachments': attachments,
-        'createdAt': createdAt.toIso8601String(),
-        'updatedAt': updatedAt.toIso8601String(),
-        'isCompleted': isCompleted,
+ codex/implement-secure-storage-and-authentication
+        'locked': locked,
+
       };
 }
