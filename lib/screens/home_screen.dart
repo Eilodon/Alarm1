@@ -1,18 +1,16 @@
-import 'note_list_for_day_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:intl/intl.dart';
-import '../services/settings_service.dart';
-import 'settings_screen.dart';
-import '../services/notification_service.dart';
-import 'note_detail_screen.dart';
+import 'package:lottie/lottie.dart';
+import 'package:provider/provider.dart';
 
-class Note {
-  final String title;
-  final String content;
-  final DateTime? remindAt;
-  Note({required this.title, required this.content, this.remindAt});
-}
+import '../models/note.dart';
+import '../providers/note_provider.dart';
+import '../services/notification_service.dart';
+import '../services/settings_service.dart';
+import '../widgets/tag_selector.dart';
+import 'note_detail_screen.dart';
+import 'note_list_for_day_screen.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
@@ -24,7 +22,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String _mascotPath = 'assets/lottie/mascot.json';
-  List<Note> notes = [];
   DateTime today = DateTime.now();
 
   @override
@@ -51,8 +48,12 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: titleCtrl, decoration: const InputDecoration(labelText: 'Tiêu đề')),
-              TextField(controller: contentCtrl, decoration: const InputDecoration(labelText: 'Nội dung')),
+              TextField(
+                  controller: titleCtrl,
+                  decoration: const InputDecoration(labelText: 'Tiêu đề')),
+              TextField(
+                  controller: contentCtrl,
+                  decoration: const InputDecoration(labelText: 'Nội dung')),
               const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: () async {
@@ -71,8 +72,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (!mounted) return;
                     if (time != null) {
                       remindAt = DateTime(
-                        picked.year, picked.month, picked.day,
-                        time.hour, time.minute,
+                        picked.year,
+                        picked.month,
+                        picked.day,
+                        time.hour,
+                        time.minute,
                       );
                     }
                   }
@@ -83,16 +87,18 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Hủy')),
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Hủy')),
           ElevatedButton(
             onPressed: () async {
               final note = Note(
+                id: DateTime.now().millisecondsSinceEpoch.toString(),
                 title: titleCtrl.text,
                 content: contentCtrl.text,
-                remindAt: remindAt,
+                alarmTime: remindAt,
               );
-              setState(() => notes.add(note));
-
+              context.read<NoteProvider>().addNote(note);
               if (remindAt != null) {
                 await NotificationService().scheduleNotification(
                   id: DateTime.now().millisecondsSinceEpoch % 100000,
@@ -101,8 +107,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   scheduledDate: remindAt!,
                 );
               }
-    if (!mounted) return;
-              Navigator.pop(context); // FIX Lỗi 1: auto đóng dialog
+              if (!mounted) return;
+              Navigator.pop(context);
             },
             child: const Text('Lưu'),
           ),
@@ -111,17 +117,20 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  List<Note> notesForDay(DateTime day) {
-    return notes.where((n) =>
-      n.remindAt != null &&
-      n.remindAt!.year == day.year &&
-      n.remindAt!.month == day.month &&
-      n.remindAt!.day == day.day
-    ).toList();
+  List<Note> notesForDay(DateTime day, List<Note> notes) {
+    return notes
+        .where((n) =>
+            n.alarmTime != null &&
+            n.alarmTime!.year == day.year &&
+            n.alarmTime!.month == day.month &&
+            n.alarmTime!.day == day.day)
+        .toList();
   }
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<NoteProvider>();
+    final notes = provider.notes;
     final weekDays = List.generate(7, (i) => today.add(Duration(days: i)));
 
     return Scaffold(
@@ -134,7 +143,8 @@ class _HomeScreenState extends State<HomeScreen> {
               await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => SettingsScreen(onThemeChanged: widget.onThemeChanged),
+                  builder: (_) =>
+                      SettingsScreen(onThemeChanged: widget.onThemeChanged),
                 ),
               );
               _loadMascot();
@@ -147,7 +157,21 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 8),
           SizedBox(width: 140, height: 140, child: Lottie.asset(_mascotPath)),
           const SizedBox(height: 8),
-          // Lịch 7 ngày - Lỗi 3
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: TextField(
+              decoration: const InputDecoration(labelText: 'Tìm kiếm'),
+              onChanged: (v) =>
+                  context.read<NoteProvider>().setSearchQuery(v),
+            ),
+          ),
+          TagSelector(
+            availableTags: provider.allTags,
+            selectedTags: provider.filterTags,
+            onChanged: (tags) =>
+                context.read<NoteProvider>().setFilterTags(tags),
+          ),
+          const SizedBox(height: 8),
           SizedBox(
             height: 80,
             child: ListView.builder(
@@ -155,14 +179,15 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: weekDays.length,
               itemBuilder: (context, i) {
                 final d = weekDays[i];
-                final hasNotes = notesForDay(d).isNotEmpty;
+                final hasNotes = notesForDay(d, notes).isNotEmpty;
                 return GestureDetector(
                   onTap: () {
-                    final dayNotes = notesForDay(d);
+                    final dayNotes = notesForDay(d, notes);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => NoteListForDayScreen(date: d, notes: dayNotes),
+                        builder: (_) =>
+                            NoteListForDayScreen(date: d, notes: dayNotes),
                       ),
                     );
                   },
@@ -187,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          Expanded(child: _buildNotesList()),
+          Expanded(child: _buildNotesList(notes)),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -197,7 +222,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildNotesList() {
+  Widget _buildNotesList(List<Note> notes) {
     if (notes.isEmpty) return const Center(child: Text('Chưa có ghi chú nào'));
     return ListView.builder(
       itemCount: notes.length,
@@ -206,8 +231,8 @@ class _HomeScreenState extends State<HomeScreen> {
         return Card(
           child: ListTile(
             title: Text(note.title),
-            subtitle: Text(note.remindAt != null
-                ? '${note.content}\n⏰ ${note.remindAt}'
+            subtitle: Text(note.alarmTime != null
+                ? '${note.content}\n⏰ ${note.alarmTime}'
                 : note.content),
             onTap: () {
               Navigator.push(
@@ -219,7 +244,8 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             trailing: IconButton(
               icon: const Icon(Icons.delete),
-              onPressed: () => setState(() => notes.removeAt(index)),
+              onPressed: () =>
+                  context.read<NoteProvider>().deleteNote(note.id),
             ),
           ),
         );
@@ -227,3 +253,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
