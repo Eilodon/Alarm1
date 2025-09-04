@@ -113,16 +113,28 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Hủy')),
-            ElevatedButton(
-              onPressed: () async {
-                final note = Note(
-                  id: DateTime.now().millisecondsSinceEpoch.toString(),
-                  title: titleCtrl.text,
-                  content: contentCtrl.text,
-                  alarmTime: alarmTime,
-                  locked: locked,
+ codex/refactor-note-id-and-alarm-time-formatting
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Hủy')),
+          ElevatedButton(
+            onPressed: () async {
+              final nowId = DateTime.now().millisecondsSinceEpoch;
+              final note = Note(
+                id: nowId.toString(),
+                title: titleCtrl.text,
+                content: contentCtrl.text,
+                alarmTime: alarmTime,
+              );
+              setState(() => notes.add(note));
+
+              if (alarmTime != null) {
+                await NotificationService().scheduleNotification(
+                  id: nowId % 100000,
+                  title: note.title,
+                  body: note.content,
+                  scheduledDate: alarmTime!,
+
                 );
                 setState(() => notes.add(note));
                 await _db.saveNotes(notes);
@@ -266,20 +278,10 @@ class _HomeScreenState extends State<HomeScreen> {
  codex/expand-note-model-with-new-fields
 
             subtitle: Text(note.alarmTime != null
- codex/implement-secure-storage-and-authentication
-                ? '${note.locked ? '[Đã khóa]' : note.content}\n⏰ ${note.alarmTime}'
-                : (note.locked ? '[Đã khóa]' : note.content)),
-            onTap: () async {
-              final requireAuth = await SettingsService().loadRequireAuth();
-              if (note.locked && requireAuth) {
-                final auth = LocalAuthentication();
-                final ok = await auth.authenticate(
-                  localizedReason: 'Mở ghi chú khóa',
-                  options: const AuthenticationOptions(biometricOnly: false),
-                );
-                if (!ok) return;
-              }
-              if (!mounted) return;
+ codex/refactor-note-id-and-alarm-time-formatting
+                ? '${note.content}\n⏰ ${DateFormat('HH:mm dd/MM/yyyy').format(note.alarmTime!)}'
+                : note.content),
+            onTap: () {
 
               Navigator.push(
                 context,
