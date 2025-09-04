@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 class SettingsService {
   static const _kThemeColor = 'theme_color';
   static const _kMascotPath = 'mascot_path';
-  static const _kRequireAuth = 'require_auth';
+ codex/enable-flutter_localizations-and-update-ui
+  static const _kFontScale = 'font_scale';
+
 
   Future<void> saveThemeColor(Color color) async {
     final sp = await SharedPreferences.getInstance();
@@ -27,13 +29,15 @@ class SettingsService {
     return sp.getString(_kMascotPath) ?? 'assets/lottie/mascot.json';
   }
 
-  Future<void> saveRequireAuth(bool value) async {
+ codex/enable-flutter_localizations-and-update-ui
+  Future<void> saveFontScale(double scale) async {
     final sp = await SharedPreferences.getInstance();
-    await sp.setBool(_kRequireAuth, value);
+    await sp.setDouble(_kFontScale, scale);
   }
 
-  Future<bool> loadRequireAuth() async {
+  Future<double> loadFontScale() async {
     final sp = await SharedPreferences.getInstance();
-    return sp.getBool(_kRequireAuth) ?? false;
+    return sp.getDouble(_kFontScale) ?? 1.0;
+
   }
 }

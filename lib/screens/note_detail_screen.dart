@@ -1,9 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
- codex/convert-notedetailscreen-to-statefulwidget
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
-import 'package:provider/provider.dart';
+ codex/enable-flutter_localizations-and-update-ui
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../models/note.dart';
 import '../providers/note_provider.dart';
@@ -76,66 +74,22 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   Widget build(BuildContext context) {
     final provider = context.watch<NoteProvider>();
     return Scaffold(
- codex/convert-notedetailscreen-to-statefulwidget
-      appBar: AppBar(title: Text(widget.note.title)),
-      body: _buildView(),
-    );
-  }
+ codex/enable-flutter_localizations-and-update-ui
+      appBar: AppBar(title: Text(note.title)),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('${AppLocalizations.of(context)!.contentLabel}: ${note.content}',
+              style: const TextStyle(fontSize: 16)),
+          if (note.alarmTime != null)
+            Text('${AppLocalizations.of(context)!.timeLabel}: ${note.alarmTime}',
+                style: const TextStyle(fontSize: 16)),
+          const SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: () => TTSService().speak(note.content),
+            child: Text(AppLocalizations.of(context)!.readNote),
+          ),
 
-  Widget _buildView() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextField(
-          controller: _titleCtrl,
-          decoration: const InputDecoration(labelText: 'Tiêu đề'),
-        ),
-        TextField(
-          controller: _contentCtrl,
-          decoration: const InputDecoration(labelText: 'Nội dung'),
-        ),
-        const SizedBox(height: 12),
-        ElevatedButton(
-          onPressed: _pickAlarmTime,
-          child: Text(
-              _alarmTime != null ? 'Thời gian: $_alarmTime' : 'Chọn thời gian nhắc'),
-        ),
-        const SizedBox(height: 12),
-        DropdownButton<RepeatInterval?>(
-          value: _repeat,
-          items: const [
-            DropdownMenuItem(value: null, child: Text('Không lặp')),
-            DropdownMenuItem(
-                value: RepeatInterval.hourly, child: Text('Hằng giờ')),
-            DropdownMenuItem(
-                value: RepeatInterval.daily, child: Text('Hằng ngày')),
-          ],
-          onChanged: (val) => setState(() => _repeat = val),
-        ),
-        Row(
-          children: [
-            const Text('Snooze:'),
-            const SizedBox(width: 8),
-            DropdownButton<int>(
-              value: _snoozeMinutes,
-              items: const [
-                DropdownMenuItem(value: 5, child: Text('5')),
-                DropdownMenuItem(value: 10, child: Text('10')),
-                DropdownMenuItem(value: 15, child: Text('15')),
-              ],
-              onChanged: (v) =>
-                  setState(() => _snoozeMinutes = v ?? _snoozeMinutes),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        ElevatedButton(onPressed: _save, child: const Text('Lưu')),
-        const SizedBox(height: 10),
-        ElevatedButton(
-          onPressed: () => TTSService().speak(_contentCtrl.text),
-          child: const Text('Đọc Note'),
-        ),
-        if (_attachments.isNotEmpty) ...[
           const Divider(),
           ..._attachments.map((a) => ListTile(title: Text(a.split('/').last))),
         ],
