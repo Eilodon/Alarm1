@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/settings_service.dart';
+import 'backup_restore_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   final Function(Color) onThemeChanged;
@@ -68,6 +69,15 @@ class SettingsScreen extends StatelessWidget {
           ListTile(
             title: const Text('Thay mascot'),
             onTap: _pickMascot,
+          ),
+          ListTile(
+            title: const Text('Backup & Restore'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const BackupRestoreScreen()),
+              );
+            },
           ),
         ],
       ),
