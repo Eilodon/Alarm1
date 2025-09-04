@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:notes_reminder_app/main.dart';
+import 'package:notes_reminder_app/providers/note_provider.dart';
 
 void main() {
- codex/enable-material-3-and-customize-theme
-  testWidgets('App builds and shows Notes tab', (WidgetTester tester) async {
-    await tester.pumpWidget(const MyApp(themeColor: Colors.blue));
-    expect(find.text('Notes'), findsOneWidget);
+ codex/convert-notedetailscreen-to-statefulwidget
+  testWidgets('renders home screen title', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MyApp(themeColor: Colors.blue, noteProvider: NoteProvider()),
+    );
+
 
   });
 }

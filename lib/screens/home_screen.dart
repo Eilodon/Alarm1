@@ -3,11 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
  codex/expand-note-model-with-new-fields
 import 'package:lottie/lottie.dart';
- codex/implement-secure-storage-and-authentication
-import 'package:local_auth/local_auth.dart';
+ codex/convert-notedetailscreen-to-statefulwidget
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:provider/provider.dart';
 
 import '../models/note.dart';
-import '../services/db_service.dart';
+import '../providers/note_provider.dart';
 
 import '../services/notification_service.dart';
 import '../services/settings_service.dart';
@@ -31,8 +32,8 @@ class _HomeScreenState extends State<HomeScreen> {
   static const _platform = MethodChannel('notes_reminder_app/actions');
 
   String _mascotPath = 'assets/lottie/mascot.json';
- codex/implement-secure-storage-and-authentication
-  List<Note> notes = [];
+ codex/convert-notedetailscreen-to-statefulwidget
+
   DateTime today = DateTime.now();
   final _db = DbService();
 
@@ -136,8 +137,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   scheduledDate: alarmTime!,
 
                 );
-                setState(() => notes.add(note));
-                await _db.saveNotes(notes);
+ codex/convert-notedetailscreen-to-statefulwidget
+                await context.read<NoteProvider>().addNote(note);
+
 
                 if (alarmTime != null) {
                   await NotificationService().scheduleNotification(
@@ -159,17 +161,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
- codex/enable-material-3-and-customize-theme
-  void _startSearch() {
-    showSearch(context: context, delegate: NoteSearchDelegate(_notes));
-  }
-
-  void _updateWidget(Note note) {
-    _platform.invokeMethod('updateWidget', {'latestNote': note.title});
-  }
-
-  List<Note> _notesForDay(DateTime day) {
-    return _notes
+ codex/convert-notedetailscreen-to-statefulwidget
+  List<Note> notesForDay(DateTime day) {
+    final notes = context.read<NoteProvider>().notes;
+    return notes
 
         .where((n) =>
             n.alarmTime != null &&
@@ -265,6 +260,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+ codex/convert-notedetailscreen-to-statefulwidget
+  Widget _buildNotesList() {
+    final notes = context.watch<NoteProvider>().notes;
+    if (notes.isEmpty) return const Center(child: Text('Chưa có ghi chú nào'));
 
     return ListView.builder(
       itemCount: _notes.length,
@@ -291,11 +290,9 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             trailing: IconButton(
               icon: const Icon(Icons.delete),
- codex/implement-secure-storage-and-authentication
-              onPressed: () async {
-                setState(() => notes.removeAt(index));
-                await _db.saveNotes(notes);
-              },
+ codex/convert-notedetailscreen-to-statefulwidget
+              onPressed: () =>
+                  context.read<NoteProvider>().removeNoteAt(index),
 
             ),
           ),

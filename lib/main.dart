@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:local_auth/local_auth.dart';
+ codex/convert-notedetailscreen-to-statefulwidget
+import 'package:provider/provider.dart';
+
+import 'providers/note_provider.dart';
 
 import 'screens/home_screen.dart';
 import 'services/notification_service.dart';
@@ -12,23 +15,17 @@ void main() async {
   await NotificationService().init();
   final settings = SettingsService();
   final themeColor = await settings.loadThemeColor();
- codex/implement-secure-storage-and-authentication
-  final requireAuth = await settings.loadRequireAuth();
-  if (requireAuth) {
-    final auth = LocalAuthentication();
-    final ok = await auth.authenticate(
-      localizedReason: 'Xác thực để mở ứng dụng',
-      options: const AuthenticationOptions(biometricOnly: false),
-    );
-    if (!ok) return;
-  }
-  runApp(MyApp(themeColor: themeColor));
+ codex/convert-notedetailscreen-to-statefulwidget
+  final noteProvider = NoteProvider();
+  await noteProvider.loadNotes();
+  runApp(MyApp(themeColor: themeColor, noteProvider: noteProvider));
 
 }
 
 class MyApp extends StatefulWidget {
   final Color themeColor;
-  const MyApp({super.key, required this.themeColor});
+  final NoteProvider noteProvider;
+  const MyApp({super.key, required this.themeColor, required this.noteProvider});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -50,8 +47,10 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => NoteProvider()..load(),
+ codex/convert-notedetailscreen-to-statefulwidget
+    return ChangeNotifierProvider.value(
+      value: widget.noteProvider,
+
       child: MaterialApp(
         title: 'Notes & Reminders',
         theme: ThemeData(

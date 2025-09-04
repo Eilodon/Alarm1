@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
 import 'package:notes_reminder_app/models/note.dart';
+import 'package:notes_reminder_app/providers/note_provider.dart';
 import 'package:notes_reminder_app/screens/note_detail_screen.dart';
 
 void main() {
@@ -15,9 +17,15 @@ void main() {
       return null;
     });
 
-    await tester.pumpWidget(const MaterialApp(home: NoteDetailScreen(note: note)));
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => NoteProvider(),
+        child: const MaterialApp(home: NoteDetailScreen(note: note)),
+      ),
+    );
 
-    // The note content should be displayed inside a read-only text field.
+ codex/convert-notedetailscreen-to-statefulwidget
+
     expect(find.text('content'), findsOneWidget);
 
     await tester.tap(find.text('Đọc Note'));
