@@ -1,23 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../models/note.dart';
+import '../providers/note_provider.dart';
 import 'note_detail_screen.dart';
 
 class NoteListForDayScreen extends StatelessWidget {
   final DateTime date;
-  final List<Note> notes;
 
   const NoteListForDayScreen({
     super.key,
     required this.date,
-    required this.notes,
   });
 
   @override
   Widget build(BuildContext context) {
+    final notes = context.watch<NoteProvider>().notes;
+    final dayNotes = notes
+        .where((n) =>
+            n.alarmTime != null &&
+            n.alarmTime!.year == date.year &&
+            n.alarmTime!.month == date.month &&
+            n.alarmTime!.day == date.day)
+        .toList()
+      ..sort((a, b) {
+        final at = a.alarmTime?.millisecondsSinceEpoch ?? 0;
+        final bt = b.alarmTime?.millisecondsSinceEpoch ?? 0;
+        return at.compareTo(bt);
+      });
     final title = 'Lịch ngày ${DateFormat('dd/MM/yyyy').format(date)}';
-    if (notes.isEmpty) {
+    if (dayNotes.isEmpty) {
       return Scaffold(
         appBar: AppBar(title: Text(title)),
         body: const Center(
@@ -25,18 +38,12 @@ class NoteListForDayScreen extends StatelessWidget {
         ),
       );
     }
-    final sorted = [...notes]
-      ..sort((a, b) {
-        final at = a.alarmTime?.millisecondsSinceEpoch ?? 0;
-        final bt = b.alarmTime?.millisecondsSinceEpoch ?? 0;
-        return at.compareTo(bt);
-      });
     return Scaffold(
       appBar: AppBar(title: Text(title)),
       body: ListView.builder(
-        itemCount: sorted.length,
+        itemCount: dayNotes.length,
         itemBuilder: (context, index) {
-          final note = sorted[index];
+          final note = dayNotes[index];
           final timeStr = note.alarmTime != null
               ? DateFormat('HH:mm').format(note.alarmTime!)
               : null;
