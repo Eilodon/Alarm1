@@ -5,8 +5,13 @@ class Note {
   DateTime? remindAt;
   bool daily;
   bool active;
-  /// Minutes to postpone a notification when snoozed.
-  int snoozeMinutes;
+ codex/expand-note-model-with-new-fields
+  List<String> tags;
+  List<String> attachments;
+  DateTime createdAt;
+  DateTime updatedAt;
+  bool isCompleted;
+
 
   Note({
     String? id,
@@ -15,8 +20,17 @@ class Note {
     this.remindAt,
     this.daily = false,
     this.active = false,
-    this.snoozeMinutes = 0,
-  }) : id = id ?? DateTime.now().millisecondsSinceEpoch.toString();
+ codex/expand-note-model-with-new-fields
+    List<String>? tags,
+    List<String>? attachments,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    this.isCompleted = false,
+  })  : tags = tags ?? [],
+        attachments = attachments ?? [],
+        createdAt = createdAt ?? DateTime.now(),
+        updatedAt = updatedAt ?? DateTime.now();
+
 
   factory Note.fromJson(Map<String, dynamic> j) => Note(
         id: j['id'],
@@ -24,8 +38,14 @@ class Note {
         content: j['content'],
 codex/implement-note-repository-and-provider
         alarmTime: j['alarmTime'] != null ? DateTime.parse(j['alarmTime']) : null,
-        daily: j['daily'] is int ? j['daily'] == 1 : j['daily'] ?? false,
-        active: j['active'] is int ? j['active'] == 1 : j['active'] ?? false,
+ codex/expand-note-model-with-new-fields
+        daily: j['daily'] ?? false,
+        active: j['active'] ?? false,
+        tags: (j['tags'] as List?)?.cast<String>() ?? [],
+        attachments: (j['attachments'] as List?)?.cast<String>() ?? [],
+        createdAt: j['createdAt'] != null ? DateTime.parse(j['createdAt']) : DateTime.now(),
+        updatedAt: j['updatedAt'] != null ? DateTime.parse(j['updatedAt']) : DateTime.now(),
+        isCompleted: j['isCompleted'] ?? false,
 
       );
 
@@ -37,5 +57,10 @@ codex/implement-note-repository-and-provider
         'remindAt': remindAt?.toIso8601String(),
         'daily': daily,
         'active': active,
+        'tags': tags,
+        'attachments': attachments,
+        'createdAt': createdAt.toIso8601String(),
+        'updatedAt': updatedAt.toIso8601String(),
+        'isCompleted': isCompleted,
       };
 }

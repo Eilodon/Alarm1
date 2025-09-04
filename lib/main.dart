@@ -42,13 +42,16 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Notes & Reminders',
-      theme: ThemeData(
-        colorSchemeSeed: _themeColor,
-        useMaterial3: true,
+    return ChangeNotifierProvider(
+      create: (_) => NoteProvider()..load(),
+      child: MaterialApp(
+        title: 'Notes & Reminders',
+        theme: ThemeData(
+          colorSchemeSeed: _themeColor,
+          useMaterial3: true,
+        ),
+        home: HomeScreen(onThemeChanged: updateTheme),
       ),
-      home: HomeScreen(onThemeChanged: updateTheme),
     );
   }
 }

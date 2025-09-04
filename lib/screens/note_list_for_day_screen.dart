@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'note_detail_screen.dart';
 import '../models/note.dart';
-import '../providers/note_provider.dart';
+ codex/expand-note-model-with-new-fields
 
 
 class NoteListForDayScreen extends StatelessWidget {

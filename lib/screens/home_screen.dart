@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
- codex/implement-note-repository-and-provider
+ codex/expand-note-model-with-new-fields
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
-import '../services/settings_service.dart';
-import 'settings_screen.dart';
 
-import '../services/notification_service.dart';
-import '../services/settings_service.dart';
-import 'note_detail_screen.dart';
- codex/implement-note-repository-and-provider
 import '../models/note.dart';
 import '../providers/note_provider.dart';
+import '../services/notification_service.dart';
+import '../services/settings_service.dart';
+import '../widgets/tag_selector.dart';
+import 'note_detail_screen.dart';
+import 'note_list_for_day_screen.dart';
+import 'settings_screen.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -51,33 +52,47 @@ class _HomeScreenState extends State<HomeScreen> {
 
     showDialog(
       context: context,
-      builder: (_) => StatefulBuilder(
-        builder: (context, setInnerState) => AlertDialog(
-          title: const Text('Thêm ghi chú / nhắc lịch'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                    controller: titleCtrl,
-                    decoration: const InputDecoration(labelText: 'Tiêu đề')),
-                TextField(
-                    controller: contentCtrl,
-                    decoration: const InputDecoration(labelText: 'Nội dung')),
-                const SizedBox(height: 12),
-                ElevatedButton(
-                  onPressed: () async {
-                    final now = DateTime.now();
-                    final picked = await showDatePicker(
+ codex/expand-note-model-with-new-fields
+      builder: (_) => AlertDialog(
+        title: const Text('Thêm ghi chú / nhắc lịch'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                  controller: titleCtrl,
+                  decoration: const InputDecoration(labelText: 'Tiêu đề')),
+              TextField(
+                  controller: contentCtrl,
+                  decoration: const InputDecoration(labelText: 'Nội dung')),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () async {
+                  final now = DateTime.now();
+                  final picked = await showDatePicker(
+                    context: context,
+                    firstDate: now,
+                    lastDate: DateTime(now.year + 2),
+                    initialDate: now,
+                  );
+                  if (picked != null) {
+                    final time = await showTimePicker(
+
                       context: context,
                       firstDate: now,
                       lastDate: DateTime(now.year + 2),
                       initialDate: now,
                     );
-                    if (picked != null) {
-                      final time = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay.now(),
+ codex/expand-note-model-with-new-fields
+                    if (!mounted) return;
+                    if (time != null) {
+                      remindAt = DateTime(
+                        picked.year,
+                        picked.month,
+                        picked.day,
+                        time.hour,
+                        time.minute,
+
                       );
                       if (!mounted) return;
                       if (time != null) {
@@ -125,20 +140,21 @@ class _HomeScreenState extends State<HomeScreen> {
  codex/update-homescreenstate-to-manage-notes
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Hủy')),
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Hủy')),
           ElevatedButton(
             onPressed: () async {
               final note = Note(
- codex/implement-note-repository-and-provider
+ codex/expand-note-model-with-new-fields
                 id: DateTime.now().millisecondsSinceEpoch.toString(),
 
                 title: titleCtrl.text,
                 content: contentCtrl.text,
                 alarmTime: remindAt,
               );
- codex/implement-note-repository-and-provider
-              await context.read<NoteProvider>().addNote(note);
-
+ codex/expand-note-model-with-new-fields
+              context.read<NoteProvider>().addNote(note);
 
               if (remindAt != null) {
                 await NotificationService().scheduleNotification(
@@ -148,7 +164,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   scheduledDate: remindAt!,
                 );
               }
-    if (!mounted) return;
+ codex/expand-note-model-with-new-fields
+              if (!mounted) return;
+
               Navigator.pop(context);
             },
             child: const Text('Lưu'),
@@ -159,8 +177,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
- codex/implement-note-repository-and-provider
-  List<Note> notesForDay(List<Note> notes, DateTime day) {
+ codex/expand-note-model-with-new-fields
+  List<Note> notesForDay(DateTime day, List<Note> notes) {
 
     return notes
         .where((n) =>
@@ -187,7 +205,8 @@ class _HomeScreenState extends State<HomeScreen> {
               await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => SettingsScreen(onThemeChanged: widget.onThemeChanged),
+                  builder: (_) =>
+                      SettingsScreen(onThemeChanged: widget.onThemeChanged),
                 ),
               );
               _loadMascot();
@@ -200,6 +219,23 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 8),
           SizedBox(width: 140, height: 140, child: Lottie.asset(_mascotPath)),
           const SizedBox(height: 8),
+ codex/expand-note-model-with-new-fields
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: TextField(
+              decoration: const InputDecoration(labelText: 'Tìm kiếm'),
+              onChanged: (v) =>
+                  context.read<NoteProvider>().setSearchQuery(v),
+            ),
+          ),
+          TagSelector(
+            availableTags: provider.allTags,
+            selectedTags: provider.filterTags,
+            onChanged: (tags) =>
+                context.read<NoteProvider>().setFilterTags(tags),
+          ),
+          const SizedBox(height: 8),
+=
           SizedBox(
             height: 80,
             child: ListView.builder(
@@ -207,13 +243,17 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: weekDays.length,
               itemBuilder: (context, i) {
                 final d = weekDays[i];
-                final hasNotes = notesForDay(notes, d).isNotEmpty;
+ codex/expand-note-model-with-new-fields
+                final hasNotes = notesForDay(d, notes).isNotEmpty;
                 return GestureDetector(
                   onTap: () {
+                    final dayNotes = notesForDay(d, notes);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => NoteListForDayScreen(date: d),
+                        builder: (_) =>
+                            NoteListForDayScreen(date: d, notes: dayNotes),
+
                       ),
                     );
                   },
@@ -248,7 +288,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
- codex/implement-note-repository-and-provider
+ codex/expand-note-model-with-new-fields
+
   Widget _buildNotesList(List<Note> notes) {
     if (notes.isEmpty) return const Center(child: Text('Chưa có ghi chú nào'));
 
@@ -259,7 +300,8 @@ class _HomeScreenState extends State<HomeScreen> {
         return Card(
           child: ListTile(
             title: Text(note.title),
- codex/implement-note-repository-and-provider
+ codex/expand-note-model-with-new-fields
+
             subtitle: Text(note.alarmTime != null
                 ? '${note.content}\n⏰ ${note.alarmTime}'
                 : note.content),
@@ -274,9 +316,9 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             trailing: IconButton(
               icon: const Icon(Icons.delete),
- codex/implement-note-repository-and-provider
+ codex/expand-note-model-with-new-fields
               onPressed: () =>
-                  context.read<NoteProvider>().removeNote(note.id),
+                  context.read<NoteProvider>().deleteNote(note.id),
 
             ),
           ),
@@ -285,3 +327,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
