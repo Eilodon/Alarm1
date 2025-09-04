@@ -18,6 +18,7 @@ class Message {
 class _ChatScreenState extends State<ChatScreen> {
   final List<Message> _messages = [];
   final TextEditingController _controller = TextEditingController();
+  final GeminiService _geminiService = GeminiService();
   bool _isLoading = false;
 
   @override
@@ -33,7 +34,7 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final reply = await GeminiService().chat(userText);
+      final reply = await _geminiService.chat(userText);
       setState(() => _messages.add(Message(reply, false)));
     } catch (e) {
       setState(() => _messages.add(Message("Lỗi: $e", false)));

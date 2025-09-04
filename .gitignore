@@ -54,3 +54,6 @@ android.bak/
 
 # nếu bạn không muốn commit script gỡ lỗi
 fix_agp.sh
+
+# Ignore old sample project
+notes_reminder_app/
