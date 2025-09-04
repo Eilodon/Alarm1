@@ -25,5 +25,17 @@ void main() {
       expect(notes.length, 1);
       expect(notes.first.title, 't');
     });
+
+    test('updateNote persists changes', () async {
+      final repo = NoteRepository();
+      final note = Note(id: '1', title: 't', content: 'c');
+      await repo.saveNotes([note]);
+      final updated = Note(id: '1', title: 't2', content: 'c2');
+      await repo.updateNote(updated);
+      final notes = await repo.getNotes();
+      expect(notes.length, 1);
+      expect(notes.first.title, 't2');
+      expect(notes.first.content, 'c2');
+    });
   });
 }
