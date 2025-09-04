@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../models/note.dart';
 import '../services/notification_service.dart';
@@ -37,72 +38,132 @@ class _HomeScreenState extends State<HomeScreen> {
     final titleCtrl = TextEditingController();
     final contentCtrl = TextEditingController();
     DateTime? alarmTime;
+    RepeatInterval? repeat;
+    int snoozeMinutes = 5;
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Thêm ghi chú / nhắc lịch'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(controller: titleCtrl, decoration: const InputDecoration(labelText: 'Tiêu đề')),
-              TextField(controller: contentCtrl, decoration: const InputDecoration(labelText: 'Nội dung')),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: () async {
-                  final now = DateTime.now();
-                  final picked = await showDatePicker(
-                    context: context,
-                    firstDate: now,
-                    lastDate: DateTime(now.year + 2),
-                    initialDate: now,
-                  );
-                  if (picked != null) {
-                    final time = await showTimePicker(
+      builder: (_) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: const Text('Thêm ghi chú / nhắc lịch'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                    controller: titleCtrl,
+                    decoration: const InputDecoration(labelText: 'Tiêu đề')),
+                TextField(
+                    controller: contentCtrl,
+                    decoration: const InputDecoration(labelText: 'Nội dung')),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () async {
+                    final now = DateTime.now();
+                    final picked = await showDatePicker(
                       context: context,
-                      initialTime: TimeOfDay.now(),
+                      firstDate: now,
+                      lastDate: DateTime(now.year + 2),
+                      initialDate: now,
                     );
-                    if (!mounted) return;
-                    if (time != null) {
-                      alarmTime = DateTime(
-                        picked.year, picked.month, picked.day,
-                        time.hour, time.minute,
+                    if (picked != null) {
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
                       );
+                      if (!mounted) return;
+                      if (time != null) {
+                        alarmTime = DateTime(
+                          picked.year, picked.month, picked.day,
+                          time.hour, time.minute,
+                        );
+                      }
                     }
-                  }
-                },
-                child: const Text('Chọn thời gian nhắc'),
-              ),
-            ],
+                  },
+                  child: const Text('Chọn thời gian nhắc'),
+                ),
+                const SizedBox(height: 12),
+                DropdownButton<RepeatInterval?>(
+                  value: repeat,
+                  items: const [
+                    DropdownMenuItem(
+                        value: null, child: Text('Không lặp')),
+                    DropdownMenuItem(
+                        value: RepeatInterval.hourly, child: Text('Hằng giờ')),
+                    DropdownMenuItem(
+                        value: RepeatInterval.daily, child: Text('Hằng ngày')),
+                  ],
+                  onChanged: (val) => setState(() => repeat = val),
+                ),
+                Row(
+                  children: [
+                    const Text('Snooze:'),
+                    const SizedBox(width: 8),
+                    DropdownButton<int>(
+                      value: snoozeMinutes,
+                      items: const [
+                        DropdownMenuItem(value: 5, child: Text('5')),
+                        DropdownMenuItem(value: 10, child: Text('10')),
+                        DropdownMenuItem(value: 15, child: Text('15')),
+                      ],
+                      onChanged: (v) =>
+                          setState(() => snoozeMinutes = v ?? snoozeMinutes),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Hủy')),
-          ElevatedButton(
-            onPressed: () async {
-              final note = Note(
-                id: DateTime.now().millisecondsSinceEpoch.toString(),
-                title: titleCtrl.text,
-                content: contentCtrl.text,
-                alarmTime: alarmTime,
-              );
-              setState(() => notes.add(note));
-
-              if (alarmTime != null) {
-                await NotificationService().scheduleNotification(
-                  id: DateTime.now().millisecondsSinceEpoch % 100000,
-                  title: note.title,
-                  body: note.content,
-                  scheduledDate: alarmTime!,
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Hủy')),
+            ElevatedButton(
+              onPressed: () async {
+                final note = Note(
+                  id: DateTime.now().millisecondsSinceEpoch.toString(),
+                  title: titleCtrl.text,
+                  content: contentCtrl.text,
+                  alarmTime: alarmTime,
+                  daily: repeat == RepeatInterval.daily,
+                  active: true,
+                  snoozeMinutes: snoozeMinutes,
                 );
-              }
-              if (!mounted) return;
-              Navigator.pop(context); // FIX Lỗi 1: auto đóng dialog
-            },
-            child: const Text('Lưu'),
-          ),
-        ],
+                setState(() => notes.add(note));
+
+                if (alarmTime != null) {
+                  final id = DateTime.now().millisecondsSinceEpoch % 100000;
+                  final service = NotificationService();
+                  if (repeat == RepeatInterval.daily) {
+                    await service.scheduleDailyAtTime(
+                      id: id,
+                      title: note.title,
+                      body: note.content,
+                      time: Time(alarmTime!.hour, alarmTime!.minute),
+                    );
+                  } else if (repeat != null) {
+                    await service.scheduleRecurring(
+                      id: id,
+                      title: note.title,
+                      body: note.content,
+                      repeatInterval: repeat!,
+                    );
+                  } else {
+                    await service.scheduleNotification(
+                      id: id,
+                      title: note.title,
+                      body: note.content,
+                      scheduledDate: alarmTime!,
+                    );
+                  }
+                }
+                if (!mounted) return;
+                Navigator.pop(context); // FIX Lỗi 1: auto đóng dialog
+              },
+              child: const Text('Lưu'),
+            ),
+          ],
+        ),
       ),
     );
   }
