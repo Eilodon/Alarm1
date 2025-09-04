@@ -6,6 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../models/note.dart';
 import '../providers/note_provider.dart';
+import '../services/db_service.dart';
 import '../services/notification_service.dart';
 import '../services/settings_service.dart';
 import 'note_detail_screen.dart';
@@ -36,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _addNote() {
+    final notes = context.read<NoteProvider>().notes;
     final titleCtrl = TextEditingController();
     final contentCtrl = TextEditingController();
     DateTime? alarmTime;
@@ -45,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
     showDialog(
       context: context,
       builder: (_) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
+        builder: (context, setInnerState) => AlertDialog(
           title: const Text('Thêm ghi chú / nhắc lịch'),
           content: SingleChildScrollView(
             child: Column(
@@ -94,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     DropdownMenuItem(
                         value: RepeatInterval.daily, child: Text('Hằng ngày')),
                   ],
-                  onChanged: (val) => setState(() => repeat = val),
+                  onChanged: (val) => setInnerState(() => repeat = val),
                 ),
                 Row(
                   children: [
@@ -108,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         DropdownMenuItem(value: 15, child: Text('15')),
                       ],
                       onChanged: (v) =>
-                          setState(() => snoozeMinutes = v ?? snoozeMinutes),
+                          setInnerState(() => snoozeMinutes = v ?? snoozeMinutes),
                     ),
                   ],
                 ),
@@ -119,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
             TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: const Text('Hủy')),
-              ElevatedButton(
+            ElevatedButton(
               onPressed: () async {
                 final note = Note(
                   id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -130,7 +132,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   active: true,
                   snoozeMinutes: snoozeMinutes,
                 );
-                await context.read<NoteProvider>().addNote(note);
+                setState(() => notes.add(note));
+                await DbService().saveNotes(notes);
 
                 if (alarmTime != null) {
                   final id = DateTime.now().millisecondsSinceEpoch % 100000;
@@ -159,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                 }
                 if (!mounted) return;
-                Navigator.pop(context); // FIX Lỗi 1: auto đóng dialog
+                Navigator.pop(context);
               },
               child: const Text('Lưu'),
             ),
