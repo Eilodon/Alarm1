@@ -52,4 +52,13 @@ class DbService {
     final raw = jsonEncode(list);
     await sp.setString(_kNotes, raw);
   }
+
+  Future<void> updateNote(Note note) async {
+    final notes = await getNotes();
+    final index = notes.indexWhere((n) => n.id == note.id);
+    if (index != -1) {
+      notes[index] = note;
+      await saveNotes(notes);
+    }
+  }
 }

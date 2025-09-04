@@ -9,9 +9,11 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
+ codex/implement-secure-storage-and-authentication
 class _SettingsScreenState extends State<SettingsScreen> {
   final _settings = SettingsService();
   bool _requireAuth = false;
+
 
   @override
   void initState() {
@@ -80,6 +82,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+ codex/implement-secure-storage-and-authentication
   void _toggleAuth(bool v) {
     setState(() => _requireAuth = v);
     _settings.saveRequireAuth(v);
@@ -106,6 +109,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ],
       ),
+
     );
   }
 }

@@ -4,12 +4,15 @@ import 'package:local_auth/local_auth.dart';
 import 'screens/home_screen.dart';
 import 'services/notification_service.dart';
 import 'services/settings_service.dart';
+import 'package:provider/provider.dart';
+import 'providers/note_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationService().init();
   final settings = SettingsService();
   final themeColor = await settings.loadThemeColor();
+ codex/implement-secure-storage-and-authentication
   final requireAuth = await settings.loadRequireAuth();
   if (requireAuth) {
     final auth = LocalAuthentication();
@@ -20,6 +23,7 @@ void main() async {
     if (!ok) return;
   }
   runApp(MyApp(themeColor: themeColor));
+
 }
 
 class MyApp extends StatefulWidget {
@@ -46,13 +50,16 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Notes & Reminders',
-      theme: ThemeData(
-        colorSchemeSeed: _themeColor,
-        useMaterial3: true,
+    return ChangeNotifierProvider(
+      create: (_) => NoteProvider()..load(),
+      child: MaterialApp(
+        title: 'Notes & Reminders',
+        theme: ThemeData(
+          colorSchemeSeed: _themeColor,
+          useMaterial3: true,
+        ),
+        home: HomeScreen(onThemeChanged: updateTheme),
       ),
-      home: HomeScreen(onThemeChanged: updateTheme),
     );
   }
 }
