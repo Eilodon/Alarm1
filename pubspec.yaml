@@ -16,9 +16,12 @@ dependencies:
   shared_preferences: ^2.3.2
   audioplayers: ^6.5.0
   intl: ^0.18.1
+  provider: ^6.1.2
   flutter_tts: ^4.2.3
+ codex/add-ask-ai-button-to-notedetailscreen
   provider: ^6.0.5
   speech_to_text: ^6.5.0
+
 
 dev_dependencies:
   flutter_test:

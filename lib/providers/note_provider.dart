@@ -1,3 +1,4 @@
+ codex/add-ask-ai-button-to-notedetailscreen
 import 'package:flutter/foundation.dart';
 
 class NoteProvider extends ChangeNotifier {
@@ -15,3 +16,4 @@ class NoteProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
+
