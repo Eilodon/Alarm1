@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'note_detail_screen.dart';
+
 import '../models/note.dart';
+import 'note_detail_screen.dart';
 
 class NoteListForDayScreen extends StatelessWidget {
   final DateTime date;

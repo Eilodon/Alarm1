@@ -1,13 +1,14 @@
-import 'note_list_for_day_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:intl/intl.dart';
-import '../services/settings_service.dart';
-import 'settings_screen.dart';
-import '../services/notification_service.dart';
-import '../services/db_service.dart';
+import 'package:lottie/lottie.dart';
+
 import '../models/note.dart';
+import '../services/db_service.dart';
+import '../services/notification_service.dart';
+import '../services/settings_service.dart';
 import 'note_detail_screen.dart';
+import 'note_list_for_day_screen.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
@@ -102,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               }
     if (!mounted) return;
-              Navigator.pop(context); // FIX Lỗi 1: auto đóng dialog
+              Navigator.pop(context);
             },
             child: const Text('Lưu'),
           ),
@@ -147,7 +148,6 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 8),
           SizedBox(width: 140, height: 140, child: Lottie.asset(_mascotPath)),
           const SizedBox(height: 8),
-          // Lịch 7 ngày - Lỗi 3
           SizedBox(
             height: 80,
             child: ListView.builder(
