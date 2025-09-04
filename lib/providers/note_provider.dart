@@ -9,12 +9,12 @@ class NoteProvider extends ChangeNotifier {
 
   NoteProvider({NoteRepository? repository})
       : _repository = repository ?? NoteRepository() {
-    _loadNotes();
+    loadNotes();
   }
 
   List<Note> get notes => _notes;
 
-  Future<void> _loadNotes() async {
+  Future<void> loadNotes() async {
     _notes = await _repository.getNotes();
     notifyListeners();
   }
