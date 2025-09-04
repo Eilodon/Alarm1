@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../models/note.dart';
-import '../providers/note_provider.dart';
 import '../services/db_service.dart';
 import '../services/notification_service.dart';
 import '../services/settings_service.dart';
@@ -24,11 +22,15 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String _mascotPath = 'assets/lottie/mascot.json';
   DateTime today = DateTime.now();
+  List<Note> notes = [];
 
   @override
   void initState() {
     super.initState();
     _loadMascot();
+    DbService().getNotes().then((loadedNotes) {
+      setState(() => notes = loadedNotes);
+    });
   }
 
   Future<void> _loadMascot() async {
@@ -37,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _addNote() {
-    final notes = context.read<NoteProvider>().notes;
     final titleCtrl = TextEditingController();
     final contentCtrl = TextEditingController();
     DateTime? alarmTime;
@@ -172,7 +173,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   List<Note> notesForDay(DateTime day) {
-    final notes = context.read<NoteProvider>().notes;
     return notes
         .where((n) =>
             n.alarmTime != null &&
@@ -184,7 +184,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final notes = context.watch<NoteProvider>().notes;
     final weekDays = List.generate(7, (i) => today.add(Duration(days: i)));
 
     return Scaffold(
@@ -261,7 +260,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildNotesList() {
-    final notes = context.watch<NoteProvider>().notes;
     if (notes.isEmpty) {
       return const Center(child: Text('Chưa có ghi chú nào'));
     }
@@ -287,8 +285,10 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             trailing: IconButton(
               icon: const Icon(Icons.delete),
-              onPressed: () =>
-                  context.read<NoteProvider>().removeNoteAt(index),
+              onPressed: () async {
+                setState(() => notes.removeAt(index));
+                await DbService().saveNotes(notes);
+              },
             ),
           ),
         );
