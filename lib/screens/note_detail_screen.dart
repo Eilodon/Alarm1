@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
 import '../models/note.dart';
 import '../services/tts_service.dart';
 import 'chat_screen.dart';
@@ -54,9 +56,13 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         ),
         if (widget.note.alarmTime != null)
           Text(
-            'Thời gian: ${widget.note.alarmTime}',
+            'Thời gian: '
+            '${DateFormat.yMd().add_Hm().format(widget.note.alarmTime!)}',
             style: const TextStyle(fontSize: 16),
           ),
+        Text('Kích hoạt: ${widget.note.active ? 'Có' : 'Không'}'),
+        if (widget.note.snoozeMinutes > 0)
+          Text('Hoãn: ${widget.note.snoozeMinutes} phút'),
         const SizedBox(height: 10),
         ElevatedButton(
           onPressed: () => TTSService().speak(_contentCtrl.text),
