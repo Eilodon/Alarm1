@@ -17,6 +17,9 @@ dependencies:
   audioplayers: ^6.5.0
   intl: ^0.18.1
   flutter_tts: ^4.2.3
+  provider: ^6.1.2
+  sqflite: ^2.3.0
+  path: ^1.8.3
 
 dev_dependencies:
   flutter_test:

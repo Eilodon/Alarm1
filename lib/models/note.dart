@@ -20,8 +20,8 @@ class Note {
         title: j['title'],
         content: j['content'],
         alarmTime: j['alarmTime'] != null ? DateTime.parse(j['alarmTime']) : null,
-        daily: j['daily'] ?? false,
-        active: j['active'] ?? false,
+        daily: j['daily'] is int ? j['daily'] == 1 : j['daily'] ?? false,
+        active: j['active'] is int ? j['active'] == 1 : j['active'] ?? false,
       );
 
   Map<String, dynamic> toJson() => {

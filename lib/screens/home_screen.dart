@@ -2,17 +2,13 @@ import 'note_list_for_day_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../services/settings_service.dart';
 import 'settings_screen.dart';
 import '../services/notification_service.dart';
 import 'note_detail_screen.dart';
-
-class Note {
-  final String title;
-  final String content;
-  final DateTime? remindAt;
-  Note({required this.title, required this.content, this.remindAt});
-}
+import '../models/note.dart';
+import '../providers/note_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
@@ -24,7 +20,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String _mascotPath = 'assets/lottie/mascot.json';
-  List<Note> notes = [];
   DateTime today = DateTime.now();
 
   @override
@@ -87,11 +82,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ElevatedButton(
             onPressed: () async {
               final note = Note(
+                id: DateTime.now().millisecondsSinceEpoch.toString(),
                 title: titleCtrl.text,
                 content: contentCtrl.text,
-                remindAt: remindAt,
+                alarmTime: remindAt,
               );
-              setState(() => notes.add(note));
+              await context.read<NoteProvider>().addNote(note);
 
               if (remindAt != null) {
                 await NotificationService().scheduleNotification(
@@ -111,17 +107,20 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  List<Note> notesForDay(DateTime day) {
-    return notes.where((n) =>
-      n.remindAt != null &&
-      n.remindAt!.year == day.year &&
-      n.remindAt!.month == day.month &&
-      n.remindAt!.day == day.day
-    ).toList();
+  List<Note> notesForDay(List<Note> notes, DateTime day) {
+    return notes
+        .where((n) =>
+            n.alarmTime != null &&
+            n.alarmTime!.year == day.year &&
+            n.alarmTime!.month == day.month &&
+            n.alarmTime!.day == day.day)
+        .toList();
   }
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<NoteProvider>();
+    final notes = provider.notes;
     final weekDays = List.generate(7, (i) => today.add(Duration(days: i)));
 
     return Scaffold(
@@ -155,14 +154,13 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: weekDays.length,
               itemBuilder: (context, i) {
                 final d = weekDays[i];
-                final hasNotes = notesForDay(d).isNotEmpty;
+                final hasNotes = notesForDay(notes, d).isNotEmpty;
                 return GestureDetector(
                   onTap: () {
-                    final dayNotes = notesForDay(d);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => NoteListForDayScreen(date: d, notes: dayNotes),
+                        builder: (_) => NoteListForDayScreen(date: d),
                       ),
                     );
                   },
@@ -187,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          Expanded(child: _buildNotesList()),
+          Expanded(child: _buildNotesList(notes)),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -197,7 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildNotesList() {
+  Widget _buildNotesList(List<Note> notes) {
     if (notes.isEmpty) return const Center(child: Text('Chưa có ghi chú nào'));
     return ListView.builder(
       itemCount: notes.length,
@@ -206,8 +204,8 @@ class _HomeScreenState extends State<HomeScreen> {
         return Card(
           child: ListTile(
             title: Text(note.title),
-            subtitle: Text(note.remindAt != null
-                ? '${note.content}\n⏰ ${note.remindAt}'
+            subtitle: Text(note.alarmTime != null
+                ? '${note.content}\n⏰ ${note.alarmTime}'
                 : note.content),
             onTap: () {
               Navigator.push(
@@ -219,7 +217,8 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             trailing: IconButton(
               icon: const Icon(Icons.delete),
-              onPressed: () => setState(() => notes.removeAt(index)),
+              onPressed: () =>
+                  context.read<NoteProvider>().removeNote(note.id),
             ),
           ),
         );
