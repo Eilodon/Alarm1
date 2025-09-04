@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
+import 'package:local_auth/local_auth.dart';
 
 import '../models/note.dart';
+import '../services/db_service.dart';
 import '../services/notification_service.dart';
 import '../services/settings_service.dart';
 import 'note_detail_screen.dart';
@@ -21,11 +23,13 @@ class _HomeScreenState extends State<HomeScreen> {
   String _mascotPath = 'assets/lottie/mascot.json';
   List<Note> notes = [];
   DateTime today = DateTime.now();
+  final _db = DbService();
 
   @override
   void initState() {
     super.initState();
     _loadMascot();
+    _loadNotes();
   }
 
   Future<void> _loadMascot() async {
@@ -33,76 +37,91 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {});
   }
 
+  Future<void> _loadNotes() async {
+    notes = await _db.getNotes();
+    setState(() {});
+  }
+
   void _addNote() {
     final titleCtrl = TextEditingController();
     final contentCtrl = TextEditingController();
     DateTime? alarmTime;
+    bool locked = false;
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Thêm ghi chú / nhắc lịch'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(controller: titleCtrl, decoration: const InputDecoration(labelText: 'Tiêu đề')),
-              TextField(controller: contentCtrl, decoration: const InputDecoration(labelText: 'Nội dung')),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: () async {
-                  final now = DateTime.now();
-                  final picked = await showDatePicker(
-                    context: context,
-                    firstDate: now,
-                    lastDate: DateTime(now.year + 2),
-                    initialDate: now,
-                  );
-                  if (picked != null) {
-                    final time = await showTimePicker(
+      builder: (_) => StatefulBuilder(
+        builder: (context, setStateDialog) => AlertDialog(
+          title: const Text('Thêm ghi chú / nhắc lịch'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(controller: titleCtrl, decoration: const InputDecoration(labelText: 'Tiêu đề')),
+                TextField(controller: contentCtrl, decoration: const InputDecoration(labelText: 'Nội dung')),
+                CheckboxListTile(
+                  value: locked,
+                  onChanged: (v) => setStateDialog(() => locked = v ?? false),
+                  title: const Text('Khóa ghi chú'),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () async {
+                    final now = DateTime.now();
+                    final picked = await showDatePicker(
                       context: context,
-                      initialTime: TimeOfDay.now(),
+                      firstDate: now,
+                      lastDate: DateTime(now.year + 2),
+                      initialDate: now,
                     );
-                    if (!mounted) return;
-                    if (time != null) {
-                      alarmTime = DateTime(
-                        picked.year, picked.month, picked.day,
-                        time.hour, time.minute,
+                    if (picked != null) {
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
                       );
+                      if (!mounted) return;
+                      if (time != null) {
+                        alarmTime = DateTime(
+                          picked.year, picked.month, picked.day,
+                          time.hour, time.minute,
+                        );
+                      }
                     }
-                  }
-                },
-                child: const Text('Chọn thời gian nhắc'),
-              ),
-            ],
+                  },
+                  child: const Text('Chọn thời gian nhắc'),
+                ),
+              ],
+            ),
           ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Hủy')),
-          ElevatedButton(
-            onPressed: () async {
-              final note = Note(
-                id: DateTime.now().millisecondsSinceEpoch.toString(),
-                title: titleCtrl.text,
-                content: contentCtrl.text,
-                alarmTime: alarmTime,
-              );
-              setState(() => notes.add(note));
-
-              if (alarmTime != null) {
-                await NotificationService().scheduleNotification(
-                  id: DateTime.now().millisecondsSinceEpoch % 100000,
-                  title: note.title,
-                  body: note.content,
-                  scheduledDate: alarmTime!,
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Hủy')),
+            ElevatedButton(
+              onPressed: () async {
+                final note = Note(
+                  id: DateTime.now().millisecondsSinceEpoch.toString(),
+                  title: titleCtrl.text,
+                  content: contentCtrl.text,
+                  alarmTime: alarmTime,
+                  locked: locked,
                 );
-              }
-              if (!mounted) return;
-              Navigator.pop(context); // FIX Lỗi 1: auto đóng dialog
-            },
-            child: const Text('Lưu'),
-          ),
-        ],
+                setState(() => notes.add(note));
+                await _db.saveNotes(notes);
+
+                if (alarmTime != null) {
+                  await NotificationService().scheduleNotification(
+                    id: DateTime.now().millisecondsSinceEpoch % 100000,
+                    title: note.title,
+                    body: note.content,
+                    scheduledDate: alarmTime!,
+                  );
+                }
+                if (!mounted) return;
+                Navigator.pop(context); // FIX Lỗi 1: auto đóng dialog
+              },
+              child: const Text('Lưu'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -202,11 +221,22 @@ class _HomeScreenState extends State<HomeScreen> {
         final note = notes[index];
         return Card(
           child: ListTile(
+            leading: note.locked ? const Icon(Icons.lock) : null,
             title: Text(note.title),
             subtitle: Text(note.alarmTime != null
-                ? '${note.content}\n⏰ ${note.alarmTime}'
-                : note.content),
-            onTap: () {
+                ? '${note.locked ? '[Đã khóa]' : note.content}\n⏰ ${note.alarmTime}'
+                : (note.locked ? '[Đã khóa]' : note.content)),
+            onTap: () async {
+              final requireAuth = await SettingsService().loadRequireAuth();
+              if (note.locked && requireAuth) {
+                final auth = LocalAuthentication();
+                final ok = await auth.authenticate(
+                  localizedReason: 'Mở ghi chú khóa',
+                  options: const AuthenticationOptions(biometricOnly: false),
+                );
+                if (!ok) return;
+              }
+              if (!mounted) return;
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -216,7 +246,10 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             trailing: IconButton(
               icon: const Icon(Icons.delete),
-              onPressed: () => setState(() => notes.removeAt(index)),
+              onPressed: () async {
+                setState(() => notes.removeAt(index));
+                await _db.saveNotes(notes);
+              },
             ),
           ),
         );

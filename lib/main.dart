@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:local_auth/local_auth.dart';
+
 import 'screens/home_screen.dart';
 import 'services/notification_service.dart';
 import 'services/settings_service.dart';
@@ -8,6 +10,15 @@ void main() async {
   await NotificationService().init();
   final settings = SettingsService();
   final themeColor = await settings.loadThemeColor();
+  final requireAuth = await settings.loadRequireAuth();
+  if (requireAuth) {
+    final auth = LocalAuthentication();
+    final ok = await auth.authenticate(
+      localizedReason: 'Xác thực để mở ứng dụng',
+      options: const AuthenticationOptions(biometricOnly: false),
+    );
+    if (!ok) return;
+  }
   runApp(MyApp(themeColor: themeColor));
 }
 
