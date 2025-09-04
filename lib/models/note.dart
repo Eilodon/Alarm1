@@ -5,6 +5,7 @@ class Note {
   DateTime? alarmTime;
   bool daily;
   bool active;
+  List<String> tags;
 
   Note({
     required this.id,
@@ -13,6 +14,7 @@ class Note {
     this.alarmTime,
     this.daily = false,
     this.active = false,
+    this.tags = const [],
   });
 
   factory Note.fromJson(Map<String, dynamic> j) => Note(
@@ -22,6 +24,7 @@ class Note {
         alarmTime: j['alarmTime'] != null ? DateTime.parse(j['alarmTime']) : null,
         daily: j['daily'] ?? false,
         active: j['active'] ?? false,
+        tags: (j['tags'] as List<dynamic>? ?? []).cast<String>(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -31,5 +34,6 @@ class Note {
         'alarmTime': alarmTime?.toIso8601String(),
         'daily': daily,
         'active': active,
+        'tags': tags,
       };
 }
