@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import '../services/gemini_service.dart';
 
 class ChatScreen extends StatefulWidget {
   final String initialMessage;
@@ -20,12 +19,10 @@ class _ChatScreenState extends State<ChatScreen> {
   final List<Message> _messages = [];
   final TextEditingController _controller = TextEditingController();
   bool _isLoading = false;
-  late final String geminiApiKey;
 
   @override
   void initState() {
     super.initState();
-    geminiApiKey = const String.fromEnvironment('GEMINI_API_KEY');
     if (widget.initialMessage.isNotEmpty) {
       _messages.add(Message(widget.initialMessage, true));
       _sendToGemini(widget.initialMessage);
@@ -36,28 +33,8 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final url = Uri.parse(
-          'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=$geminiApiKey');
-      final headers = {'Content-Type': 'application/json'};
-      final body = jsonEncode({
-        "contents": [
-          {
-            "parts": [
-              {"text": userText}
-            ]
-          }
-        ]
-      });
-
-      final resp = await http.post(url, headers: headers, body: body);
-
-      if (resp.statusCode == 200) {
-        final data = jsonDecode(resp.body);
-        final reply = data["candidates"]?[0]?["content"]?["parts"]?[0]?["text"] ?? "(Không có phản hồi)";
-        setState(() => _messages.add(Message(reply, false)));
-      } else {
-        setState(() => _messages.add(Message("Lỗi API: ${resp.statusCode}", false)));
-      }
+      final reply = await GeminiService().chat(userText);
+      setState(() => _messages.add(Message(reply, false)));
     } catch (e) {
       setState(() => _messages.add(Message("Lỗi: $e", false)));
     } finally {
