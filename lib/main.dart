@@ -10,7 +10,12 @@ void main() async {
   await NotificationService().init();
   final settings = SettingsService();
   final themeColor = await settings.loadThemeColor();
-  runApp(MyApp(themeColor: themeColor));
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => NoteProvider(),
+      child: MyApp(themeColor: themeColor),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {

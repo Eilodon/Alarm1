@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+ codex/expand-note-model-with-new-fields
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
@@ -12,6 +13,7 @@ import 'note_detail_screen.dart';
 import 'note_list_for_day_screen.dart';
 import 'settings_screen.dart';
 
+
 class HomeScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
   const HomeScreen({super.key, required this.onThemeChanged});
@@ -23,11 +25,17 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String _mascotPath = 'assets/lottie/mascot.json';
   DateTime today = DateTime.now();
+  List<Note> notes = [];
 
   @override
   void initState() {
     super.initState();
     _loadMascot();
+ codex/update-homescreenstate-to-manage-notes
+    DbService().getNotes().then((value) {
+      setState(() => notes = value);
+
+    });
   }
 
   Future<void> _loadMascot() async {
@@ -38,10 +46,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void _addNote() {
     final titleCtrl = TextEditingController();
     final contentCtrl = TextEditingController();
-    DateTime? remindAt;
+    DateTime? alarmTime;
+    RepeatInterval? repeat;
+    int snoozeMinutes = 5;
 
     showDialog(
       context: context,
+ codex/expand-note-model-with-new-fields
       builder: (_) => AlertDialog(
         title: const Text('Thêm ghi chú / nhắc lịch'),
         content: SingleChildScrollView(
@@ -66,9 +77,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                   if (picked != null) {
                     final time = await showTimePicker(
+
                       context: context,
-                      initialTime: TimeOfDay.now(),
+                      firstDate: now,
+                      lastDate: DateTime(now.year + 2),
+                      initialDate: now,
                     );
+ codex/expand-note-model-with-new-fields
                     if (!mounted) return;
                     if (time != null) {
                       remindAt = DateTime(
@@ -77,14 +92,52 @@ class _HomeScreenState extends State<HomeScreen> {
                         picked.day,
                         time.hour,
                         time.minute,
+
                       );
+                      if (!mounted) return;
+                      if (time != null) {
+                        alarmTime = DateTime(
+                          picked.year, picked.month, picked.day,
+                          time.hour, time.minute,
+                        );
+                      }
                     }
-                  }
-                },
-                child: const Text('Chọn thời gian nhắc'),
-              ),
-            ],
+                  },
+                  child: const Text('Chọn thời gian nhắc'),
+                ),
+                const SizedBox(height: 12),
+                DropdownButton<RepeatInterval?>(
+                  value: repeat,
+                  items: const [
+                    DropdownMenuItem(
+                        value: null, child: Text('Không lặp')),
+                    DropdownMenuItem(
+                        value: RepeatInterval.hourly, child: Text('Hằng giờ')),
+                    DropdownMenuItem(
+                        value: RepeatInterval.daily, child: Text('Hằng ngày')),
+                  ],
+                  onChanged: (val) => setInnerState(() => repeat = val),
+                ),
+                Row(
+                  children: [
+                    const Text('Snooze:'),
+                    const SizedBox(width: 8),
+                    DropdownButton<int>(
+                      value: snoozeMinutes,
+                      items: const [
+                        DropdownMenuItem(value: 5, child: Text('5')),
+                        DropdownMenuItem(value: 10, child: Text('10')),
+                        DropdownMenuItem(value: 15, child: Text('15')),
+                      ],
+                      onChanged: (v) =>
+                          setInnerState(() => snoozeMinutes = v ?? snoozeMinutes),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
+ codex/update-homescreenstate-to-manage-notes
         ),
         actions: [
           TextButton(
@@ -93,12 +146,16 @@ class _HomeScreenState extends State<HomeScreen> {
           ElevatedButton(
             onPressed: () async {
               final note = Note(
+ codex/expand-note-model-with-new-fields
                 id: DateTime.now().millisecondsSinceEpoch.toString(),
+
                 title: titleCtrl.text,
                 content: contentCtrl.text,
                 alarmTime: remindAt,
               );
+ codex/expand-note-model-with-new-fields
               context.read<NoteProvider>().addNote(note);
+
               if (remindAt != null) {
                 await NotificationService().scheduleNotification(
                   id: DateTime.now().millisecondsSinceEpoch % 100000,
@@ -107,17 +164,22 @@ class _HomeScreenState extends State<HomeScreen> {
                   scheduledDate: remindAt!,
                 );
               }
+ codex/expand-note-model-with-new-fields
               if (!mounted) return;
+
               Navigator.pop(context);
             },
             child: const Text('Lưu'),
           ),
         ],
+
       ),
     );
   }
 
+ codex/expand-note-model-with-new-fields
   List<Note> notesForDay(DateTime day, List<Note> notes) {
+
     return notes
         .where((n) =>
             n.alarmTime != null &&
@@ -157,6 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 8),
           SizedBox(width: 140, height: 140, child: Lottie.asset(_mascotPath)),
           const SizedBox(height: 8),
+ codex/expand-note-model-with-new-fields
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: TextField(
@@ -172,6 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 context.read<NoteProvider>().setFilterTags(tags),
           ),
           const SizedBox(height: 8),
+=
           SizedBox(
             height: 80,
             child: ListView.builder(
@@ -179,6 +243,7 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: weekDays.length,
               itemBuilder: (context, i) {
                 final d = weekDays[i];
+ codex/expand-note-model-with-new-fields
                 final hasNotes = notesForDay(d, notes).isNotEmpty;
                 return GestureDetector(
                   onTap: () {
@@ -188,6 +253,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       MaterialPageRoute(
                         builder: (_) =>
                             NoteListForDayScreen(date: d, notes: dayNotes),
+
                       ),
                     );
                   },
@@ -222,8 +288,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+ codex/expand-note-model-with-new-fields
+
   Widget _buildNotesList(List<Note> notes) {
     if (notes.isEmpty) return const Center(child: Text('Chưa có ghi chú nào'));
+
     return ListView.builder(
       itemCount: notes.length,
       itemBuilder: (context, index) {
@@ -231,9 +300,12 @@ class _HomeScreenState extends State<HomeScreen> {
         return Card(
           child: ListTile(
             title: Text(note.title),
+ codex/expand-note-model-with-new-fields
+
             subtitle: Text(note.alarmTime != null
                 ? '${note.content}\n⏰ ${note.alarmTime}'
                 : note.content),
+
             onTap: () {
               Navigator.push(
                 context,
@@ -244,8 +316,10 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             trailing: IconButton(
               icon: const Icon(Icons.delete),
+ codex/expand-note-model-with-new-fields
               onPressed: () =>
                   context.read<NoteProvider>().deleteNote(note.id),
+
             ),
           ),
         );

@@ -1,13 +1,17 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+ codex/expand-note-model-with-new-fields
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../models/note.dart';
 import '../providers/note_provider.dart';
+
 import '../services/tts_service.dart';
 import '../widgets/tag_selector.dart';
 import 'chat_screen.dart';
+ codex/expand-note-model-with-new-fields
+
 
 class NoteDetailScreen extends StatefulWidget {
   final Note note;
@@ -18,17 +22,20 @@ class NoteDetailScreen extends StatefulWidget {
 }
 
 class _NoteDetailScreenState extends State<NoteDetailScreen> {
+ codex/expand-note-model-with-new-fields
   late TextEditingController _titleCtrl;
   late TextEditingController _contentCtrl;
   late List<String> _tags;
   late List<String> _attachments;
   bool _editing = false;
 
+
   @override
   void initState() {
     super.initState();
     _titleCtrl = TextEditingController(text: widget.note.title);
     _contentCtrl = TextEditingController(text: widget.note.content);
+ codex/expand-note-model-with-new-fields
     _tags = [...widget.note.tags];
     _attachments = [...widget.note.attachments];
   }
@@ -57,12 +64,14 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       ..updatedAt = DateTime.now();
     context.read<NoteProvider>().updateNote(widget.note);
     setState(() => _editing = false);
+
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<NoteProvider>();
     return Scaffold(
+ codex/expand-note-model-with-new-fields
       appBar: AppBar(
         title: Text(_editing ? 'Chỉnh sửa' : widget.note.title),
         actions: [
@@ -168,8 +177,11 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               ),
             ],
           ),
+
         ],
-      ),
+        const Divider(),
+        Expanded(child: ChatScreen(initialMessage: _contentCtrl.text)),
+      ],
     );
   }
 }

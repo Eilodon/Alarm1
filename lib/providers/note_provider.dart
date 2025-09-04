@@ -1,3 +1,4 @@
+ codex/expand-note-model-with-new-fields
 import 'package:flutter/material.dart';
 import '../models/note.dart';
 import '../services/db_service.dart';
@@ -66,7 +67,10 @@ class NoteProvider extends ChangeNotifier {
 
   void setFilterTags(List<String> tags) {
     _filterTags = tags;
+
     notifyListeners();
   }
 }
+
+ codex/expand-note-model-with-new-fields
 
