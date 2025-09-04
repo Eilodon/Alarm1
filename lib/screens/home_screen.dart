@@ -124,7 +124,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ElevatedButton(
               onPressed: () async {
                 final note = Note(
-                  id: DateTime.now().millisecondsSinceEpoch.toString(),
                   title: titleCtrl.text,
                   content: contentCtrl.text,
                   alarmTime: alarmTime,
