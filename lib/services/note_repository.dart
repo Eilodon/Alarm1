@@ -13,4 +13,8 @@ class NoteRepository {
   Future<void> saveNotes(List<Note> notes) {
     return _dbService.saveNotes(notes);
   }
+
+  Future<void> updateNote(Note note) {
+    return _dbService.updateNote(note);
+  }
 }

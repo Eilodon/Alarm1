@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+ codex/verify-imports-and-clean-up-code
 import 'package:provider/provider.dart';
 
 import '../models/note.dart';
 import '../providers/note_provider.dart';
+
 import 'note_detail_screen.dart';
+import '../models/note.dart';
+ codex/expand-note-model-with-new-fields
+
 
 class NoteListForDayScreen extends StatelessWidget {
   final DateTime date;
@@ -16,6 +21,7 @@ class NoteListForDayScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+ codex/verify-imports-and-clean-up-code
     final notes = context.watch<NoteProvider>().notes;
     final dayNotes = notes
         .where((n) =>
@@ -29,6 +35,7 @@ class NoteListForDayScreen extends StatelessWidget {
         final bt = b.alarmTime?.millisecondsSinceEpoch ?? 0;
         return at.compareTo(bt);
       });
+
     final title = 'Lịch ngày ${DateFormat('dd/MM/yyyy').format(date)}';
     if (dayNotes.isEmpty) {
       return Scaffold(
@@ -38,6 +45,8 @@ class NoteListForDayScreen extends StatelessWidget {
         ),
       );
     }
+ codex/verify-imports-and-clean-up-code
+
     return Scaffold(
       appBar: AppBar(title: Text(title)),
       body: ListView.builder(
@@ -50,12 +59,27 @@ class NoteListForDayScreen extends StatelessWidget {
           return Card(
             child: ListTile(
               title: Text(note.title),
-              subtitle: Text(
-                timeStr != null
-                    ? '${note.content}\n⏰ $timeStr'
-                    : note.content,
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    timeStr != null
+                        ? '${note.content}\n⏰ $timeStr'
+                        : note.content,
+                  ),
+                  if (note.tags.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Wrap(
+                      spacing: 4,
+                      runSpacing: 4,
+                      children:
+                          note.tags.map((t) => Chip(label: Text(t))).toList(),
+                    ),
+                  ]
+                ],
               ),
-              isThreeLine: timeStr != null,
+              isThreeLine: timeStr != null || note.tags.isNotEmpty,
               onTap: () {
                 Navigator.push(
                   context,

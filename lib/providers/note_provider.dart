@@ -1,3 +1,4 @@
+codex/verify-imports-and-clean-up-code
 import 'package:flutter/foundation.dart';
 
 import '../models/note.dart';
@@ -29,3 +30,4 @@ class NoteProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
+
