@@ -9,22 +9,22 @@ class Note {
   int snoozeMinutes;
 
   Note({
-    required this.id,
+    String? id,
     required this.title,
     required this.content,
     this.alarmTime,
     this.daily = false,
     this.active = false,
     this.snoozeMinutes = 0,
-  });
+  }) : id = id ?? DateTime.now().millisecondsSinceEpoch.toString();
 
   factory Note.fromJson(Map<String, dynamic> j) => Note(
         id: j['id'],
         title: j['title'],
         content: j['content'],
         alarmTime: j['alarmTime'] != null ? DateTime.parse(j['alarmTime']) : null,
-        daily: j['daily'] == 1,
-        active: j['active'] == 1,
+        daily: j['daily'] == 1 || j['daily'] == true,
+        active: j['active'] == 1 || j['active'] == true,
         snoozeMinutes: j['snoozeMinutes'] as int? ?? 0,
       );
 
