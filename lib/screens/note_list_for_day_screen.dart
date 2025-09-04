@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+ codex/implement-note-repository-and-provider
 import 'package:provider/provider.dart';
 import 'note_detail_screen.dart';
 import '../models/note.dart';
 import '../providers/note_provider.dart';
+
 
 class NoteListForDayScreen extends StatelessWidget {
   final DateTime date;
@@ -29,11 +31,13 @@ class NoteListForDayScreen extends StatelessWidget {
         ),
       );
     }
+ codex/implement-note-repository-and-provider
     final sorted = [...notes]..sort((a, b) {
       final at = a.alarmTime?.millisecondsSinceEpoch ?? 0;
       final bt = b.alarmTime?.millisecondsSinceEpoch ?? 0;
       return at.compareTo(bt);
     });
+
     return Scaffold(
       appBar: AppBar(title: Text(title)),
       body: ListView.builder(

@@ -1,14 +1,17 @@
-import 'note_list_for_day_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:intl/intl.dart';
+ codex/implement-note-repository-and-provider
 import 'package:provider/provider.dart';
 import '../services/settings_service.dart';
 import 'settings_screen.dart';
+
 import '../services/notification_service.dart';
+import '../services/settings_service.dart';
 import 'note_detail_screen.dart';
+ codex/implement-note-repository-and-provider
 import '../models/note.dart';
 import '../providers/note_provider.dart';
+
 
 class HomeScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
@@ -21,11 +24,17 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String _mascotPath = 'assets/lottie/mascot.json';
   DateTime today = DateTime.now();
+  List<Note> notes = [];
 
   @override
   void initState() {
     super.initState();
     _loadMascot();
+ codex/update-homescreenstate-to-manage-notes
+    DbService().getNotes().then((value) {
+      setState(() => notes = value);
+
+    });
   }
 
   Future<void> _loadMascot() async {
@@ -36,58 +45,100 @@ class _HomeScreenState extends State<HomeScreen> {
   void _addNote() {
     final titleCtrl = TextEditingController();
     final contentCtrl = TextEditingController();
-    DateTime? remindAt;
+    DateTime? alarmTime;
+    RepeatInterval? repeat;
+    int snoozeMinutes = 5;
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Thêm ghi chú / nhắc lịch'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(controller: titleCtrl, decoration: const InputDecoration(labelText: 'Tiêu đề')),
-              TextField(controller: contentCtrl, decoration: const InputDecoration(labelText: 'Nội dung')),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: () async {
-                  final now = DateTime.now();
-                  final picked = await showDatePicker(
-                    context: context,
-                    firstDate: now,
-                    lastDate: DateTime(now.year + 2),
-                    initialDate: now,
-                  );
-                  if (picked != null) {
-                    final time = await showTimePicker(
+      builder: (_) => StatefulBuilder(
+        builder: (context, setInnerState) => AlertDialog(
+          title: const Text('Thêm ghi chú / nhắc lịch'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                    controller: titleCtrl,
+                    decoration: const InputDecoration(labelText: 'Tiêu đề')),
+                TextField(
+                    controller: contentCtrl,
+                    decoration: const InputDecoration(labelText: 'Nội dung')),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () async {
+                    final now = DateTime.now();
+                    final picked = await showDatePicker(
                       context: context,
-                      initialTime: TimeOfDay.now(),
+                      firstDate: now,
+                      lastDate: DateTime(now.year + 2),
+                      initialDate: now,
                     );
-                    if (!mounted) return;
-                    if (time != null) {
-                      remindAt = DateTime(
-                        picked.year, picked.month, picked.day,
-                        time.hour, time.minute,
+                    if (picked != null) {
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
                       );
+                      if (!mounted) return;
+                      if (time != null) {
+                        alarmTime = DateTime(
+                          picked.year, picked.month, picked.day,
+                          time.hour, time.minute,
+                        );
+                      }
                     }
-                  }
-                },
-                child: const Text('Chọn thời gian nhắc'),
-              ),
-            ],
+                  },
+                  child: const Text('Chọn thời gian nhắc'),
+                ),
+                const SizedBox(height: 12),
+                DropdownButton<RepeatInterval?>(
+                  value: repeat,
+                  items: const [
+                    DropdownMenuItem(
+                        value: null, child: Text('Không lặp')),
+                    DropdownMenuItem(
+                        value: RepeatInterval.hourly, child: Text('Hằng giờ')),
+                    DropdownMenuItem(
+                        value: RepeatInterval.daily, child: Text('Hằng ngày')),
+                  ],
+                  onChanged: (val) => setInnerState(() => repeat = val),
+                ),
+                Row(
+                  children: [
+                    const Text('Snooze:'),
+                    const SizedBox(width: 8),
+                    DropdownButton<int>(
+                      value: snoozeMinutes,
+                      items: const [
+                        DropdownMenuItem(value: 5, child: Text('5')),
+                        DropdownMenuItem(value: 10, child: Text('10')),
+                        DropdownMenuItem(value: 15, child: Text('15')),
+                      ],
+                      onChanged: (v) =>
+                          setInnerState(() => snoozeMinutes = v ?? snoozeMinutes),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
+ codex/update-homescreenstate-to-manage-notes
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Hủy')),
           ElevatedButton(
             onPressed: () async {
               final note = Note(
+ codex/implement-note-repository-and-provider
                 id: DateTime.now().millisecondsSinceEpoch.toString(),
+
                 title: titleCtrl.text,
                 content: contentCtrl.text,
                 alarmTime: remindAt,
               );
+ codex/implement-note-repository-and-provider
               await context.read<NoteProvider>().addNote(note);
+
 
               if (remindAt != null) {
                 await NotificationService().scheduleNotification(
@@ -98,16 +149,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               }
     if (!mounted) return;
-              Navigator.pop(context); // FIX Lỗi 1: auto đóng dialog
+              Navigator.pop(context);
             },
             child: const Text('Lưu'),
           ),
         ],
+
       ),
     );
   }
 
+ codex/implement-note-repository-and-provider
   List<Note> notesForDay(List<Note> notes, DateTime day) {
+
     return notes
         .where((n) =>
             n.alarmTime != null &&
@@ -146,7 +200,6 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 8),
           SizedBox(width: 140, height: 140, child: Lottie.asset(_mascotPath)),
           const SizedBox(height: 8),
-          // Lịch 7 ngày - Lỗi 3
           SizedBox(
             height: 80,
             child: ListView.builder(
@@ -195,8 +248,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+ codex/implement-note-repository-and-provider
   Widget _buildNotesList(List<Note> notes) {
     if (notes.isEmpty) return const Center(child: Text('Chưa có ghi chú nào'));
+
     return ListView.builder(
       itemCount: notes.length,
       itemBuilder: (context, index) {
@@ -204,9 +259,11 @@ class _HomeScreenState extends State<HomeScreen> {
         return Card(
           child: ListTile(
             title: Text(note.title),
+ codex/implement-note-repository-and-provider
             subtitle: Text(note.alarmTime != null
                 ? '${note.content}\n⏰ ${note.alarmTime}'
                 : note.content),
+
             onTap: () {
               Navigator.push(
                 context,
@@ -217,8 +274,10 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             trailing: IconButton(
               icon: const Icon(Icons.delete),
+ codex/implement-note-repository-and-provider
               onPressed: () =>
                   context.read<NoteProvider>().removeNote(note.id),
+
             ),
           ),
         );
