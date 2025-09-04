@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
+import 'package:provider/provider.dart';
 
 import '../models/note.dart';
+import '../providers/note_provider.dart';
 import '../services/notification_service.dart';
 import '../services/settings_service.dart';
 import 'note_detail_screen.dart';
 import 'note_list_for_day_screen.dart';
 import 'settings_screen.dart';
+import 'voice_to_note_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
@@ -34,8 +37,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _addNote() {
+    final provider = context.read<NoteProvider>();
     final titleCtrl = TextEditingController();
-    final contentCtrl = TextEditingController();
+    final contentCtrl = TextEditingController(text: provider.draft);
     DateTime? alarmTime;
 
     showDialog(
@@ -78,7 +82,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Hủy')),
+          TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Hủy')),
           ElevatedButton(
             onPressed: () async {
               final note = Note(
@@ -98,6 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               }
               if (!mounted) return;
+              provider.clear();
               Navigator.pop(context); // FIX Lỗi 1: auto đóng dialog
             },
             child: const Text('Lưu'),
@@ -125,6 +134,15 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Notes & Reminders'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.mic),
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const VoiceToNoteScreen()),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () async {

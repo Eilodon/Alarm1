@@ -2,13 +2,20 @@ import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'services/notification_service.dart';
 import 'services/settings_service.dart';
+import 'package:provider/provider.dart';
+import 'providers/note_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationService().init();
   final settings = SettingsService();
   final themeColor = await settings.loadThemeColor();
-  runApp(MyApp(themeColor: themeColor));
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => NoteProvider(),
+      child: MyApp(themeColor: themeColor),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
