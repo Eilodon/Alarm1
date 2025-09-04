@@ -1,12 +1,19 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+ codex/convert-notedetailscreen-to-statefulwidget
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
 import 'package:provider/provider.dart';
 
 import '../models/note.dart';
 import '../providers/note_provider.dart';
+ codex/convert-notedetailscreen-to-statefulwidget
 import '../services/notification_service.dart';
+
 import '../services/tts_service.dart';
-import 'chat_screen.dart';
+ codex/add-ask-ai-button-to-notedetailscreen
+import '../services/gemini_service.dart';
+
 
 class NoteDetailScreen extends StatefulWidget {
   final Note note;
@@ -17,6 +24,7 @@ class NoteDetailScreen extends StatefulWidget {
 }
 
 class _NoteDetailScreenState extends State<NoteDetailScreen> {
+ codex/convert-notedetailscreen-to-statefulwidget
   late final TextEditingController _titleCtrl;
   late final TextEditingController _contentCtrl;
   final List<String> _attachments = [];
@@ -24,26 +32,51 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   RepeatInterval? _repeat;
   int _snoozeMinutes = 5;
 
+
   @override
   void initState() {
     super.initState();
     _titleCtrl = TextEditingController(text: widget.note.title);
     _contentCtrl = TextEditingController(text: widget.note.content);
+ codex/convert-notedetailscreen-to-statefulwidget
     _alarmTime = widget.note.alarmTime;
     _repeat = widget.note.daily ? RepeatInterval.daily : null;
     _snoozeMinutes = widget.note.snoozeMinutes;
+
   }
 
-  @override
-  void dispose() {
-    _titleCtrl.dispose();
-    _contentCtrl.dispose();
-    super.dispose();
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final file = await picker.pickImage(source: ImageSource.gallery);
+    if (file != null) {
+      setState(() => _attachments.add(file.path));
+    }
+  }
+
+  Future<void> _pickAudio() async {
+    final res = await FilePicker.platform.pickFiles(type: FileType.audio);
+    if (res != null && res.files.single.path != null) {
+      setState(() => _attachments.add(res.files.single.path!));
+    }
+  }
+
+  void _save() {
+    widget.note
+      ..title = _titleCtrl.text
+      ..content = _contentCtrl.text
+      ..tags = _tags
+      ..attachments = _attachments
+      ..updatedAt = DateTime.now();
+    context.read<NoteProvider>().updateNote(widget.note);
+    setState(() => _editing = false);
+
   }
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<NoteProvider>();
     return Scaffold(
+ codex/convert-notedetailscreen-to-statefulwidget
       appBar: AppBar(title: Text(widget.note.title)),
       body: _buildView(),
     );
@@ -109,6 +142,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         const Divider(),
         Expanded(child: ChatScreen(initialMessage: _contentCtrl.text)),
       ],
+
     );
   }
 
@@ -184,3 +218,4 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     Navigator.pop(context);
   }
 }
+

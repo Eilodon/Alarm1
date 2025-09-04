@@ -8,7 +8,7 @@ import 'package:notes_reminder_app/screens/note_detail_screen.dart';
 
 void main() {
   testWidgets('display note and trigger TTS', (tester) async {
-    const note = Note(id: '1', title: 'title', content: 'content');
+    final note = Note(id: '1', title: 'title', content: 'content');
 
     const channel = MethodChannel('flutter_tts');
     final calls = <MethodCall>[];
@@ -23,6 +23,8 @@ void main() {
         child: const MaterialApp(home: NoteDetailScreen(note: note)),
       ),
     );
+
+ codex/convert-notedetailscreen-to-statefulwidget
 
     expect(find.text('content'), findsOneWidget);
 

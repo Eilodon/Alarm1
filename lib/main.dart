@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
+ codex/convert-notedetailscreen-to-statefulwidget
 import 'package:provider/provider.dart';
 
 import 'providers/note_provider.dart';
+
 import 'screens/home_screen.dart';
 import 'services/notification_service.dart';
 import 'services/settings_service.dart';
+import 'package:provider/provider.dart';
+import 'providers/note_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationService().init();
   final settings = SettingsService();
   final themeColor = await settings.loadThemeColor();
+ codex/convert-notedetailscreen-to-statefulwidget
   final noteProvider = NoteProvider();
   await noteProvider.loadNotes();
   runApp(MyApp(themeColor: themeColor, noteProvider: noteProvider));
+
 }
 
 class MyApp extends StatefulWidget {
@@ -41,8 +47,10 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+ codex/convert-notedetailscreen-to-statefulwidget
     return ChangeNotifierProvider.value(
       value: widget.noteProvider,
+
       child: MaterialApp(
         title: 'Notes & Reminders',
         theme: ThemeData(
