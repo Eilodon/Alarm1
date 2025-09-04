@@ -77,7 +77,11 @@ class NotificationService {
       priority: Priority.high,
     );
 
-    const details = NotificationDetails(android: androidDetails);
+    const iosDetails = DarwinNotificationDetails();
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
 
     await _fln.periodicallyShow(
       id,
@@ -103,7 +107,11 @@ class NotificationService {
       priority: Priority.high,
     );
 
-    const details = NotificationDetails(android: androidDetails);
+    const iosDetails = DarwinNotificationDetails();
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
 
     final scheduledDate = _nextInstanceOfTime(time);
 
