@@ -5,6 +5,9 @@ codex/update-homescreenstate-to-manage-notes
 import '../models/note.dart';
 import '../services/tts_service.dart';
 import 'chat_screen.dart';
+ codex/implement-note-repository-and-provider
+import '../models/note.dart';
+
 
 class NoteDetailScreen extends StatefulWidget {
   final Note note;
@@ -36,30 +39,19 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.note.title)),
-      body: _buildView(),
-    );
-  }
+ codex/implement-note-repository-and-provider
+      appBar: AppBar(title: Text(note.title)),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Nội dung: ${note.content}', style: const TextStyle(fontSize: 16)),
+          if (note.alarmTime != null)
+            Text('Thời gian: ${note.alarmTime}', style: const TextStyle(fontSize: 16)),
+          const SizedBox(height: 10),
+          ElevatedButton(
+            onPressed: () => TTSService().speak(note.content),
+            child: const Text('Đọc Note'),
 
-  Widget _buildView() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextField(
-          controller: _titleCtrl,
-          decoration: const InputDecoration(labelText: 'Tiêu đề'),
-          readOnly: true,
-        ),
-        TextField(
-          controller: _contentCtrl,
-          decoration: const InputDecoration(labelText: 'Nội dung'),
-          readOnly: true,
-        ),
-        if (widget.note.alarmTime != null)
-          Text(
-            'Thời gian: '
-            '${DateFormat.yMd().add_Hm().format(widget.note.alarmTime!)}',
-            style: const TextStyle(fontSize: 16),
           ),
         Text('Kích hoạt: ${widget.note.active ? 'Có' : 'Không'}'),
         if (widget.note.snoozeMinutes > 0)

@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:lottie/lottie.dart';
-codex/update-homescreenstate-to-manage-notes
+ codex/implement-note-repository-and-provider
+import 'package:provider/provider.dart';
+import '../services/settings_service.dart';
+import 'settings_screen.dart';
 
-
-import '../models/note.dart';
-import '../services/db_service.dart';
 import '../services/notification_service.dart';
 import '../services/settings_service.dart';
 import 'note_detail_screen.dart';
-import 'note_list_for_day_screen.dart';
-import 'settings_screen.dart';
+ codex/implement-note-repository-and-provider
+import '../models/note.dart';
+import '../providers/note_provider.dart';
+
 
 class HomeScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
@@ -128,13 +129,16 @@ class _HomeScreenState extends State<HomeScreen> {
           ElevatedButton(
             onPressed: () async {
               final note = Note(
-                id: DateTime.now().microsecondsSinceEpoch.toString(),
+ codex/implement-note-repository-and-provider
+                id: DateTime.now().millisecondsSinceEpoch.toString(),
+
                 title: titleCtrl.text,
                 content: contentCtrl.text,
-                remindAt: remindAt,
+                alarmTime: remindAt,
               );
-              setState(() => notes.add(note));
-              await DbService().saveNotes(notes);
+ codex/implement-note-repository-and-provider
+              await context.read<NoteProvider>().addNote(note);
+
 
               if (remindAt != null) {
                 await NotificationService().scheduleNotification(
@@ -155,7 +159,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  List<Note> notesForDay(DateTime day) {
+ codex/implement-note-repository-and-provider
+  List<Note> notesForDay(List<Note> notes, DateTime day) {
+
     return notes
         .where((n) =>
             n.alarmTime != null &&
@@ -167,6 +173,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<NoteProvider>();
+    final notes = provider.notes;
     final weekDays = List.generate(7, (i) => today.add(Duration(days: i)));
 
     return Scaffold(
@@ -199,14 +207,13 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: weekDays.length,
               itemBuilder: (context, i) {
                 final d = weekDays[i];
-                final hasNotes = notesForDay(d).isNotEmpty;
+                final hasNotes = notesForDay(notes, d).isNotEmpty;
                 return GestureDetector(
                   onTap: () {
-                    final dayNotes = notesForDay(d);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => NoteListForDayScreen(date: d, notes: dayNotes),
+                        builder: (_) => NoteListForDayScreen(date: d),
                       ),
                     );
                   },
@@ -231,7 +238,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          Expanded(child: _buildNotesList()),
+          Expanded(child: _buildNotesList(notes)),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -241,10 +248,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildNotesList() {
-    if (notes.isEmpty) {
-      return const Center(child: Text('Chưa có ghi chú nào'));
-    }
+ codex/implement-note-repository-and-provider
+  Widget _buildNotesList(List<Note> notes) {
+    if (notes.isEmpty) return const Center(child: Text('Chưa có ghi chú nào'));
+
     return ListView.builder(
       itemCount: notes.length,
       itemBuilder: (context, index) {
@@ -252,11 +259,11 @@ class _HomeScreenState extends State<HomeScreen> {
         return Card(
           child: ListTile(
             title: Text(note.title),
-            subtitle: Text(
-              note.alarmTime != null
-                  ? '${note.content}\n⏰ ${note.alarmTime}'
-                  : note.content,
-            ),
+ codex/implement-note-repository-and-provider
+            subtitle: Text(note.alarmTime != null
+                ? '${note.content}\n⏰ ${note.alarmTime}'
+                : note.content),
+
             onTap: () {
               Navigator.push(
                 context,
@@ -267,10 +274,10 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             trailing: IconButton(
               icon: const Icon(Icons.delete),
-              onPressed: () async {
-                setState(() => notes.removeAt(index));
-                await DbService().saveNotes(notes);
-              },
+ codex/implement-note-repository-and-provider
+              onPressed: () =>
+                  context.read<NoteProvider>().removeNote(note.id),
+
             ),
           ),
         );

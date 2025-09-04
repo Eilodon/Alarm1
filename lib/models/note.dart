@@ -22,10 +22,10 @@ class Note {
         id: j['id'],
         title: j['title'],
         content: j['content'],
- codex/update-homescreenstate-to-manage-notes
-        remindAt: j['remindAt'] != null ? DateTime.parse(j['remindAt']) : null,
-        daily: j['daily'] ?? false,
-        active: j['active'] ?? false,
+codex/implement-note-repository-and-provider
+        alarmTime: j['alarmTime'] != null ? DateTime.parse(j['alarmTime']) : null,
+        daily: j['daily'] is int ? j['daily'] == 1 : j['daily'] ?? false,
+        active: j['active'] is int ? j['active'] == 1 : j['active'] ?? false,
 
       );
 
