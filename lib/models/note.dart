@@ -22,8 +22,8 @@ class Note {
         title: j['title'],
         content: j['content'],
         alarmTime: j['alarmTime'] != null ? DateTime.parse(j['alarmTime']) : null,
-        daily: j['daily'] ?? false,
-        active: j['active'] ?? false,
+        daily: j['daily'] == 1,
+        active: j['active'] == 1,
         snoozeMinutes: j['snoozeMinutes'] ?? 0,
       );
 
@@ -32,8 +32,8 @@ class Note {
         'title': title,
         'content': content,
         'alarmTime': alarmTime?.toIso8601String(),
-        'daily': daily,
-        'active': active,
+        'daily': daily ? 1 : 0,
+        'active': active ? 1 : 0,
         'snoozeMinutes': snoozeMinutes,
       };
 }
