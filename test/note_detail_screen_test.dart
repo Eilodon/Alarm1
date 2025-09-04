@@ -6,7 +6,7 @@ import 'package:notes_reminder_app/screens/note_detail_screen.dart';
 
 void main() {
   testWidgets('display note and trigger TTS', (tester) async {
-    const note = Note(id: '1', title: 'title', content: 'content');
+    final note = Note(id: '1', title: 'title', content: 'content');
 
     const channel = MethodChannel('flutter_tts');
     final calls = <MethodCall>[];
@@ -17,7 +17,8 @@ void main() {
 
     await tester.pumpWidget(const MaterialApp(home: NoteDetailScreen(note: note)));
 
-    expect(find.text('Nội dung: content'), findsOneWidget);
+    // The note content should be displayed inside a read-only text field.
+    expect(find.text('content'), findsOneWidget);
 
     await tester.tap(find.text('Đọc Note'));
     await tester.pump();
