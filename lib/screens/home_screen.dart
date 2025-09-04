@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
  codex/expand-note-model-with-new-fields
 import 'package:lottie/lottie.dart';
- codex/enable-material-3-and-customize-theme
-import 'package:quick_actions/quick_actions.dart';
+ codex/add-ask-ai-button-to-notedetailscreen
+import 'package:provider/provider.dart';
 
 
 import '../models/note.dart';
@@ -16,6 +16,7 @@ import 'note_detail_screen.dart';
 import 'note_list_for_day_screen.dart';
 import 'note_search_delegate.dart';
 import 'settings_screen.dart';
+import 'voice_to_note_screen.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -71,8 +72,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _addNote() {
+    final provider = context.read<NoteProvider>();
     final titleCtrl = TextEditingController();
-    final contentCtrl = TextEditingController();
+    final contentCtrl = TextEditingController(text: provider.draft);
     DateTime? alarmTime;
     RepeatInterval? repeat;
     int snoozeMinutes = 5;
@@ -171,7 +173,11 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
+ codex/add-ask-ai-button-to-notedetailscreen
+              onPressed: () {
+                Navigator.pop(context);
+              },
+
               child: const Text('Hủy')),
           ElevatedButton(
             onPressed: () async {
@@ -197,8 +203,10 @@ class _HomeScreenState extends State<HomeScreen> {
  codex/enable-material-3-and-customize-theme
               _updateWidget(note);
               if (!mounted) return;
+ codex/add-ask-ai-button-to-notedetailscreen
+              provider.clear();
+              Navigator.pop(context); // FIX Lỗi 1: auto đóng dialog
 
-              Navigator.pop(context);
             },
             child: const Text('Lưu'),
           ),
@@ -228,11 +236,93 @@ class _HomeScreenState extends State<HomeScreen> {
         .toList();
   }
 
- codex/enable-material-3-and-customize-theme
-  Widget _buildNotesTab() {
-    if (_notes.isEmpty) {
-      return const Center(child: Text('Chưa có ghi chú nào'));
-    }
+ codex/add-ask-ai-button-to-notedetailscreen
+  @override
+  Widget build(BuildContext context) {
+    final weekDays = List.generate(7, (i) => today.add(Duration(days: i)));
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Notes & Reminders'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.mic),
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const VoiceToNoteScreen()),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => SettingsScreen(onThemeChanged: widget.onThemeChanged),
+                ),
+              );
+              _loadMascot();
+            },
+          )
+        ],
+      ),
+      body: Column(
+        children: [
+          const SizedBox(height: 8),
+          SizedBox(width: 140, height: 140, child: Lottie.asset(_mascotPath)),
+          const SizedBox(height: 8),
+          // Lịch 7 ngày - Lỗi 3
+          SizedBox(
+            height: 80,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: weekDays.length,
+              itemBuilder: (context, i) {
+                final d = weekDays[i];
+                final hasNotes = notesForDay(d).isNotEmpty;
+                return GestureDetector(
+                  onTap: () {
+                    final dayNotes = notesForDay(d);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => NoteListForDayScreen(date: d, notes: dayNotes),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    width: 60,
+                    margin: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: hasNotes ? Colors.orange : Colors.white,
+                      border: Border.all(color: Colors.black),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(DateFormat('E').format(d)),
+                        Text('${d.day}'),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 8),
+          Expanded(child: _buildNotesList()),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _addNote,
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
 
     return ListView.builder(
       itemCount: _notes.length,
