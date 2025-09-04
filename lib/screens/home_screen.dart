@@ -1,18 +1,13 @@
-import 'note_list_for_day_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:intl/intl.dart';
-import '../services/settings_service.dart';
-import 'settings_screen.dart';
-import '../services/notification_service.dart';
-import 'note_detail_screen.dart';
+import 'package:lottie/lottie.dart';
 
-class Note {
-  final String title;
-  final String content;
-  final DateTime? remindAt;
-  Note({required this.title, required this.content, this.remindAt});
-}
+import '../models/note.dart';
+import '../services/notification_service.dart';
+import '../services/settings_service.dart';
+import 'note_detail_screen.dart';
+import 'note_list_for_day_screen.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
@@ -41,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _addNote() {
     final titleCtrl = TextEditingController();
     final contentCtrl = TextEditingController();
-    DateTime? remindAt;
+    DateTime? alarmTime;
 
     showDialog(
       context: context,
@@ -70,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                     if (!mounted) return;
                     if (time != null) {
-                      remindAt = DateTime(
+                      alarmTime = DateTime(
                         picked.year, picked.month, picked.day,
                         time.hour, time.minute,
                       );
@@ -87,21 +82,22 @@ class _HomeScreenState extends State<HomeScreen> {
           ElevatedButton(
             onPressed: () async {
               final note = Note(
+                id: DateTime.now().millisecondsSinceEpoch.toString(),
                 title: titleCtrl.text,
                 content: contentCtrl.text,
-                remindAt: remindAt,
+                alarmTime: alarmTime,
               );
               setState(() => notes.add(note));
 
-              if (remindAt != null) {
+              if (alarmTime != null) {
                 await NotificationService().scheduleNotification(
                   id: DateTime.now().millisecondsSinceEpoch % 100000,
                   title: note.title,
                   body: note.content,
-                  scheduledDate: remindAt!,
+                  scheduledDate: alarmTime!,
                 );
               }
-    if (!mounted) return;
+              if (!mounted) return;
               Navigator.pop(context); // FIX Lỗi 1: auto đóng dialog
             },
             child: const Text('Lưu'),
@@ -112,12 +108,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   List<Note> notesForDay(DateTime day) {
-    return notes.where((n) =>
-      n.remindAt != null &&
-      n.remindAt!.year == day.year &&
-      n.remindAt!.month == day.month &&
-      n.remindAt!.day == day.day
-    ).toList();
+    return notes
+        .where((n) =>
+            n.alarmTime != null &&
+            n.alarmTime!.year == day.year &&
+            n.alarmTime!.month == day.month &&
+            n.alarmTime!.day == day.day)
+        .toList();
   }
 
   @override
@@ -206,8 +203,8 @@ class _HomeScreenState extends State<HomeScreen> {
         return Card(
           child: ListTile(
             title: Text(note.title),
-            subtitle: Text(note.remindAt != null
-                ? '${note.content}\n⏰ ${note.remindAt}'
+            subtitle: Text(note.alarmTime != null
+                ? '${note.content}\n⏰ ${note.alarmTime}'
                 : note.content),
             onTap: () {
               Navigator.push(
