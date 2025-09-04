@@ -1,0 +1,33 @@
+{
+  "appTitle": "Notes & Reminders",
+  "addNoteReminder": "Add note / reminder",
+  "titleLabel": "Title",
+  "contentLabel": "Content",
+  "selectReminderTime": "Select reminder time",
+  "cancel": "Cancel",
+  "save": "Save",
+  "noNotes": "No notes yet",
+  "settings": "Settings",
+  "chooseThemeColor": "Choose theme color",
+  "changeThemeColor": "Change theme color",
+  "chooseMascot": "Choose mascot",
+  "changeMascot": "Change mascot",
+  "fontSize": "Font size",
+  "chatAI": "Chat AI",
+  "enterMessage": "Enter message...",
+  "send": "Send",
+  "errorWithMessage": "Error: {error}",
+  "errorWithMessage@placeholders": {
+    "error": {}
+  },
+  "readNote": "Read Note",
+  "scheduleForDate": "Schedule for {date}",
+  "scheduleForDate@placeholders": {
+    "date": {}
+  },
+  "noNotesForDay": "No notes/reminders for this day",
+  "addNoteTooltip": "Add note",
+  "settingsTooltip": "Open settings",
+  "delete": "Delete",
+  "timeLabel": "Time"
+}

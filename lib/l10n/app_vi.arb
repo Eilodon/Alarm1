@@ -1,0 +1,33 @@
+{
+  "appTitle": "Ghi chú & Nhắc nhở",
+  "addNoteReminder": "Thêm ghi chú / nhắc lịch",
+  "titleLabel": "Tiêu đề",
+  "contentLabel": "Nội dung",
+  "selectReminderTime": "Chọn thời gian nhắc",
+  "cancel": "Hủy",
+  "save": "Lưu",
+  "noNotes": "Chưa có ghi chú nào",
+  "settings": "Cài đặt",
+  "chooseThemeColor": "Chọn màu chủ đề",
+  "changeThemeColor": "Đổi màu giao diện",
+  "chooseMascot": "Chọn mascot",
+  "changeMascot": "Thay mascot",
+  "fontSize": "Cỡ chữ",
+  "chatAI": "Chat AI",
+  "enterMessage": "Nhập tin nhắn...",
+  "send": "Gửi",
+  "errorWithMessage": "Lỗi: {error}",
+  "errorWithMessage@placeholders": {
+    "error": {}
+  },
+  "readNote": "Đọc Note",
+  "scheduleForDate": "Lịch ngày {date}",
+  "scheduleForDate@placeholders": {
+    "date": {}
+  },
+  "noNotesForDay": "Không có ghi chú/nhắc lịch cho ngày này",
+  "addNoteTooltip": "Thêm ghi chú",
+  "settingsTooltip": "Mở cài đặt",
+  "delete": "Xóa",
+  "timeLabel": "Thời gian"
+}

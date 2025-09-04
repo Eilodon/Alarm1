@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 
@@ -11,7 +12,12 @@ import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
-  const HomeScreen({super.key, required this.onThemeChanged});
+  final Function(double) onFontScaleChanged;
+  const HomeScreen({
+    super.key,
+    required this.onThemeChanged,
+    required this.onFontScaleChanged,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -41,13 +47,17 @@ class _HomeScreenState extends State<HomeScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Thêm ghi chú / nhắc lịch'),
+        title: Text(AppLocalizations.of(context)!.addNoteReminder),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: titleCtrl, decoration: const InputDecoration(labelText: 'Tiêu đề')),
-              TextField(controller: contentCtrl, decoration: const InputDecoration(labelText: 'Nội dung')),
+              TextField(
+                  controller: titleCtrl,
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.titleLabel)),
+              TextField(
+                  controller: contentCtrl,
+                  decoration: InputDecoration(labelText: AppLocalizations.of(context)!.contentLabel)),
               const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: () async {
@@ -72,13 +82,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     }
                   }
                 },
-                child: const Text('Chọn thời gian nhắc'),
+                child: Text(AppLocalizations.of(context)!.selectReminderTime),
               ),
             ],
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Hủy')),
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(AppLocalizations.of(context)!.cancel)),
           ElevatedButton(
             onPressed: () async {
               final note = Note(
@@ -100,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
               if (!mounted) return;
               Navigator.pop(context); // FIX Lỗi 1: auto đóng dialog
             },
-            child: const Text('Lưu'),
+            child: Text(AppLocalizations.of(context)!.save),
           ),
         ],
       ),
@@ -123,15 +135,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notes & Reminders'),
+        title: Text(AppLocalizations.of(context)!.appTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
+            tooltip: AppLocalizations.of(context)!.settingsTooltip,
             onPressed: () async {
               await Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => SettingsScreen(onThemeChanged: widget.onThemeChanged),
+                  builder: (_) => SettingsScreen(
+                      onThemeChanged: widget.onThemeChanged,
+                      onFontScaleChanged: widget.onFontScaleChanged),
                 ),
               );
               _loadMascot();
@@ -189,13 +204,15 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addNote,
+        tooltip: AppLocalizations.of(context)!.addNoteTooltip,
         child: const Icon(Icons.add),
       ),
     );
   }
 
   Widget _buildNotesList() {
-    if (notes.isEmpty) return const Center(child: Text('Chưa có ghi chú nào'));
+    if (notes.isEmpty)
+      return Center(child: Text(AppLocalizations.of(context)!.noNotes));
     return ListView.builder(
       itemCount: notes.length,
       itemBuilder: (context, index) {
@@ -216,6 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             trailing: IconButton(
               icon: const Icon(Icons.delete),
+              tooltip: AppLocalizations.of(context)!.delete,
               onPressed: () => setState(() => notes.removeAt(index)),
             ),
           ),

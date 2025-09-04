@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   flutter_local_notifications: ^19.4.1
   timezone: ^0.10.1
   lottie: ^3.3.1
@@ -24,6 +26,7 @@ dev_dependencies:
   flutter_lints: ^2.0.0
 
 flutter:
+  generate: true
   uses-material-design: true
   assets:
     - assets/lottie/mascot.json

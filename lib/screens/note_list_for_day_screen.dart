@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 import '../models/note.dart';
@@ -16,12 +17,13 @@ class NoteListForDayScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = 'Lịch ngày ${DateFormat('dd/MM/yyyy').format(date)}';
+    final title = AppLocalizations.of(context)!
+        .scheduleForDate(DateFormat('dd/MM/yyyy').format(date));
     if (notes.isEmpty) {
       return Scaffold(
         appBar: AppBar(title: Text(title)),
-        body: const Center(
-          child: Text('Không có ghi chú/nhắc lịch cho ngày này'),
+        body: Center(
+          child: Text(AppLocalizations.of(context)!.noNotesForDay),
         ),
       );
     }

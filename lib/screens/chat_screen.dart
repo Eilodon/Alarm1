@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../services/gemini_service.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -36,7 +37,8 @@ class _ChatScreenState extends State<ChatScreen> {
       final reply = await GeminiService().chat(userText);
       setState(() => _messages.add(Message(reply, false)));
     } catch (e) {
-      setState(() => _messages.add(Message("Lỗi: $e", false)));
+      setState(() =>
+          _messages.add(Message(AppLocalizations.of(context)!.errorWithMessage(e.toString()), false)));
     } finally {
       setState(() => _isLoading = false);
     }
@@ -55,7 +57,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Chat AI')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.chatAI)),
       body: Column(
         children: [
           Expanded(
@@ -89,16 +91,19 @@ class _ChatScreenState extends State<ChatScreen> {
                 Expanded(
                   child: TextField(
                     controller: _controller,
-                    decoration: const InputDecoration(
-                      hintText: 'Nhập tin nhắn...',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      hintText: AppLocalizations.of(context)!.enterMessage,
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                 ),
                 const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: _sendMessage,
-                  child: const Text('Gửi'),
+                Tooltip(
+                  message: AppLocalizations.of(context)!.send,
+                  child: ElevatedButton(
+                    onPressed: _sendMessage,
+                    child: Text(AppLocalizations.of(context)!.send),
+                  ),
                 ),
               ],
             ),
