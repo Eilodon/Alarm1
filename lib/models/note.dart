@@ -5,7 +5,7 @@ class Note {
   DateTime? alarmTime;
   bool daily;
   bool active;
-  int? snoozeMinutes;
+  int snoozeMinutes;
 
   Note({
     required this.id,
@@ -14,7 +14,7 @@ class Note {
     this.alarmTime,
     this.daily = false,
     this.active = false,
-    this.snoozeMinutes,
+    this.snoozeMinutes = 0,
   });
 
   factory Note.fromJson(Map<String, dynamic> j) => Note(
@@ -24,7 +24,7 @@ class Note {
         alarmTime: j['alarmTime'] != null ? DateTime.parse(j['alarmTime']) : null,
         daily: j['daily'] ?? false,
         active: j['active'] ?? false,
-        snoozeMinutes: j['snoozeMinutes'],
+        snoozeMinutes: j['snoozeMinutes'] ?? 0,
       );
 
   Map<String, dynamic> toJson() => {
