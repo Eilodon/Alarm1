@@ -18,10 +18,8 @@ dependencies:
   intl: ^0.18.1
   provider: ^6.1.2
   flutter_tts: ^4.2.3
-  provider: ^6.1.2
- codex/expand-note-model-with-new-fields
-  image_picker: ^1.0.4
-  file_picker: ^8.0.0
+ codex/enable-material-3-and-customize-theme
+  quick_actions: ^1.0.0
 
 
 dev_dependencies:

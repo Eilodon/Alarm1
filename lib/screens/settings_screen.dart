@@ -10,7 +10,14 @@ class SettingsScreen extends StatelessWidget {
     final _settings = SettingsService();
 
     void _pickColor() async {
-      final colors = [Colors.blue, Colors.green, Colors.red, Colors.purple, Colors.orange, Colors.teal];
+      final colors = [
+        Colors.blue,
+        Colors.green,
+        Colors.red,
+        Colors.purple,
+        Colors.orange,
+        Colors.teal
+      ];
       await showDialog(
         context: context,
         builder: (_) => AlertDialog(
@@ -23,9 +30,11 @@ class SettingsScreen extends StatelessWidget {
                   Navigator.pop(context);
                 },
                 child: Container(
-                  width: 40, height: 40,
+                  width: 40,
+                  height: 40,
                   margin: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(color: c, shape: BoxShape.circle),
+                  decoration:
+                      BoxDecoration(color: c, shape: BoxShape.circle),
                 ),
               );
             }).toList(),
@@ -57,20 +66,17 @@ class SettingsScreen extends StatelessWidget {
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Cài đặt')),
-      body: ListView(
-        children: [
-          ListTile(
-            title: const Text('Đổi màu giao diện'),
-            onTap: _pickColor,
-          ),
-          ListTile(
-            title: const Text('Thay mascot'),
-            onTap: _pickMascot,
-          ),
-        ],
-      ),
+    return ListView(
+      children: [
+        ListTile(
+          title: const Text('Đổi màu giao diện'),
+          onTap: _pickColor,
+        ),
+        ListTile(
+          title: const Text('Thay mascot'),
+          onTap: _pickMascot,
+        ),
+      ],
     );
   }
 }
