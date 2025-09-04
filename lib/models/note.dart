@@ -5,8 +5,8 @@ class Note {
   DateTime? remindAt;
   bool daily;
   bool active;
- codex/implement-secure-storage-and-authentication
-  bool locked;
+ codex/add-tag-chips-to-note-list
+  List<String> tags;
 
 
   Note({
@@ -16,8 +16,9 @@ class Note {
     this.remindAt,
     this.daily = false,
     this.active = false,
- codex/implement-secure-storage-and-authentication
-    this.locked = false,
+ codex/add-tag-chips-to-note-list
+    this.tags = const [],
+
   });
 
 
@@ -30,8 +31,8 @@ codex/implement-note-repository-and-provider
  codex/expand-note-model-with-new-fields
         daily: j['daily'] ?? false,
         active: j['active'] ?? false,
- codex/implement-secure-storage-and-authentication
-        locked: j['locked'] ?? false,
+ codex/add-tag-chips-to-note-list
+        tags: (j['tags'] as List<dynamic>? ?? []).cast<String>(),
 
       );
 
@@ -43,8 +44,8 @@ codex/implement-note-repository-and-provider
         'remindAt': remindAt?.toIso8601String(),
         'daily': daily,
         'active': active,
- codex/implement-secure-storage-and-authentication
-        'locked': locked,
+ codex/add-tag-chips-to-note-list
+        'tags': tags,
 
       };
 }

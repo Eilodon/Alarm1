@@ -50,12 +50,27 @@ class NoteListForDayScreen extends StatelessWidget {
           return Card(
             child: ListTile(
               title: Text(note.title),
-              subtitle: Text(
-                timeStr != null
-                    ? '${note.content}\n⏰ $timeStr'
-                    : note.content,
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    timeStr != null
+                        ? '${note.content}\n⏰ $timeStr'
+                        : note.content,
+                  ),
+                  if (note.tags.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Wrap(
+                      spacing: 4,
+                      runSpacing: 4,
+                      children:
+                          note.tags.map((t) => Chip(label: Text(t))).toList(),
+                    ),
+                  ]
+                ],
               ),
-              isThreeLine: timeStr != null,
+              isThreeLine: timeStr != null || note.tags.isNotEmpty,
               onTap: () {
                 Navigator.push(
                   context,
