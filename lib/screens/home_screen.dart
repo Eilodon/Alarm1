@@ -169,7 +169,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  List<Note> notesForDay(DateTime day, List<Note> notes) {
+  List<Note> notesForDay(DateTime day) {
+    final notes = context.read<NoteProvider>().notes;
     return notes
         .where((n) =>
             n.alarmTime != null &&
@@ -215,10 +216,10 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: weekDays.length,
               itemBuilder: (context, i) {
                 final d = weekDays[i];
-                final hasNotes = notesForDay(d, notes).isNotEmpty;
+                final hasNotes = notesForDay(d).isNotEmpty;
                 return GestureDetector(
                   onTap: () {
-                    final dayNotes = notesForDay(d, notes);
+                    final dayNotes = notesForDay(d);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -247,7 +248,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          Expanded(child: _buildNotesList(notes)),
+          Expanded(child: _buildNotesList()),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -257,7 +258,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildNotesList(List<Note> notes) {
+  Widget _buildNotesList() {
+    final notes = context.watch<NoteProvider>().notes;
     if (notes.isEmpty) {
       return const Center(child: Text('Chưa có ghi chú nào'));
     }
