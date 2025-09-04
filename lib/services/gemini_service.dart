@@ -6,7 +6,7 @@ class GeminiService {
   static const _model = 'gemini-1.5-flash-latest';
 
   Future<String> chat(String userText) async {
-    if (_apiKey.isEmpty) return 'Chưa cấu hình GEMINI_API_KEY';
+    if (_apiKey.isEmpty) return 'Gemini API key chưa được cấu hình.';
 
     final uri = Uri.parse(
       'https://generativelanguage.googleapis.com/v1beta/models/$_model:generateContent?key=$_apiKey',
