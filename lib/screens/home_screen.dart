@@ -5,6 +5,7 @@ import 'package:lottie/lottie.dart';
 import '../models/note.dart';
 import '../services/notification_service.dart';
 import '../services/settings_service.dart';
+import '../services/note_repository.dart';
 import 'note_detail_screen.dart';
 import 'note_list_for_day_screen.dart';
 import 'settings_screen.dart';
@@ -21,15 +22,22 @@ class _HomeScreenState extends State<HomeScreen> {
   String _mascotPath = 'assets/lottie/mascot.json';
   List<Note> notes = [];
   DateTime today = DateTime.now();
+  final _repo = NoteRepository();
 
   @override
   void initState() {
     super.initState();
     _loadMascot();
+    _loadNotes();
   }
 
   Future<void> _loadMascot() async {
     _mascotPath = await SettingsService().loadMascotPath();
+    setState(() {});
+  }
+
+  Future<void> _loadNotes() async {
+    notes = await _repo.getNotes();
     setState(() {});
   }
 
@@ -87,6 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 content: contentCtrl.text,
                 alarmTime: alarmTime,
               );
+              await _repo.addOrUpdate(note);
               setState(() => notes.add(note));
 
               if (alarmTime != null) {
@@ -216,7 +225,10 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             trailing: IconButton(
               icon: const Icon(Icons.delete),
-              onPressed: () => setState(() => notes.removeAt(index)),
+              onPressed: () async {
+                await _repo.delete(note.id);
+                setState(() => notes.removeAt(index));
+              },
             ),
           ),
         );
