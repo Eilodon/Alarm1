@@ -2,7 +2,7 @@ class Note {
   String id;
   String title;
   String content;
-  DateTime? alarmTime;
+  DateTime? remindAt;
   bool daily;
   bool active;
   /// Minutes to postpone a notification when snoozed.
@@ -12,7 +12,7 @@ class Note {
     String? id,
     required this.title,
     required this.content,
-    this.alarmTime,
+    this.remindAt,
     this.daily = false,
     this.active = false,
     this.snoozeMinutes = 0,
@@ -22,19 +22,20 @@ class Note {
         id: j['id'],
         title: j['title'],
         content: j['content'],
-        alarmTime: j['alarmTime'] != null ? DateTime.parse(j['alarmTime']) : null,
-        daily: j['daily'] == 1 || j['daily'] == true,
-        active: j['active'] == 1 || j['active'] == true,
-        snoozeMinutes: j['snoozeMinutes'] as int? ?? 0,
+ codex/update-homescreenstate-to-manage-notes
+        remindAt: j['remindAt'] != null ? DateTime.parse(j['remindAt']) : null,
+        daily: j['daily'] ?? false,
+        active: j['active'] ?? false,
+
       );
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'title': title,
         'content': content,
-        'alarmTime': alarmTime?.toIso8601String(),
-        'daily': daily ? 1 : 0,
-        'active': active ? 1 : 0,
-        'snoozeMinutes': snoozeMinutes,
+ codex/update-homescreenstate-to-manage-notes
+        'remindAt': remindAt?.toIso8601String(),
+        'daily': daily,
+        'active': active,
       };
 }

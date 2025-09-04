@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+codex/update-homescreenstate-to-manage-notes
+
 
 import '../models/note.dart';
 import '../services/db_service.dart';
@@ -28,8 +29,10 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadMascot();
-    DbService().getNotes().then((loadedNotes) {
-      setState(() => notes = loadedNotes);
+ codex/update-homescreenstate-to-manage-notes
+    DbService().getNotes().then((value) {
+      setState(() => notes = value);
+
     });
   }
 
@@ -118,56 +121,36 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          actions: [
-            TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Hủy')),
-            ElevatedButton(
-              onPressed: () async {
-                final note = Note(
-                  title: titleCtrl.text,
-                  content: contentCtrl.text,
-                  alarmTime: alarmTime,
-                  daily: repeat == RepeatInterval.daily,
-                  active: true,
-                  snoozeMinutes: snoozeMinutes,
-                );
-                setState(() => notes.add(note));
-                await DbService().saveNotes(notes);
-
-                if (alarmTime != null) {
-                  final id = DateTime.now().millisecondsSinceEpoch % 100000;
-                  final service = NotificationService();
-                  if (repeat == RepeatInterval.daily) {
-                    await service.scheduleDailyAtTime(
-                      id: id,
-                      title: note.title,
-                      body: note.content,
-                      time: Time(alarmTime!.hour, alarmTime!.minute),
-                    );
-                  } else if (repeat != null) {
-                    await service.scheduleRecurring(
-                      id: id,
-                      title: note.title,
-                      body: note.content,
-                      repeatInterval: repeat!,
-                    );
-                  } else {
-                    await service.scheduleNotification(
-                      id: id,
-                      title: note.title,
-                      body: note.content,
-                      scheduledDate: alarmTime!,
-                    );
-                  }
-                }
-                if (!mounted) return;
-                Navigator.pop(context);
-              },
-              child: const Text('Lưu'),
-            ),
-          ],
+ codex/update-homescreenstate-to-manage-notes
         ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Hủy')),
+          ElevatedButton(
+            onPressed: () async {
+              final note = Note(
+                id: DateTime.now().microsecondsSinceEpoch.toString(),
+                title: titleCtrl.text,
+                content: contentCtrl.text,
+                remindAt: remindAt,
+              );
+              setState(() => notes.add(note));
+              await DbService().saveNotes(notes);
+
+              if (remindAt != null) {
+                await NotificationService().scheduleNotification(
+                  id: DateTime.now().millisecondsSinceEpoch % 100000,
+                  title: note.title,
+                  body: note.content,
+                  scheduledDate: remindAt!,
+                );
+              }
+    if (!mounted) return;
+              Navigator.pop(context);
+            },
+            child: const Text('Lưu'),
+          ),
+        ],
+
       ),
     );
   }
@@ -209,7 +192,6 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 8),
           SizedBox(width: 140, height: 140, child: Lottie.asset(_mascotPath)),
           const SizedBox(height: 8),
-          // Lịch 7 ngày - Lỗi 3
           SizedBox(
             height: 80,
             child: ListView.builder(
