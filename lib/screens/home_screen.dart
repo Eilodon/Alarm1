@@ -169,8 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  List<Note> notesForDay(DateTime day) {
-    final notes = context.watch<NoteProvider>().notes;
+  List<Note> notesForDay(DateTime day, List<Note> notes) {
     return notes
         .where((n) =>
             n.alarmTime != null &&
@@ -182,6 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final notes = context.watch<NoteProvider>().notes;
     final weekDays = List.generate(7, (i) => today.add(Duration(days: i)));
 
     return Scaffold(
@@ -215,10 +215,10 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: weekDays.length,
               itemBuilder: (context, i) {
                 final d = weekDays[i];
-                final hasNotes = notesForDay(d).isNotEmpty;
+                final hasNotes = notesForDay(d, notes).isNotEmpty;
                 return GestureDetector(
                   onTap: () {
-                    final dayNotes = notesForDay(d);
+                    final dayNotes = notesForDay(d, notes);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -247,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          Expanded(child: _buildNotesList()),
+          Expanded(child: _buildNotesList(notes)),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -257,8 +257,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildNotesList() {
-    final notes = context.watch<NoteProvider>().notes;
+  Widget _buildNotesList(List<Note> notes) {
     if (notes.isEmpty) {
       return const Center(child: Text('Chưa có ghi chú nào'));
     }
