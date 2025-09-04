@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/tts_service.dart';
 import 'chat_screen.dart';
-import '../screens/home_screen.dart';
+import '../models/note.dart';
 
 class NoteDetailScreen extends StatelessWidget {
   final Note note;

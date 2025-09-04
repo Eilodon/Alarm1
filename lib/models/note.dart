@@ -2,7 +2,7 @@ class Note {
   String id;
   String title;
   String content;
-  DateTime? alarmTime;
+  DateTime? remindAt;
   bool daily;
   bool active;
 
@@ -10,7 +10,7 @@ class Note {
     required this.id,
     required this.title,
     required this.content,
-    this.alarmTime,
+    this.remindAt,
     this.daily = false,
     this.active = false,
   });
@@ -19,7 +19,7 @@ class Note {
         id: j['id'],
         title: j['title'],
         content: j['content'],
-        alarmTime: j['alarmTime'] != null ? DateTime.parse(j['alarmTime']) : null,
+        remindAt: j['remindAt'] != null ? DateTime.parse(j['remindAt']) : null,
         daily: j['daily'] ?? false,
         active: j['active'] ?? false,
       );
@@ -28,7 +28,7 @@ class Note {
         'id': id,
         'title': title,
         'content': content,
-        'alarmTime': alarmTime?.toIso8601String(),
+        'remindAt': remindAt?.toIso8601String(),
         'daily': daily,
         'active': active,
       };

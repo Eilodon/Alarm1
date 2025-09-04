@@ -5,14 +5,9 @@ import 'package:intl/intl.dart';
 import '../services/settings_service.dart';
 import 'settings_screen.dart';
 import '../services/notification_service.dart';
+import '../services/db_service.dart';
+import '../models/note.dart';
 import 'note_detail_screen.dart';
-
-class Note {
-  final String title;
-  final String content;
-  final DateTime? remindAt;
-  Note({required this.title, required this.content, this.remindAt});
-}
 
 class HomeScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
@@ -31,6 +26,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadMascot();
+    DbService().getNotes().then((value) {
+      setState(() => notes = value);
+    });
   }
 
   Future<void> _loadMascot() async {
@@ -87,11 +85,13 @@ class _HomeScreenState extends State<HomeScreen> {
           ElevatedButton(
             onPressed: () async {
               final note = Note(
+                id: DateTime.now().microsecondsSinceEpoch.toString(),
                 title: titleCtrl.text,
                 content: contentCtrl.text,
                 remindAt: remindAt,
               );
               setState(() => notes.add(note));
+              await DbService().saveNotes(notes);
 
               if (remindAt != null) {
                 await NotificationService().scheduleNotification(
@@ -219,7 +219,10 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             trailing: IconButton(
               icon: const Icon(Icons.delete),
-              onPressed: () => setState(() => notes.removeAt(index)),
+              onPressed: () async {
+                setState(() => notes.removeAt(index));
+                await DbService().saveNotes(notes);
+              },
             ),
           ),
         );
