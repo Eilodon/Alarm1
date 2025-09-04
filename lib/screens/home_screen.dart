@@ -5,6 +5,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../models/note.dart';
 import '../services/notification_service.dart';
+import '../services/db_service.dart';
 import '../services/settings_service.dart';
 import 'note_detail_screen.dart';
 import 'note_list_for_day_screen.dart';
@@ -130,6 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   snoozeMinutes: snoozeMinutes,
                 );
                 setState(() => notes.add(note));
+                await DbService().saveNotes(notes);
 
                 if (alarmTime != null) {
                   final id = DateTime.now().millisecondsSinceEpoch % 100000;
