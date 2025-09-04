@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'providers/note_provider.dart';
 import 'screens/home_screen.dart';
 import 'services/notification_service.dart';
 import 'services/settings_service.dart';
@@ -8,12 +11,15 @@ void main() async {
   await NotificationService().init();
   final settings = SettingsService();
   final themeColor = await settings.loadThemeColor();
-  runApp(MyApp(themeColor: themeColor));
+  final noteProvider = NoteProvider();
+  await noteProvider.loadNotes();
+  runApp(MyApp(themeColor: themeColor, noteProvider: noteProvider));
 }
 
 class MyApp extends StatefulWidget {
   final Color themeColor;
-  const MyApp({super.key, required this.themeColor});
+  final NoteProvider noteProvider;
+  const MyApp({super.key, required this.themeColor, required this.noteProvider});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -35,13 +41,16 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Notes & Reminders',
-      theme: ThemeData(
-        colorSchemeSeed: _themeColor,
-        useMaterial3: true,
+    return ChangeNotifierProvider.value(
+      value: widget.noteProvider,
+      child: MaterialApp(
+        title: 'Notes & Reminders',
+        theme: ThemeData(
+          colorSchemeSeed: _themeColor,
+          useMaterial3: true,
+        ),
+        home: HomeScreen(onThemeChanged: updateTheme),
       ),
-      home: HomeScreen(onThemeChanged: updateTheme),
     );
   }
 }

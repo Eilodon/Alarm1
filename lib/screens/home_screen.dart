@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:provider/provider.dart';
 
 import '../models/note.dart';
+import '../providers/note_provider.dart';
 import '../services/notification_service.dart';
-import '../services/db_service.dart';
 import '../services/settings_service.dart';
 import 'note_detail_screen.dart';
 import 'note_list_for_day_screen.dart';
@@ -21,7 +22,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String _mascotPath = 'assets/lottie/mascot.json';
-  List<Note> notes = [];
   DateTime today = DateTime.now();
 
   @override
@@ -130,8 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   active: true,
                   snoozeMinutes: snoozeMinutes,
                 );
-                setState(() => notes.add(note));
-                await DbService().saveNotes(notes);
+                await context.read<NoteProvider>().addNote(note);
 
                 if (alarmTime != null) {
                   final id = DateTime.now().millisecondsSinceEpoch % 100000;
@@ -171,6 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   List<Note> notesForDay(DateTime day) {
+    final notes = context.read<NoteProvider>().notes;
     return notes
         .where((n) =>
             n.alarmTime != null &&
@@ -258,6 +258,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildNotesList() {
+    final notes = context.watch<NoteProvider>().notes;
     if (notes.isEmpty) return const Center(child: Text('Chưa có ghi chú nào'));
     return ListView.builder(
       itemCount: notes.length,
@@ -279,7 +280,8 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             trailing: IconButton(
               icon: const Icon(Icons.delete),
-              onPressed: () => setState(() => notes.removeAt(index)),
+              onPressed: () =>
+                  context.read<NoteProvider>().removeNoteAt(index),
             ),
           ),
         );

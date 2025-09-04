@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
+import 'package:notes_reminder_app/providers/note_provider.dart';
 import 'package:notes_reminder_app/screens/home_screen.dart';
 
 void main() {
   testWidgets('add and delete notes', (tester) async {
-    await tester.pumpWidget(MaterialApp(home: HomeScreen(onThemeChanged: (_) {})));
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => NoteProvider(),
+        child: MaterialApp(home: HomeScreen(onThemeChanged: (_) {})),
+      ),
+    );
 
     expect(find.text('Chưa có ghi chú nào'), findsOneWidget);
 
