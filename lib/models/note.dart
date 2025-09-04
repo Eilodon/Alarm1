@@ -5,6 +5,7 @@ class Note {
   DateTime? alarmTime;
   bool daily;
   bool active;
+  /// Minutes to postpone a notification when snoozed.
   int snoozeMinutes;
 
   Note({
@@ -24,7 +25,7 @@ class Note {
         alarmTime: j['alarmTime'] != null ? DateTime.parse(j['alarmTime']) : null,
         daily: j['daily'] == 1,
         active: j['active'] == 1,
-        snoozeMinutes: j['snoozeMinutes'] ?? 0,
+        snoozeMinutes: j['snoozeMinutes'] as int? ?? 0,
       );
 
   Map<String, dynamic> toJson() => {
