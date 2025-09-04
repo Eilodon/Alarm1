@@ -14,3 +14,9 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+## Permissions
+
+The application requests notification permissions on iOS for alerts, badges,
+and sounds. Ensure these permissions are granted to allow scheduled
+notifications to appear.
