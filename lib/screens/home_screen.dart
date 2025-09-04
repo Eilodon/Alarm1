@@ -81,8 +81,9 @@ class _HomeScreenState extends State<HomeScreen> {
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Hủy')),
           ElevatedButton(
             onPressed: () async {
+              final nowId = DateTime.now().millisecondsSinceEpoch;
               final note = Note(
-                id: DateTime.now().millisecondsSinceEpoch.toString(),
+                id: nowId.toString(),
                 title: titleCtrl.text,
                 content: contentCtrl.text,
                 alarmTime: alarmTime,
@@ -91,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
               if (alarmTime != null) {
                 await NotificationService().scheduleNotification(
-                  id: DateTime.now().millisecondsSinceEpoch % 100000,
+                  id: nowId % 100000,
                   title: note.title,
                   body: note.content,
                   scheduledDate: alarmTime!,
@@ -204,7 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: ListTile(
             title: Text(note.title),
             subtitle: Text(note.alarmTime != null
-                ? '${note.content}\n⏰ ${note.alarmTime}'
+                ? '${note.content}\n⏰ ${DateFormat('HH:mm dd/MM/yyyy').format(note.alarmTime!)}'
                 : note.content),
             onTap: () {
               Navigator.push(
