@@ -145,6 +145,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: titleCtrl.text,
                 content: contentCtrl.text,
                 alarmTime: alarmTime,
+                locked: locked,
+                updatedAt: DateTime.now(),
               );
               setState(() => _notes.add(note));
 

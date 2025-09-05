@@ -8,7 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/note.dart';
 
 class DbService {
-  static const _kNotes = 'notes_v1';
+  static const _kNotes = 'notes_v2';
+  static const _kLegacyNotes = 'notes_v1';
   static const _kEncKey = 'enc_key';
 
   final _secure = const FlutterSecureStorage();
@@ -26,7 +27,8 @@ class DbService {
 
   Future<List<Note>> getNotes() async {
     final sp = await SharedPreferences.getInstance();
-    final raw = sp.getString(_kNotes);
+    var raw = sp.getString(_kNotes);
+    raw ??= sp.getString(_kLegacyNotes);
     if (raw == null) return [];
     final key = await _getKey();
     final iv = encrypt.IV.fromLength(16);
