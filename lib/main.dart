@@ -16,6 +16,8 @@ import 'package:provider/provider.dart';
 import 'providers/note_provider.dart';
 import 'firebase_options.dart';
 
+final messengerKey = GlobalKey<ScaffoldMessengerState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   bool authFailed = false;
@@ -93,14 +95,14 @@ class _MyAppState extends State<MyApp> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final l10n = AppLocalizations.of(context)!;
       if (widget.authFailed) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        messengerKey.currentState?.showSnackBar(
           SnackBar(
             content: Text(l10n.authFailedMessage),
           ),
         );
       }
       if (widget.notificationFailed) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        messengerKey.currentState?.showSnackBar(
           SnackBar(
             content: Text(l10n.notificationFailedMessage),
           ),
@@ -111,7 +113,7 @@ class _MyAppState extends State<MyApp> {
       _connSub = Connectivity().onConnectivityChanged.listen((result) {
         if (result == ConnectivityResult.none) {
           final l10n = AppLocalizations.of(context)!;
-          ScaffoldMessenger.of(context).showSnackBar(
+          messengerKey.currentState?.showSnackBar(
             SnackBar(
               content: Text(l10n.noInternetConnection),
             ),
@@ -142,6 +144,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      scaffoldMessengerKey: messengerKey,
       onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
       localizationsDelegates: const [
         AppLocalizations.delegate,
