@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../models/note.dart';
 import 'note_detail_screen.dart';
 import '../services/auth_service.dart';
@@ -48,7 +49,8 @@ class NoteSearchDelegate extends SearchDelegate {
                 subtitle: Text(n.content),
                 onTap: () async {
                   if (n.locked) {
-                    final ok = await AuthService().authenticate();
+                    final ok = await AuthService()
+                        .authenticate(AppLocalizations.of(context)!);
                     if (!ok) return;
                   }
                   Navigator.push(

@@ -22,7 +22,9 @@ void main() async {
   final settings = SettingsService();
   final requireAuth = await settings.loadRequireAuth();
   if (requireAuth) {
-    final ok = await AuthService().authenticate();
+    final locale = WidgetsBinding.instance.platformDispatcher.locale;
+    final l10n = await AppLocalizations.delegate.load(locale);
+    final ok = await AuthService().authenticate(l10n);
     if (!ok) {
       return;
     }

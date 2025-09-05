@@ -222,7 +222,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             onTap: () async {
               if (note.locked) {
-                final ok = await AuthService().authenticate();
+                final ok = await AuthService()
+                    .authenticate(AppLocalizations.of(context)!);
                 if (!ok) return;
               }
               Navigator.push(

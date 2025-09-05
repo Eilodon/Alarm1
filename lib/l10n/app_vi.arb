@@ -57,6 +57,7 @@
   "addTag": "Thêm tag",
   "requireAuth": "Yêu cầu xác thực",
   "lockNote": "Khóa ghi chú",
+  "authReason": "Vui lòng xác thực để tiếp tục",
   "voiceToNote": "Giọng nói thành ghi chú",
   "stop": "Dừng",
   "speak": "Nói",
