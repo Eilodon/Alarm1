@@ -22,7 +22,10 @@ class NoteRepository {
     return _dbService.encryptNote(note);
   }
 
+
+
   Future<Note> decryptNote(Map<String, dynamic> data) {
     return _dbService.decryptNote(data);
   }
+
 }

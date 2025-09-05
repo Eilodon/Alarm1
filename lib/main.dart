@@ -14,37 +14,13 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-  } catch (e) {
-    debugPrint('Firebase init failed: $e');
-    runApp(
-      const MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: Text('Failed to initialize app'),
-          ),
-        ),
-      ),
-    );
-    return;
-  }
-  var authFailed = false;
-  var notificationFailed = false;
-  try {
-    await FirebaseAuth.instance.signInAnonymously();
-  } catch (e) {
-    authFailed = true;
-    debugPrint('Anonymous sign-in failed: $e');
-  }
-  try {
-    await NotificationService().init();
-  } catch (e) {
-    notificationFailed = true;
-    debugPrint('Notification setup failed: $e');
-  }
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await FirebaseAuth.instance.signInAnonymously();
+  await NotificationService().init();
+
   final settings = SettingsService();
   final requireAuth = await settings.loadRequireAuth();
   if (requireAuth) {
