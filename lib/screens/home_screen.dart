@@ -158,7 +158,10 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-    );
+    ).whenComplete(() {
+      titleCtrl.dispose();
+      contentCtrl.dispose();
+    });
   }
 
   List<Note> _notesForDay(DateTime day, List<Note> notes) {
