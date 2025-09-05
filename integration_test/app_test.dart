@@ -13,7 +13,7 @@ void main() {
     app.main();
     await tester.pumpAndSettle();
 
-    expect(find.text('No notes yet'), findsOneWidget);
+    expect(find.text('No notes'), findsOneWidget);
 
     await tester.tap(find.byTooltip('Add note'));
     await tester.pumpAndSettle();
@@ -38,6 +38,6 @@ void main() {
     await tester.tap(find.byTooltip('Delete'));
     await tester.pumpAndSettle();
 
-    expect(find.text('No notes yet'), findsOneWidget);
+    expect(find.text('No notes'), findsOneWidget);
   });
 }

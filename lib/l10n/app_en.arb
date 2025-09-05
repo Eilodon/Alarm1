@@ -7,7 +7,7 @@
   "selectReminderTime": "Select reminder time",
   "cancel": "Cancel",
   "save": "Save",
-  "noNotes": "No notes yet",
+  "noNotes": "No notes",
   "settings": "Settings",
   "chooseThemeColor": "Choose theme color",
   "changeThemeColor": "Change theme color",
@@ -56,6 +56,11 @@
   },
   "imageLabel": "Image",
   "audioLabel": "Audio",
+
+  "exportNotes": "Export notes",
+  "importNotes": "Import notes",
+  "notesExported": "Notes exported",
+  "notesImported": "Notes imported",
 
   "tagsLabel": "Tags",
   "allTags": "All tags",

@@ -7,7 +7,7 @@
   "selectReminderTime": "Chọn thời gian nhắc",
   "cancel": "Hủy",
   "save": "Lưu",
-  "noNotes": "Chưa có ghi chú nào",
+  "noNotes": "Không có ghi chú",
   "settings": "Cài đặt",
   "chooseThemeColor": "Chọn màu chủ đề",
   "changeThemeColor": "Đổi màu giao diện",
@@ -56,6 +56,11 @@
   },
   "imageLabel": "Ảnh",
   "audioLabel": "Âm thanh",
+
+  "exportNotes": "Xuất ghi chú",
+  "importNotes": "Nhập ghi chú",
+  "notesExported": "Đã xuất ghi chú",
+  "notesImported": "Đã nhập ghi chú",
 
   "tagsLabel": "Tag",
   "allTags": "Tất cả tag",

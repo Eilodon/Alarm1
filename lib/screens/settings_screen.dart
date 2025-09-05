@@ -145,7 +145,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await _noteRepository.exportNotes(l10n);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Notes exported')),
+      SnackBar(content: Text(l10n.notesExported)),
     );
   }
 
@@ -155,7 +155,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (!mounted) return;
     await context.read<NoteProvider>().loadNotes();
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Notes imported')),
+      SnackBar(content: Text(l10n.notesImported)),
     );
   }
 
@@ -180,11 +180,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: _changeFontScale,
           ),
           ListTile(
-            title: const Text('Export notes'),
+            title: Text(AppLocalizations.of(context)!.exportNotes),
             onTap: _exportNotes,
           ),
           ListTile(
-            title: const Text('Import notes'),
+            title: Text(AppLocalizations.of(context)!.importNotes),
             onTap: _importNotes,
           ),
           SwitchListTile(
