@@ -56,8 +56,10 @@
   "convertSpeechPrompt@placeholders": {
     "recognized": {}
   },
+
   "scheduled": "Scheduled",
   "recurring": "Recurring",
   "daily": "Daily",
   "snooze": "Snooze"
+
 }

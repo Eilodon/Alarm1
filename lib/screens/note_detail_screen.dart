@@ -8,7 +8,6 @@ import '../models/note.dart';
 import '../providers/note_provider.dart';
 import '../services/notification_service.dart';
 import '../services/tts_service.dart';
-import '../services/gemini_service.dart';
 import 'chat_screen.dart';
 import 'package:intl/intl.dart';
 import '../widgets/tag_selector.dart';
@@ -69,7 +68,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   }
 
   Future<void> _readNote() async {
-    await _ttsService.speak(_contentCtrl.text);
+    await _ttsService.speak(
+      _contentCtrl.text,
+      locale: Localizations.localeOf(context),
+    );
   }
 
   @override

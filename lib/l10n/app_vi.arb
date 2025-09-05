@@ -56,8 +56,10 @@
   "convertSpeechPrompt@placeholders": {
     "recognized": {}
   },
+
   "scheduled": "Lên lịch",
   "recurring": "Định kỳ",
   "daily": "Hàng ngày",
   "snooze": "Báo lại"
+
 }
