@@ -77,4 +77,19 @@ class DbService {
     m['iv'] = iv.base64;
     return m;
   }
+
+  Future<Note> decryptNote(Map<String, dynamic> data) async {
+    final key = await _getKey();
+    final encrypter = encrypt.Encrypter(encrypt.AES(key));
+    final ivString = data['iv'] as String?;
+    final iv = ivString != null
+        ? encrypt.IV.fromBase64(ivString)
+        : encrypt.IV.fromLength(16);
+    final decrypted = encrypter.decrypt64(data['content'], iv: iv);
+    final map = Map<String, dynamic>.from(data);
+    map['content'] = decrypted;
+    map.remove('iv');
+    map.remove('userId');
+    return Note.fromJson(map);
+  }
 }

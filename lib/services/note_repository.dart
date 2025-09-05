@@ -21,4 +21,8 @@ class NoteRepository {
   Future<Map<String, dynamic>> encryptNote(Note note) {
     return _dbService.encryptNote(note);
   }
+
+  Future<Note> decryptNote(Map<String, dynamic> data) {
+    return _dbService.decryptNote(data);
+  }
 }
