@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
- codex/verify-imports-and-clean-up-code
 import 'package:provider/provider.dart';
-
 import '../models/note.dart';
 import '../providers/note_provider.dart';
-
 import 'note_detail_screen.dart';
 import '../models/note.dart';
- codex/expand-note-model-with-new-fields
 
 
 class NoteListForDayScreen extends StatelessWidget {
@@ -22,10 +18,20 @@ class NoteListForDayScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
- codex/enable-flutter_localizations-and-update-ui
+
+    final notes = context.watch<NoteProvider>().notes;
+    final dayNotes = notes
+        .where((n) =>
+            n.alarmTime != null &&
+            n.alarmTime!.year == date.year &&
+            n.alarmTime!.month == date.month &&
+            n.alarmTime!.day == date.day)
+        .toList();
+
+
     final title = AppLocalizations.of(context)!
         .scheduleForDate(DateFormat('dd/MM/yyyy').format(date));
-    if (notes.isEmpty) {
+    if (dayNotes.isEmpty) {
 
       return Scaffold(
         appBar: AppBar(title: Text(title)),
@@ -34,7 +40,6 @@ class NoteListForDayScreen extends StatelessWidget {
         ),
       );
     }
- codex/verify-imports-and-clean-up-code
 
     return Scaffold(
       appBar: AppBar(title: Text(title)),

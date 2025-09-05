@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import '../services/settings_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
   final Function(double) onFontScaleChanged;
+
   const SettingsScreen({
     super.key,
     required this.onThemeChanged,
@@ -15,7 +17,8 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
- codex/enable-flutter_localizations-and-update-ui
+
+
     void _pickColor() async {
       final colors = [Colors.blue, Colors.green, Colors.red, Colors.purple, Colors.orange, Colors.teal];
       await showDialog(
@@ -41,28 +44,47 @@ class SettingsScreen extends StatefulWidget {
       );
     }
 
-    void _pickMascot() async {
-      final options = [
-        'assets/lottie/mascot.json',
-        'assets/lottie/mascot2.json',
-        'assets/lottie/mascot3.json'
-      ];
-      await showDialog(
-        context: context,
-        builder: (_) => SimpleDialog(
-          title: Text(AppLocalizations.of(context)!.chooseMascot),
-          children: options.map((path) {
-            return SimpleDialogOption(
-              onPressed: () {
-                _settings.saveMascotPath(path);
 
+  void _pickColor() async {
+    final colors = [
+      Colors.blue,
+      Colors.green,
+      Colors.red,
+      Colors.purple,
+      Colors.orange,
+      Colors.teal,
+    ];
+
+
+  void _pickColor() async {
+    final colors = [
+      Colors.blue,
+      Colors.green,
+      Colors.red,
+      Colors.purple,
+      Colors.orange,
+      Colors.teal,
+    ];
+    await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.chooseThemeColor),
+        content: Wrap(
+
+          children: colors.map((c) {
+            return GestureDetector(
+              onTap: () {
+                widget.onThemeChanged(c);
                 Navigator.pop(context);
               },
               child: Container(
                 width: 40,
                 height: 40,
                 margin: const EdgeInsets.all(4),
-                decoration: BoxDecoration(color: c, shape: BoxShape.circle),
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                ),
               ),
             );
           }).toList(),
@@ -71,30 +93,42 @@ class SettingsScreen extends StatefulWidget {
     );
   }
 
-  void _pickMascot() async {
-    final options = [
-      'assets/lottie/mascot.json',
-      'assets/lottie/mascot2.json',
-      'assets/lottie/mascot3.json'
-    ];
+
+  void _changeFontScale() async {
+    final current = await _settings.loadFontScale();
+    double temp = current;
     await showDialog(
       context: context,
-      builder: (_) => SimpleDialog(
-        title: const Text('Chọn mascot'),
-        children: options.map((path) {
-          return SimpleDialogOption(
+      builder: (_) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.fontSize),
+        content: StatefulBuilder(
+          builder: (context, setState) => Slider(
+            min: 0.8,
+            max: 2.0,
+            divisions: 12,
+            value: temp,
+            label: temp.toStringAsFixed(1),
+            onChanged: (v) => setState(() => temp = v),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppLocalizations.of(context)!.cancel),
+          ),
+          TextButton(
             onPressed: () {
-              _settings.saveMascotPath(path);
+              widget.onFontScaleChanged(temp);
               Navigator.pop(context);
             },
-            child: Text(path.split('/').last),
-          );
-        }).toList(),
+            child: Text(AppLocalizations.of(context)!.save),
+          ),
+        ],
       ),
     );
   }
 
- codex/implement-secure-storage-and-authentication
+
   void _toggleAuth(bool v) {
     setState(() => _requireAuth = v);
     _settings.saveRequireAuth(v);
@@ -103,7 +137,9 @@ class SettingsScreen extends StatefulWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context)!.settings)),
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context)!.settings),
+      ),
       body: ListView(
         children: [
           ListTile(
@@ -114,45 +150,13 @@ class SettingsScreen extends StatefulWidget {
             title: Text(AppLocalizations.of(context)!.changeMascot),
             onTap: _pickMascot,
           ),
- codex/enable-flutter_localizations-and-update-ui
           ListTile(
             title: Text(AppLocalizations.of(context)!.fontSize),
-            onTap: () async {
-              final current = await _settings.loadFontScale();
-              double temp = current;
-              await showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                  title: Text(AppLocalizations.of(context)!.fontSize),
-                  content: StatefulBuilder(
-                    builder: (context, setState) => Slider(
-                      min: 0.8,
-                      max: 2.0,
-                      divisions: 12,
-                      value: temp,
-                      label: temp.toStringAsFixed(1),
-                      onChanged: (v) => setState(() => temp = v),
-                    ),
-                  ),
-                  actions: [
-                    TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(AppLocalizations.of(context)!.cancel)),
-                    TextButton(
-                        onPressed: () {
-                          onFontScaleChanged(temp);
-                          Navigator.pop(context);
-                        },
-                        child: Text(AppLocalizations.of(context)!.save)),
-                  ],
-                ),
-              );
-            },
-
+            onTap: _changeFontScale,
           ),
         ],
       ),
-
     );
   }
 }
+

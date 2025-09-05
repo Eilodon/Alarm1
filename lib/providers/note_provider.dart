@@ -1,4 +1,3 @@
- codex/convert-notedetailscreen-to-statefulwidget
 
 import 'package:flutter/foundation.dart';
 
@@ -9,7 +8,6 @@ class NoteProvider extends ChangeNotifier {
   final NoteRepository _repository;
   List<Note> _notes = [];
 
- codex/convert-notedetailscreen-to-statefulwidget
   NoteProvider({NoteRepository? repository})
       : _repository = repository ?? NoteRepository();
 
@@ -27,7 +25,6 @@ class NoteProvider extends ChangeNotifier {
     notifyListeners();
   }
 
- codex/convert-notedetailscreen-to-statefulwidget
   Future<void> updateNote(Note note) async {
     final index = _notes.indexWhere((n) => n.id == note.id);
     if (index != -1) {
@@ -44,5 +41,4 @@ class NoteProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
- codex/convert-notedetailscreen-to-statefulwidget
 
