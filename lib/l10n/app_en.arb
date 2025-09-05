@@ -54,6 +54,7 @@
   "audioLabel": "Audio",
 
   "tagsLabel": "Tags",
+  "allTags": "All tags",
   "addTag": "Add tag",
   "requireAuth": "Require authentication",
   "lockNote": "Lock note",

@@ -22,8 +22,11 @@ import '../services/gemini_service.dart';
 class NoteDetailScreen extends StatefulWidget {
   final Note note;
   final TTSService ttsService;
-  const NoteDetailScreen({super.key, required this.note, TTSService? ttsService})
-      : ttsService = ttsService ?? TTSService();
+  const NoteDetailScreen({
+    super.key,
+    required this.note,
+    TTSService? ttsService,
+  }) : ttsService = ttsService ?? TTSService();
 
   @override
   State<NoteDetailScreen> createState() => _NoteDetailScreenState();
@@ -133,9 +136,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                   Padding(
                     padding: const EdgeInsets.only(left: 8),
                     child: Text(
-                      DateFormat.yMd(Localizations.localeOf(context).toString())
-                          .add_Hm()
-                          .format(_alarmTime!),
+                      DateFormat.yMd(
+                        Localizations.localeOf(context).toString(),
+                      ).add_Hm().format(_alarmTime!),
                     ),
                   ),
               ],
@@ -210,6 +213,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               ],
             ),
             const SizedBox(height: 12),
+
             ..._attachments.asMap().entries.map(
               (entry) {
                 final index = entry.key;
@@ -251,6 +255,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                 );
               },
             ),
+
             const SizedBox(height: 12),
             ElevatedButton.icon(
               onPressed: () {
@@ -311,14 +316,17 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
 
     if (analysis != null) {
       final summaryCtrl = TextEditingController(text: analysis.summary);
-      final actionCtrl =
-          TextEditingController(text: analysis.actionItems.join('\n'));
-      final tagsCtrl =
-          TextEditingController(text: analysis.suggestedTags.join(', '));
+      final actionCtrl = TextEditingController(
+        text: analysis.actionItems.join('\n'),
+      );
+      final tagsCtrl = TextEditingController(
+        text: analysis.suggestedTags.join(', '),
+      );
       final datesCtrl = TextEditingController(
-          text: analysis.dates
-              .map((d) => DateFormat('yyyy-MM-dd').format(d))
-              .join(', '));
+        text: analysis.dates
+            .map((d) => DateFormat('yyyy-MM-dd').format(d))
+            .join(', '),
+      );
 
       final accepted = await showDialog<bool>(
         context: context,
@@ -334,8 +342,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                 ),
                 TextField(
                   controller: actionCtrl,
-                  decoration:
-                      InputDecoration(labelText: l10n.actionItemsLabel),
+                  decoration: InputDecoration(labelText: l10n.actionItemsLabel),
                   maxLines: null,
                 ),
                 TextField(
