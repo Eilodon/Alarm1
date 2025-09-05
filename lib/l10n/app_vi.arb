@@ -37,6 +37,9 @@
   "delete": "Xóa",
   "timeLabel": "Thời gian",
 
+  "noteDeleted": "Đã xóa ghi chú",
+  "undo": "Hoàn tác",
+
   "repeatLabel": "Lặp lại:",
   "repeatNone": "Không",
   "repeatEveryMinute": "Mỗi phút",

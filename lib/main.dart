@@ -7,6 +7,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'screens/home_screen.dart';
 import 'services/notification_service.dart';
 import 'services/settings_service.dart';
+import 'services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'providers/note_provider.dart';
 import 'firebase_options.dart';
@@ -19,6 +20,13 @@ void main() async {
   await FirebaseAuth.instance.signInAnonymously();
   await NotificationService().init();
   final settings = SettingsService();
+  final requireAuth = await settings.loadRequireAuth();
+  if (requireAuth) {
+    final ok = await AuthService().authenticate();
+    if (!ok) {
+      return;
+    }
+  }
   final themeColor = await settings.loadThemeColor();
   final fontScale = await settings.loadFontScale();
   runApp(

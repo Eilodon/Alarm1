@@ -35,8 +35,14 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
 
   Future<void> _startOffline() async {
     if (_voskRecognizer == null) {
+      final locale = Localizations.localeOf(context);
+      final code = {
+            'vi': 'vi',
+            'en': 'en',
+          }[locale.languageCode] ??
+          'en';
       final model = await widget.vosk
-          .createModel('assets/models/vosk-model-small-en-us-0.15');
+          .createModel('assets/models/vosk-model-small-$code');
       _voskRecognizer = await widget.vosk.createRecognizer(model: model);
       _voskService = await widget.vosk.initSpeechService(_voskRecognizer!);
       _voskService!.onResult().listen((event) {

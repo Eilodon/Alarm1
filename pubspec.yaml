@@ -26,6 +26,8 @@ dependencies:
   vosk_flutter: ^0.3.48
   share_plus: ^10.0.2
 
+  local_auth: ^2.1.7
+
   encrypt: ^5.0.1
   flutter_secure_storage: ^9.0.0
   file_picker: ^6.1.1
@@ -48,4 +50,5 @@ flutter:
     - assets/lottie/mascot2.json
     - assets/lottie/mascot3.json
     - assets/models/
-    - assets/models/vosk-model-small-en-us-0.15/
+    - assets/models/vosk-model-small-en/
+    - assets/models/vosk-model-small-vi/

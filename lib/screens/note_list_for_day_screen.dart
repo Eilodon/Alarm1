@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../models/note.dart';
 import '../providers/note_provider.dart';
 import 'note_detail_screen.dart';
+import '../services/auth_service.dart';
 
 class NoteListForDayScreen extends StatelessWidget {
   final DateTime date;
@@ -74,7 +75,11 @@ class NoteListForDayScreen extends StatelessWidget {
                 ],
               ),
               isThreeLine: timeStr != null || note.tags.isNotEmpty,
-              onTap: () {
+              onTap: () async {
+                if (note.locked) {
+                  final ok = await AuthService().authenticate();
+                  if (!ok) return;
+                }
                 Navigator.push(
                   context,
                   MaterialPageRoute(

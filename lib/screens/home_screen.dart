@@ -11,6 +11,7 @@ import '../models/note.dart';
 import '../providers/note_provider.dart';
 import '../services/notification_service.dart';
 import '../services/settings_service.dart';
+import '../services/auth_service.dart';
 import '../widgets/tag_selector.dart';
 import 'note_detail_screen.dart';
 import 'note_list_for_day_screen.dart';
@@ -109,18 +110,27 @@ class _HomeScreenState extends State<HomeScreen> {
                         initialTime: TimeOfDay.now(),
                       );
                       if (time != null) {
-                        alarmTime = DateTime(
-                          picked.year,
-                          picked.month,
-                          picked.day,
-                          time.hour,
-                          time.minute,
-                        );
+                        setState(() {
+                          alarmTime = DateTime(
+                            picked.year,
+                            picked.month,
+                            picked.day,
+                            time.hour,
+                            time.minute,
+                          );
+                        });
                       }
                     }
                   },
                   child: Text(AppLocalizations.of(context)!.selectReminderTime),
                 ),
+                if (alarmTime != null)
+                  Text(
+                    DateFormat.yMd(
+                            Localizations.localeOf(context).toString())
+                        .add_Hm()
+                        .format(alarmTime!),
+                  ),
               ],
             ),
           ),
@@ -209,7 +219,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           .format(note.alarmTime!)}'
                   : note.content,
             ),
-            onTap: () {
+            onTap: () async {
+              if (note.locked) {
+                final ok = await AuthService().authenticate();
+                if (!ok) return;
+              }
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => NoteDetailScreen(note: note)),
@@ -218,7 +232,22 @@ class _HomeScreenState extends State<HomeScreen> {
             trailing: IconButton(
               icon: const Icon(Icons.delete),
               tooltip: AppLocalizations.of(context)!.delete,
-              onPressed: () => context.read<NoteProvider>().removeNoteAt(index),
+              onPressed: () {
+                final note = context.read<NoteProvider>().notes[index];
+                context.read<NoteProvider>().removeNoteAt(index);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      AppLocalizations.of(context)!.noteDeleted,
+                    ),
+                    action: SnackBarAction(
+                      label: AppLocalizations.of(context)!.undo,
+                      onPressed: () =>
+                          context.read<NoteProvider>().addNote(note),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         );
