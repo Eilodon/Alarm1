@@ -7,11 +7,13 @@ import '../services/note_repository.dart';
 class NoteProvider extends ChangeNotifier {
   final NoteRepository _repository;
   List<Note> _notes = [];
+  String _draft = '';
 
   NoteProvider({NoteRepository? repository})
       : _repository = repository ?? NoteRepository();
 
   List<Note> get notes => List.unmodifiable(_notes);
+  String get draft => _draft;
 
 
   Future<void> loadNotes() async {
@@ -38,6 +40,11 @@ class NoteProvider extends ChangeNotifier {
   Future<void> removeNoteAt(int index) async {
     _notes.removeAt(index);
     await _repository.saveNotes(_notes);
+    notifyListeners();
+  }
+
+  void setDraft(String value) {
+    _draft = value;
     notifyListeners();
   }
 }
