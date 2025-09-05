@@ -109,18 +109,27 @@ class _HomeScreenState extends State<HomeScreen> {
                         initialTime: TimeOfDay.now(),
                       );
                       if (time != null) {
-                        alarmTime = DateTime(
-                          picked.year,
-                          picked.month,
-                          picked.day,
-                          time.hour,
-                          time.minute,
-                        );
+                        setState(() {
+                          alarmTime = DateTime(
+                            picked.year,
+                            picked.month,
+                            picked.day,
+                            time.hour,
+                            time.minute,
+                          );
+                        });
                       }
                     }
                   },
                   child: Text(AppLocalizations.of(context)!.selectReminderTime),
                 ),
+                if (alarmTime != null)
+                  Text(
+                    DateFormat.yMd(
+                            Localizations.localeOf(context).toString())
+                        .add_Hm()
+                        .format(alarmTime!),
+                  ),
               ],
             ),
           ),
