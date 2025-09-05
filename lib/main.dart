@@ -1,6 +1,10 @@
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -68,6 +72,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   Color _themeColor = Colors.blue;
   double _fontScale = 1.0;
+  StreamSubscription<ConnectivityResult>? _connSub;
 
   @override
   void initState() {
@@ -91,6 +96,20 @@ class _MyAppState extends State<MyApp> {
         );
       }
     });
+    try {
+      _connSub = Connectivity().onConnectivityChanged.listen((result) {
+        if (result == ConnectivityResult.none) {
+          final l10n = AppLocalizations.of(context)!;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.noInternetConnection),
+            ),
+          );
+        }
+      });
+    } on MissingPluginException {
+      // Ignore if connectivity plugin is not available (e.g., tests)
+    }
   }
 
   void updateTheme(Color newColor) async {
@@ -101,6 +120,12 @@ class _MyAppState extends State<MyApp> {
   void updateFontScale(double newScale) async {
     setState(() => _fontScale = newScale);
     await SettingsService().saveFontScale(newScale);
+  }
+
+  @override
+  void dispose() {
+    _connSub?.cancel();
+    super.dispose();
   }
 
   @override
