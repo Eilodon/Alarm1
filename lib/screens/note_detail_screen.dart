@@ -69,7 +69,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   }
 
   Future<void> _readNote() async {
-    await _ttsService.speak(_contentCtrl.text);
+    await _ttsService.speak(
+      _contentCtrl.text,
+      locale: Localizations.localeOf(context),
+    );
   }
 
   @override
