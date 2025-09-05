@@ -11,6 +11,7 @@ import '../models/note.dart';
 import '../providers/note_provider.dart';
 import '../services/notification_service.dart';
 import '../services/settings_service.dart';
+import '../services/auth_service.dart';
 import '../widgets/tag_selector.dart';
 import 'note_detail_screen.dart';
 import 'note_list_for_day_screen.dart';
@@ -209,7 +210,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           .format(note.alarmTime!)}'
                   : note.content,
             ),
-            onTap: () {
+            onTap: () async {
+              if (note.locked) {
+                final ok = await AuthService().authenticate();
+                if (!ok) return;
+              }
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => NoteDetailScreen(note: note)),
