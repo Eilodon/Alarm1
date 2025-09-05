@@ -1,38 +1,46 @@
 class Note {
-  String id;
-  String title;
-  String content;
-  DateTime? remindAt;
-  bool daily;
-  bool active;
- codex/add-tag-chips-to-note-list
-  List<String> tags;
 
 
-  Note({
-    String? id,
+
+  final String id;
+  final String title;
+  final String content;
+  final DateTime? remindAt;
+  final bool daily;
+  final bool active;
+  final List<String> tags;
+  final int snoozeMinutes;
+
+  const Note({
+    required this.id,
+
+
+
     required this.title,
     required this.content,
-    this.remindAt,
+    this.alarmTime,
     this.daily = false,
     this.active = false,
- codex/add-tag-chips-to-note-list
-    this.tags = const [],
 
+    this.tags = const [],
+    this.snoozeMinutes = 0,
   });
 
-
   factory Note.fromJson(Map<String, dynamic> j) => Note(
-        id: j['id'],
-        title: j['title'],
-        content: j['content'],
-codex/implement-note-repository-and-provider
-        alarmTime: j['alarmTime'] != null ? DateTime.parse(j['alarmTime']) : null,
- codex/expand-note-model-with-new-fields
+
+
+        id: j['id'] as String,
+        title: j['title'] as String,
+        content: j['content'] as String,
+        remindAt: j['remindAt'] != null
+            ? DateTime.parse(j['remindAt'])
+            : null,
+
+
         daily: j['daily'] ?? false,
         active: j['active'] ?? false,
- codex/add-tag-chips-to-note-list
         tags: (j['tags'] as List<dynamic>? ?? []).cast<String>(),
+        snoozeMinutes: j['snoozeMinutes'] ?? 0,
 
       );
 
@@ -40,12 +48,12 @@ codex/implement-note-repository-and-provider
         'id': id,
         'title': title,
         'content': content,
- codex/update-homescreenstate-to-manage-notes
+
         'remindAt': remindAt?.toIso8601String(),
         'daily': daily,
         'active': active,
- codex/add-tag-chips-to-note-list
         'tags': tags,
-
+        'snoozeMinutes': snoozeMinutes,
       };
 }
+

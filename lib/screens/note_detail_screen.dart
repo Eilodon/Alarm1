@@ -1,16 +1,15 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
- codex/enable-flutter_localizations-and-update-ui
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../models/note.dart';
 import '../providers/note_provider.dart';
- codex/convert-notedetailscreen-to-statefulwidget
 import '../services/notification_service.dart';
-
 import '../services/tts_service.dart';
- codex/add-ask-ai-button-to-notedetailscreen
 import '../services/gemini_service.dart';
+import 'chat_screen.dart';
 
 
 class NoteDetailScreen extends StatefulWidget {
@@ -22,13 +21,14 @@ class NoteDetailScreen extends StatefulWidget {
 }
 
 class _NoteDetailScreenState extends State<NoteDetailScreen> {
- codex/convert-notedetailscreen-to-statefulwidget
   late final TextEditingController _titleCtrl;
   late final TextEditingController _contentCtrl;
   final List<String> _attachments = [];
   DateTime? _alarmTime;
   RepeatInterval? _repeat;
   int _snoozeMinutes = 5;
+  List<String> _tags = [];
+  bool _editing = false;
 
 
   @override
@@ -36,7 +36,6 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     super.initState();
     _titleCtrl = TextEditingController(text: widget.note.title);
     _contentCtrl = TextEditingController(text: widget.note.content);
- codex/convert-notedetailscreen-to-statefulwidget
     _alarmTime = widget.note.alarmTime;
     _repeat = widget.note.daily ? RepeatInterval.daily : null;
     _snoozeMinutes = widget.note.snoozeMinutes;
@@ -58,23 +57,11 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     }
   }
 
-  void _save() {
-    widget.note
-      ..title = _titleCtrl.text
-      ..content = _contentCtrl.text
-      ..tags = _tags
-      ..attachments = _attachments
-      ..updatedAt = DateTime.now();
-    context.read<NoteProvider>().updateNote(widget.note);
-    setState(() => _editing = false);
-
-  }
-
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<NoteProvider>();
+    context.watch<NoteProvider>();
+    final note = widget.note;
     return Scaffold(
- codex/enable-flutter_localizations-and-update-ui
       appBar: AppBar(title: Text(note.title)),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,14 +76,12 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
             onPressed: () => TTSService().speak(note.content),
             child: Text(AppLocalizations.of(context)!.readNote),
           ),
-
           const Divider(),
           ..._attachments.map((a) => ListTile(title: Text(a.split('/').last))),
+          const Divider(),
+          Expanded(child: ChatScreen(initialMessage: _contentCtrl.text)),
         ],
-        const Divider(),
-        Expanded(child: ChatScreen(initialMessage: _contentCtrl.text)),
-      ],
-
+      ),
     );
   }
 
@@ -129,46 +114,48 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   }
 
   Future<void> _save() async {
-    final updated = Note(
-      id: widget.note.id,
-      title: _titleCtrl.text,
-      content: _contentCtrl.text,
-      alarmTime: _alarmTime,
-      daily: _repeat == RepeatInterval.daily,
-      active: true,
-      snoozeMinutes: _snoozeMinutes,
-    );
-    await context.read<NoteProvider>().updateNote(updated);
+    widget.note
+      ..title = _titleCtrl.text
+      ..content = _contentCtrl.text
+      ..tags = _tags
+      ..attachments = _attachments
+      ..alarmTime = _alarmTime
+      ..daily = _repeat == RepeatInterval.daily
+      ..active = true
+      ..snoozeMinutes = _snoozeMinutes
+      ..updatedAt = DateTime.now();
+    await context.read<NoteProvider>().updateNote(widget.note);
 
     if (_alarmTime != null) {
-      final id = int.tryParse(updated.id) ??
+      final id = int.tryParse(widget.note.id) ??
           DateTime.now().millisecondsSinceEpoch % 100000;
       final service = NotificationService();
       if (_repeat == RepeatInterval.daily) {
         await service.scheduleDailyAtTime(
           id: id,
-          title: updated.title,
-          body: updated.content,
+          title: widget.note.title,
+          body: widget.note.content,
           time: Time(_alarmTime!.hour, _alarmTime!.minute),
         );
       } else if (_repeat != null) {
         await service.scheduleRecurring(
           id: id,
-          title: updated.title,
-          body: updated.content,
+          title: widget.note.title,
+          body: widget.note.content,
           repeatInterval: _repeat!,
         );
       } else {
         await service.scheduleNotification(
           id: id,
-          title: updated.title,
-          body: updated.content,
+          title: widget.note.title,
+          body: widget.note.content,
           scheduledDate: _alarmTime!,
         );
       }
     }
 
     if (!mounted) return;
+    setState(() => _editing = false);
     Navigator.pop(context);
   }
 }

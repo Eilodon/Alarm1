@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:notes_reminder_app/services/note_repository.dart';
 import 'package:notes_reminder_app/models/note.dart';
 
@@ -9,6 +10,7 @@ void main() {
   group('NoteRepository', () {
     setUp(() {
       SharedPreferences.setMockInitialValues({});
+      FlutterSecureStorage.setMockInitialValues({});
     });
 
     test('getNotes returns empty list when no data', () async {
