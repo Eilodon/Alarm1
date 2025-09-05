@@ -15,7 +15,6 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
- codex/enable-flutter_localizations-and-update-ui
     void _pickColor() async {
       final colors = [Colors.blue, Colors.green, Colors.red, Colors.purple, Colors.orange, Colors.teal];
       await showDialog(
@@ -94,7 +93,6 @@ class SettingsScreen extends StatefulWidget {
     );
   }
 
- codex/implement-secure-storage-and-authentication
   void _toggleAuth(bool v) {
     setState(() => _requireAuth = v);
     _settings.saveRequireAuth(v);
@@ -114,7 +112,6 @@ class SettingsScreen extends StatefulWidget {
             title: Text(AppLocalizations.of(context)!.changeMascot),
             onTap: _pickMascot,
           ),
- codex/enable-flutter_localizations-and-update-ui
           ListTile(
             title: Text(AppLocalizations.of(context)!.fontSize),
             onTap: () async {

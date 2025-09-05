@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 class SettingsService {
   static const _kThemeColor = 'theme_color';
   static const _kMascotPath = 'mascot_path';
- codex/enable-flutter_localizations-and-update-ui
   static const _kFontScale = 'font_scale';
 
 
@@ -29,7 +28,6 @@ class SettingsService {
     return sp.getString(_kMascotPath) ?? 'assets/lottie/mascot.json';
   }
 
- codex/enable-flutter_localizations-and-update-ui
   Future<void> saveFontScale(double scale) async {
     final sp = await SharedPreferences.getInstance();
     await sp.setDouble(_kFontScale, scale);

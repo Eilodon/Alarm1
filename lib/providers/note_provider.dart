@@ -1,3 +1,4 @@
+
 import 'package:flutter/foundation.dart';
 
 import '../models/note.dart';
@@ -40,3 +41,4 @@ class NoteProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
+
