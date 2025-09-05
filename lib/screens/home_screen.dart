@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
@@ -145,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () async {
                 final noteId = const Uuid().v4();
                 final notificationId =
-                    alarmTime != null ? Random().nextInt(1 << 31) : null;
+                    alarmTime != null ? const Uuid().v4().hashCode : null;
 
                 final note = Note(
                   id: noteId,
