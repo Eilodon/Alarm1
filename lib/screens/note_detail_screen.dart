@@ -76,7 +76,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         actions: [
           TextButton(
             onPressed: _readNote,
-            child: const Text('Đọc Note'),
+            child: Text(AppLocalizations.of(context)!.readNote),
           ),
           IconButton(
             icon: const Icon(Icons.save),
