@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -7,9 +9,14 @@ import 'services/notification_service.dart';
 import 'services/settings_service.dart';
 import 'package:provider/provider.dart';
 import 'providers/note_provider.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await FirebaseAuth.instance.signInAnonymously();
   await NotificationService().init();
   final settings = SettingsService();
   final themeColor = await settings.loadThemeColor();
