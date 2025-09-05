@@ -260,6 +260,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           title: updated.title,
           body: updated.content,
           time: Time(_alarmTime!.hour, _alarmTime!.minute),
+          l10n: AppLocalizations.of(context)!,
         );
       } else if (_repeat != null) {
         await service.scheduleRecurring(
@@ -267,6 +268,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           title: updated.title,
           body: updated.content,
           repeatInterval: _repeat!,
+          l10n: AppLocalizations.of(context)!,
         );
       } else {
         await service.scheduleNotification(
@@ -274,6 +276,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           title: updated.title,
           body: updated.content,
           scheduledDate: _alarmTime!,
+          l10n: AppLocalizations.of(context)!,
         );
       }
     }

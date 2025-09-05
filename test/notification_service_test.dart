@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'dart:ui';
 import 'package:notes_reminder_app/services/notification_service.dart';
 
 void main() {
@@ -27,34 +29,40 @@ void main() {
   });
 
   test('scheduleNotification schedules notification', () async {
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
     final service = NotificationService();
     await service.scheduleNotification(
       id: 1,
       title: 't',
       body: 'b',
       scheduledDate: DateTime.now().add(const Duration(minutes: 1)),
+      l10n: l10n,
     );
     expect(log.any((c) => c.method == 'zonedSchedule'), isTrue);
   });
 
   test('scheduleDailyAtTime schedules daily notification', () async {
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
     final service = NotificationService();
     await service.scheduleDailyAtTime(
       id: 2,
       title: 't',
       body: 'b',
       time: const Time(10, 0, 0),
+      l10n: l10n,
     );
     expect(log.any((c) => c.method == 'zonedSchedule'), isTrue);
   });
 
   test('scheduleRecurring schedules recurring notification', () async {
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
     final service = NotificationService();
     await service.scheduleRecurring(
       id: 3,
       title: 't',
       body: 'b',
       repeatInterval: RepeatInterval.daily,
+      l10n: l10n,
     );
     expect(log.any((c) => c.method == 'periodicallyShow'), isTrue);
   });

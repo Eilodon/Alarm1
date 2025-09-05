@@ -55,5 +55,9 @@
   "convertSpeechPrompt": "Chuyển đoạn nói sau thành ghi chú: {recognized}",
   "convertSpeechPrompt@placeholders": {
     "recognized": {}
-  }
+  },
+  "scheduled": "Lên lịch",
+  "recurring": "Định kỳ",
+  "daily": "Hàng ngày",
+  "snooze": "Báo lại"
 }
