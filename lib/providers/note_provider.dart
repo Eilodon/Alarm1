@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import '../models/note.dart';
 import '../services/note_repository.dart';
 import '../services/calendar_service.dart';
+import '../services/notification_service.dart';
 
 class NoteProvider extends ChangeNotifier {
   final NoteRepository _repository;
@@ -91,8 +92,16 @@ class NoteProvider extends ChangeNotifier {
 
 
   Future<void> removeNoteAt(int index) async {
+    final note = _notes[index];
 
-    final note = _notes.removeAt(index);
+    if (note.notificationId != null) {
+      await NotificationService().cancel(note.notificationId!);
+    }
+    if (note.eventId != null) {
+      await _calendarService.deleteEvent(note.eventId!);
+    }
+
+    _notes.removeAt(index);
 
     await _repository.saveNotes(_notes);
     notifyListeners();
