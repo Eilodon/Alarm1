@@ -46,6 +46,13 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     _tags = List.from(widget.note.tags);
   }
 
+  @override
+  void dispose() {
+    _titleCtrl.dispose();
+    _contentCtrl.dispose();
+    super.dispose();
+  }
+
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final file = await picker.pickImage(source: ImageSource.gallery);
