@@ -302,7 +302,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(DateFormat('E').format(d)),
+                        Text(DateFormat.E(Localizations.localeOf(context).toString()).format(d)),
                         Text('${d.day}'),
                       ],
                     ),
