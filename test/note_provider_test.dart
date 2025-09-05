@@ -6,6 +6,7 @@ import 'package:notes_reminder_app/services/note_repository.dart';
 import 'package:notes_reminder_app/services/calendar_service.dart';
 import 'package:notes_reminder_app/services/notification_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class MockRepo extends Mock implements NoteRepository {}
 class MockCalendar extends Mock implements CalendarService {}
@@ -107,5 +108,94 @@ void main() {
     ).captured;
     expect(captured.first, isA<int>());
     expect(captured.first > 0, isTrue);
+  });
+
+  test('createNote with repeat interval schedules recurring notification', () async {
+    final repo = MockRepo();
+    final calendar = MockCalendar();
+    final notification = MockNotification();
+    final l10n = FakeL10n();
+    when(() => repo.saveNotes(any())).thenAnswer((_) async {});
+    when(
+      () => notification.scheduleRecurring(
+        id: any(named: 'id'),
+        title: any(named: 'title'),
+        body: any(named: 'body'),
+        repeatInterval: any(named: 'repeatInterval'),
+        l10n: l10n,
+      ),
+    ).thenAnswer((_) async {});
+    when(() => calendar.createEvent(
+          title: any(named: 'title'),
+          description: any(named: 'description'),
+          start: any(named: 'start'),
+        )).thenAnswer((_) async => 'e1');
+
+    final provider = NoteProvider(
+      repository: repo,
+      calendarService: calendar,
+      notificationService: notification,
+    );
+
+    await provider.createNote(
+      title: 't',
+      content: 'c',
+      alarmTime: DateTime(2025, 1, 1),
+      repeatInterval: RepeatInterval.daily,
+      l10n: l10n,
+    );
+
+    verify(() => notification.scheduleRecurring(
+          id: any(named: 'id'),
+          title: 't',
+          body: 'c',
+          repeatInterval: RepeatInterval.daily,
+          l10n: l10n,
+        )).called(1);
+  });
+
+  test('snoozeNote calls notification snooze', () async {
+    final repo = MockRepo();
+    final calendar = MockCalendar();
+    final notification = MockNotification();
+    final l10n = FakeL10n();
+    when(() => repo.getNotes()).thenAnswer((_) async => [
+          const Note(
+            id: '1',
+            title: 't',
+            content: 'c',
+            snoozeMinutes: 5,
+            notificationId: 10,
+            summary: '',
+            actionItems: [],
+            dates: [],
+          )
+        ]);
+    when(() => repo.saveNotes(any())).thenAnswer((_) async {});
+    when(() => notification.snoozeNotification(
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          minutes: any(named: 'minutes'),
+          l10n: l10n,
+        )).thenAnswer((_) async {});
+
+    final provider = NoteProvider(
+      repository: repo,
+      calendarService: calendar,
+      notificationService: notification,
+    );
+
+    await provider.loadNotes();
+    final note = provider.notes.first;
+    await provider.snoozeNote(note, l10n);
+
+    verify(() => notification.snoozeNotification(
+          id: 10,
+          title: 't',
+          body: 'c',
+          minutes: 5,
+          l10n: l10n,
+        )).called(1);
   });
 }
