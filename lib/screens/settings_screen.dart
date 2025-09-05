@@ -141,7 +141,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _exportNotes() async {
-    await _noteRepository.exportNotes();
+    final l10n = AppLocalizations.of(context)!;
+    await _noteRepository.exportNotes(l10n);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Notes exported')),
@@ -149,7 +150,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _importNotes() async {
-    await _noteRepository.importNotes();
+    final l10n = AppLocalizations.of(context)!;
+    await _noteRepository.importNotes(l10n);
     if (!mounted) return;
     await context.read<NoteProvider>().loadNotes();
     ScaffoldMessenger.of(context).showSnackBar(
