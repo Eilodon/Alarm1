@@ -31,6 +31,19 @@
   "delete": "Xóa",
   "timeLabel": "Thời gian",
 
+  "repeatLabel": "Lặp lại:",
+  "repeatNone": "Không",
+  "repeatEveryMinute": "Mỗi phút",
+  "repeatHourly": "Hàng giờ",
+  "repeatDaily": "Hàng ngày",
+  "repeatWeekly": "Hàng tuần",
+  "snoozeLabel": "Báo lại: {minutes} phút",
+  "snoozeLabel@placeholders": {
+    "minutes": {}
+  },
+  "imageLabel": "Ảnh",
+  "audioLabel": "Âm thanh",
+
   "tagsLabel": "Tag",
   "addTag": "Thêm tag",
   "requireAuth": "Yêu cầu xác thực",
