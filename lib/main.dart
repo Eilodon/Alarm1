@@ -18,12 +18,23 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  bool authFailed = false;
+  bool notificationFailed = false;
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  await FirebaseAuth.instance.signInAnonymously();
-  await NotificationService().init();
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    await FirebaseAuth.instance.signInAnonymously();
+  } catch (e) {
+    authFailed = true;
+  }
+
+  try {
+    await NotificationService().init();
+  } catch (e) {
+    notificationFailed = true;
+  }
 
   final settings = SettingsService();
   final requireAuth = await settings.loadRequireAuth();
