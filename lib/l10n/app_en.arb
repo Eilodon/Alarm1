@@ -82,6 +82,8 @@
   "aiSuggestionsTitle": "AI Suggestions",
   "summaryLabel": "Summary",
   "actionItemsLabel": "Action items",
-  "datesLabel": "Dates"
+  "datesLabel": "Dates",
+  "authFailedMessage": "Anonymous sign-in failed. Limited functionality.",
+  "notificationFailedMessage": "Notification setup failed."
 
 }

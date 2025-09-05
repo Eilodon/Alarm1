@@ -99,17 +99,18 @@ class _MyAppState extends State<MyApp> {
     _themeColor = widget.themeColor;
     _fontScale = widget.fontScale;
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final l10n = AppLocalizations.of(context)!;
       if (widget.authFailed) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Anonymous sign-in failed. Limited functionality.'),
+          SnackBar(
+            content: Text(l10n.authFailedMessage),
           ),
         );
       }
       if (widget.notificationFailed) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Notification setup failed.'),
+          SnackBar(
+            content: Text(l10n.notificationFailedMessage),
           ),
         );
       }

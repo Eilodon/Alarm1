@@ -82,6 +82,8 @@
   "aiSuggestionsTitle": "Gợi ý AI",
   "summaryLabel": "Tóm tắt",
   "actionItemsLabel": "Cần làm",
-  "datesLabel": "Ngày"
+  "datesLabel": "Ngày",
+  "authFailedMessage": "Đăng nhập ẩn danh thất bại. Chức năng bị hạn chế.",
+  "notificationFailedMessage": "Thiết lập thông báo thất bại."
 
 }
