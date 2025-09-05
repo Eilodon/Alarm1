@@ -8,7 +8,7 @@ import 'package:notes_reminder_app/screens/note_detail_screen.dart';
 
 void main() {
   testWidgets('display note and trigger TTS', (tester) async {
-    final note = Note(id: '1', title: 'title', content: 'content');
+    const note = Note(id: '1', title: 'title', content: 'content');
 
     const channel = MethodChannel('flutter_tts');
     final calls = <MethodCall>[];
@@ -20,7 +20,7 @@ void main() {
     await tester.pumpWidget(
       ChangeNotifierProvider(
         create: (_) => NoteProvider(),
-        child: const MaterialApp(home: NoteDetailScreen(note: note)),
+        child: MaterialApp(home: NoteDetailScreen(note: note)),
       ),
     );
 
