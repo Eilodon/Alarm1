@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
- codex/enable-flutter_localizations-and-update-ui
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:intl/intl.dart';
- codex/expand-note-model-with-new-fields
 import 'package:lottie/lottie.dart';
- codex/convert-notedetailscreen-to-statefulwidget
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 
@@ -39,7 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
   static const _platform = MethodChannel('notes_reminder_app/actions');
 
   String _mascotPath = 'assets/lottie/mascot.json';
- codex/convert-notedetailscreen-to-statefulwidget
 
   DateTime today = DateTime.now();
   final _db = DbService();
@@ -49,7 +45,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadMascot();
- codex/implement-secure-storage-and-authentication
     _loadNotes();
 
   }
@@ -69,12 +64,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final titleCtrl = TextEditingController();
     final contentCtrl = TextEditingController(text: provider.draft);
     DateTime? alarmTime;
- codex/implement-secure-storage-and-authentication
     bool locked = false;
 
     showDialog(
       context: context,
- codex/enable-flutter_localizations-and-update-ui
       builder: (_) => AlertDialog(
         title: Text(AppLocalizations.of(context)!.addNoteReminder),
         content: SingleChildScrollView(
@@ -105,7 +98,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       lastDate: DateTime(now.year + 2),
                       initialDate: now,
                     );
- codex/implement-secure-storage-and-authentication
                     if (picked != null) {
                       final time = await showTimePicker(
                         context: context,
@@ -120,7 +112,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       }
                     }
- codex/enable-flutter_localizations-and-update-ui
                   }
                 },
                 child: Text(AppLocalizations.of(context)!.selectReminderTime),
@@ -128,7 +119,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
 
           ),
- codex/refactor-note-id-and-alarm-time-formatting
         ),
         actions: [
           TextButton(
@@ -153,7 +143,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   scheduledDate: alarmTime!,
 
                 );
- codex/enable-flutter_localizations-and-update-ui
               }
               if (!mounted) return;
               Navigator.pop(context); // FIX Lỗi 1: auto đóng dialog
@@ -166,7 +155,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
- codex/convert-notedetailscreen-to-statefulwidget
   List<Note> notesForDay(DateTime day) {
     final notes = context.read<NoteProvider>().notes;
     return notes
@@ -179,7 +167,6 @@ class _HomeScreenState extends State<HomeScreen> {
         .toList();
   }
 
- codex/add-ask-ai-button-to-notedetailscreen
   @override
   Widget build(BuildContext context) {
     final weekDays = List.generate(7, (i) => today.add(Duration(days: i)));
@@ -269,9 +256,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
- codex/convert-notedetailscreen-to-statefulwidget
   Widget _buildNotesList() {
- codex/enable-flutter_localizations-and-update-ui
     if (notes.isEmpty)
       return Center(child: Text(AppLocalizations.of(context)!.noNotes));
 
@@ -283,10 +268,8 @@ class _HomeScreenState extends State<HomeScreen> {
           child: ListTile(
             leading: note.locked ? const Icon(Icons.lock) : null,
             title: Text(note.title),
- codex/expand-note-model-with-new-fields
 
             subtitle: Text(note.alarmTime != null
- codex/refactor-note-id-and-alarm-time-formatting
                 ? '${note.content}\n⏰ ${DateFormat('HH:mm dd/MM/yyyy').format(note.alarmTime!)}'
                 : note.content),
             onTap: () {
@@ -300,7 +283,6 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             trailing: IconButton(
               icon: const Icon(Icons.delete),
- codex/enable-flutter_localizations-and-update-ui
               tooltip: AppLocalizations.of(context)!.delete,
               onPressed: () => setState(() => notes.removeAt(index)),
 

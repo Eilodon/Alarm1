@@ -24,7 +24,6 @@ void main() {
       ),
     );
 
- codex/convert-notedetailscreen-to-statefulwidget
 
     expect(find.text('content'), findsOneWidget);
 
