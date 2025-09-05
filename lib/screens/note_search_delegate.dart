@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/note.dart';
+import 'note_detail_screen.dart';
 
 class NoteSearchDelegate extends SearchDelegate {
   final List<Note> notes;
@@ -25,15 +26,15 @@ class NoteSearchDelegate extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    return _buildList();
+    return _buildList(context);
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return _buildList();
+    return _buildList(context);
   }
 
-  Widget _buildList() {
+  Widget _buildList(BuildContext context) {
     final filtered = notes.where((n) {
       final lower = query.toLowerCase();
       return n.title.toLowerCase().contains(lower) ||
@@ -44,6 +45,14 @@ class NoteSearchDelegate extends SearchDelegate {
           .map((n) => ListTile(
                 title: Text(n.title),
                 subtitle: Text(n.content),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => NoteDetailScreen(note: n),
+                    ),
+                  );
+                },
               ))
           .toList(),
     );
