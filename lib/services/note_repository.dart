@@ -1,3 +1,5 @@
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import '../models/note.dart';
 import 'db_service.dart';
 import 'backup_service.dart';
@@ -32,13 +34,13 @@ class NoteRepository {
     return _dbService.decryptNote(data);
   }
 
-  Future<void> exportNotes() async {
+  Future<void> exportNotes(AppLocalizations l10n) async {
     final notes = await _dbService.getNotes();
-    await _backupService.exportNotes(notes);
+    await _backupService.exportNotes(notes, l10n);
   }
 
-  Future<List<Note>> importNotes() async {
-    final notes = await _backupService.importNotes();
+  Future<List<Note>> importNotes(AppLocalizations l10n) async {
+    final notes = await _backupService.importNotes(l10n);
     if (notes.isNotEmpty) {
       await _dbService.saveNotes(notes);
     }
