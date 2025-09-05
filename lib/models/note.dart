@@ -14,9 +14,8 @@ class Note {
   final int snoozeMinutes;
   final DateTime? updatedAt;
   final int? notificationId;
-  final String summary;
-  final List<String> actionItems;
-  final List<DateTime> dates;
+  final String? eventId;
+
 
   const Note({
     required this.id,
@@ -32,9 +31,9 @@ class Note {
     this.snoozeMinutes = 0,
     this.updatedAt,
     this.notificationId,
-    this.summary = '',
-    this.actionItems = const [],
-    this.dates = const [],
+
+    this.eventId,
+
   });
 
   Note copyWith({
@@ -51,9 +50,9 @@ class Note {
     int? snoozeMinutes,
     DateTime? updatedAt,
     Object? notificationId = _notificationIdSentinel,
-    String? summary,
-    List<String>? actionItems,
-    List<DateTime>? dates,
+
+    Object? eventId = _eventIdSentinel,
+
   }) {
     return Note(
       id: id ?? this.id,
@@ -71,9 +70,10 @@ class Note {
       notificationId: notificationId == _notificationIdSentinel
           ? this.notificationId
           : notificationId as int?,
-      summary: summary ?? this.summary,
-      actionItems: actionItems ?? this.actionItems,
-      dates: dates ?? this.dates,
+
+      eventId:
+          eventId == _eventIdSentinel ? this.eventId : eventId as String?,
+
     );
   }
 
@@ -100,12 +100,9 @@ class Note {
           ? DateTime.parse(json['updatedAt'])
           : null,
       notificationId: json['notificationId'] as int?,
-      summary: json['summary'] as String? ?? '',
-      actionItems: (json['actionItems'] as List<dynamic>? ?? []).cast<String>(),
-      dates: (json['dates'] as List<dynamic>? ?? [])
-          .map((d) => DateTime.tryParse(d as String))
-          .whereType<DateTime>()
-          .toList(),
+
+      eventId: json['eventId'] as String?,
+
     );
   }
 
@@ -123,13 +120,14 @@ class Note {
     'snoozeMinutes': snoozeMinutes,
     'updatedAt': updatedAt?.toIso8601String(),
     'notificationId': notificationId,
-    'summary': summary,
-    'actionItems': actionItems,
-    'dates': dates.map((d) => d.toIso8601String()).toList(),
+
+    'eventId': eventId,
+
   };
 }
 
 const _notificationIdSentinel = Object();
+const _eventIdSentinel = Object();
 
 RepeatInterval? _repeatIntervalFromString(String? value) {
   if (value == null) return null;
