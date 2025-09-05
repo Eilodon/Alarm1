@@ -157,20 +157,24 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: const Icon(Icons.delete),
               tooltip: AppLocalizations.of(context)!.delete,
               onPressed: () {
-                final note = context.read<NoteProvider>().notes[index];
-                context.read<NoteProvider>().removeNoteAt(index);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      AppLocalizations.of(context)!.noteDeleted,
+                final provider = context.read<NoteProvider>();
+                final note = notes[index];
+                final idx =
+                    provider.notes.indexWhere((n) => n.id == note.id);
+                if (idx != -1) {
+                  provider.removeNoteAt(idx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLocalizations.of(context)!.noteDeleted,
+                      ),
+                      action: SnackBarAction(
+                        label: AppLocalizations.of(context)!.undo,
+                        onPressed: () => provider.addNote(note),
+                      ),
                     ),
-                    action: SnackBarAction(
-                      label: AppLocalizations.of(context)!.undo,
-                      onPressed: () =>
-                          context.read<NoteProvider>().addNote(note),
-                    ),
-                  ),
-                );
+                  );
+                }
               },
             ),
           ),
