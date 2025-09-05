@@ -32,6 +32,12 @@ dependencies:
   cloud_firestore: ^6.0.1
   firebase_auth: ^6.0.2
 
+  speech_to_text: ^x.y.z
+  vosk_flutter: ^x.y.z
+  google_sign_in: ^x.y.z
+  googleapis: ^x.y.z
+  image_picker: ^x.y.z
+
 
 
 
