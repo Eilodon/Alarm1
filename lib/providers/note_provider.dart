@@ -18,6 +18,9 @@ class NoteProvider extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  final CalendarService _calendarService;
+  final NotificationService _notificationService;
+
   List<Note> _notes = [];
   String _draft = '';
   final Set<String> _unsyncedNoteIds = {};
@@ -92,9 +95,65 @@ class NoteProvider extends ChangeNotifier {
     return success;
   }
 
+  Future<List<Note>> fetchNotesPage(DateTime? startAfter, int limit) async {
+    if (_notes.isEmpty && startAfter == null) {
+      _notes = await _repository.getNotes();
+    }
+
+    if (Firebase.apps.isNotEmpty) {
+      final user = _auth.currentUser ?? await _auth.signInAnonymously();
+      var query = _firestore
+          .collection('notes')
+          .where('userId', isEqualTo: user.uid)
+          .orderBy('updatedAt', descending: true)
+          .limit(limit);
+      if (startAfter != null) {
+        query = query.startAfter([startAfter.toIso8601String()]);
+      }
+      final snapshot = await query.get();
+      final remoteNotes = await Future.wait(
+        snapshot.docs.map((d) => _repository.decryptNote(d.data())),
+      );
+      final map = {for (var n in _notes) n.id: n};
+      for (final n in remoteNotes) {
+        final local = map[n.id];
+        if (local == null) {
+          map[n.id] = n;
+        } else {
+          final localUpdated =
+              local.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+          final remoteUpdated =
+              n.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+          if (remoteUpdated.isAfter(localUpdated)) {
+            map[n.id] = n;
+          }
+        }
+      }
+      _notes = map.values.toList()
+        ..sort((a, b) => (b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0))
+            .compareTo(a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0)));
+      await _repository.saveNotes(_notes);
+    }
+
+    final sorted = _notes.toList()
+      ..sort((a, b) => (b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0))
+          .compareTo(a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0)));
+    final page = sorted
+        .where((n) => startAfter == null
+            ? true
+            : (n.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0))
+                .isBefore(startAfter))
+        .take(limit)
+        .toList();
+    notifyListeners();
+    return page;
+  }
+
 
   Future<void> addNote(Note note) async {
     _notes.add(note);
+    _notes.sort((a, b) => (b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0))
+        .compareTo(a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0)));
     await _repository.saveNotes(_notes);
     notifyListeners();
     if (Firebase.apps.isNotEmpty) {
