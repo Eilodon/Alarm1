@@ -47,4 +47,5 @@ flutter:
     - assets/lottie/mascot2.json
     - assets/lottie/mascot3.json
     - assets/models/
-    - assets/models/vosk-model-small-en-us-0.15/
+    - assets/models/vosk-model-small-en/
+    - assets/models/vosk-model-small-vi/
