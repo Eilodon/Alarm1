@@ -15,8 +15,46 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
-  final _settings = SettingsService();
+
+    void _pickColor() async {
+      final colors = [Colors.blue, Colors.green, Colors.red, Colors.purple, Colors.orange, Colors.teal];
+      await showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text(AppLocalizations.of(context)!.chooseThemeColor),
+          content: Wrap(
+            children: colors.map((c) {
+              return GestureDetector(
+                onTap: () {
+                  onThemeChanged(c);
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  width: 40, height: 40,
+                  margin: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(color: c, shape: BoxShape.circle),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      );
+    }
+
+    void _pickMascot() async {
+      final options = [
+        'assets/lottie/mascot.json',
+        'assets/lottie/mascot2.json',
+        'assets/lottie/mascot3.json'
+      ];
+      await showDialog(
+        context: context,
+        builder: (_) => SimpleDialog(
+          title: Text(AppLocalizations.of(context)!.chooseMascot),
+          children: options.map((path) {
+            return SimpleDialogOption(
+              onPressed: () {
+                _settings.saveMascotPath(path);
 
   void _pickColor() async {
     final colors = [
@@ -85,6 +123,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  void _toggleAuth(bool v) {
+    setState(() => _requireAuth = v);
+    _settings.saveRequireAuth(v);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,6 +137,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ListTile(
             title: Text(AppLocalizations.of(context)!.changeThemeColor),
             onTap: _pickColor,
+          ),
+          ListTile(
+            title: Text(AppLocalizations.of(context)!.changeMascot),
+            onTap: _pickMascot,
           ),
           ListTile(
             title: Text(AppLocalizations.of(context)!.fontSize),

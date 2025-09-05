@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
 import '../models/note.dart';
 import '../providers/note_provider.dart';
-
 import 'note_detail_screen.dart';
+import '../models/note.dart';
 
 
 class NoteListForDayScreen extends StatelessWidget {
@@ -19,6 +18,7 @@ class NoteListForDayScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final notes = context.watch<NoteProvider>().notes;
     final dayNotes = notes
         .where((n) =>
@@ -27,6 +27,7 @@ class NoteListForDayScreen extends StatelessWidget {
             n.alarmTime!.month == date.month &&
             n.alarmTime!.day == date.day)
         .toList();
+
 
     final title = AppLocalizations.of(context)!
         .scheduleForDate(DateFormat('dd/MM/yyyy').format(date));
