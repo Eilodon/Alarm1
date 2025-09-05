@@ -210,19 +210,45 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               ],
             ),
             const SizedBox(height: 12),
-            ..._attachments.map(
-              (a) {
+            ..._attachments.asMap().entries.map(
+              (entry) {
+                final index = entry.key;
+                final a = entry.value;
                 final ext = a.split('.').last.toLowerCase();
                 if (['jpg', 'jpeg', 'png', 'gif', 'bmp'].contains(ext)) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Image.file(File(a)),
+                  return Stack(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Image.file(File(a)),
+                      ),
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () =>
+                              setState(() => _attachments.removeAt(index)),
+                        ),
+                      ),
+                    ],
                   );
                 }
                 if (['mp3', 'wav'].contains(ext)) {
-                  return _AudioAttachment(path: a);
+                  return _AudioAttachment(
+                    path: a,
+                    onDelete: () =>
+                        setState(() => _attachments.removeAt(index)),
+                  );
                 }
-                return ListTile(title: Text(a.split('/').last));
+                return ListTile(
+                  title: Text(a.split('/').last),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () =>
+                        setState(() => _attachments.removeAt(index)),
+                  ),
+                );
               },
             ),
             const SizedBox(height: 12),
@@ -420,7 +446,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
 
 class _AudioAttachment extends StatefulWidget {
   final String path;
-  const _AudioAttachment({required this.path});
+  final VoidCallback? onDelete;
+  const _AudioAttachment({required this.path, this.onDelete});
 
   @override
   State<_AudioAttachment> createState() => _AudioAttachmentState();
@@ -449,9 +476,19 @@ class _AudioAttachmentState extends State<_AudioAttachment> {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(widget.path.split('/').last),
-      trailing: IconButton(
-        icon: Icon(_playing ? Icons.pause : Icons.play_arrow),
-        onPressed: _toggle,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: Icon(_playing ? Icons.pause : Icons.play_arrow),
+            onPressed: _toggle,
+          ),
+          if (widget.onDelete != null)
+            IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: widget.onDelete,
+            ),
+        ],
       ),
     );
   }
