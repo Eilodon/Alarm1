@@ -77,7 +77,8 @@ class NoteListForDayScreen extends StatelessWidget {
               isThreeLine: timeStr != null || note.tags.isNotEmpty,
               onTap: () async {
                 if (note.locked) {
-                  final ok = await AuthService().authenticate();
+                  final ok = await AuthService()
+                      .authenticate(AppLocalizations.of(context)!);
                   if (!ok) return;
                 }
                 Navigator.push(

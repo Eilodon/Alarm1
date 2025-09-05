@@ -58,6 +58,7 @@
   "addTag": "Add tag",
   "requireAuth": "Require authentication",
   "lockNote": "Lock note",
+  "authReason": "Please authenticate to continue",
   "voiceToNote": "Voice To Note",
   "stop": "Stop",
   "speak": "Speak",
