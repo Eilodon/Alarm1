@@ -36,7 +36,6 @@ dependencies:
   firebase_core: ^4.1.0
   cloud_firestore: ^6.0.1
   firebase_auth: ^6.0.2
-  connectivity_plus: ^6.1.5
 
   google_sign_in: ^6.2.1
 
@@ -51,7 +50,6 @@ dev_dependencies:
     sdk: flutter
 
 dependency_overrides:
-  http: ^0.13.5
   archive: ^4.0.0
 
 flutter:
