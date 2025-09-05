@@ -3,6 +3,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:lottie/lottie.dart';
 
 import '../services/settings_service.dart';
+import '../services/note_repository.dart';
+import 'package:provider/provider.dart';
+import '../providers/note_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
@@ -20,6 +23,7 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final SettingsService _settings = SettingsService();
+  final NoteRepository _noteRepository = NoteRepository();
   bool _requireAuth = false;
 
   @override
@@ -136,6 +140,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _settings.saveRequireAuth(v);
   }
 
+  Future<void> _exportNotes() async {
+    await _noteRepository.exportNotes();
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Notes exported')),
+    );
+  }
+
+  Future<void> _importNotes() async {
+    await _noteRepository.importNotes();
+    if (!mounted) return;
+    await context.read<NoteProvider>().loadNotes();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Notes imported')),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -155,6 +176,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ListTile(
             title: Text(AppLocalizations.of(context)!.fontSize),
             onTap: _changeFontScale,
+          ),
+          ListTile(
+            title: const Text('Export notes'),
+            onTap: _exportNotes,
+          ),
+          ListTile(
+            title: const Text('Import notes'),
+            onTap: _importNotes,
           ),
           SwitchListTile(
             title: Text(AppLocalizations.of(context)!.requireAuth),
