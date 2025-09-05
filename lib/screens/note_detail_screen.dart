@@ -197,9 +197,18 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               (a) => ListTile(title: Text(a.split('/').last)),
             ),
             const SizedBox(height: 12),
-            SizedBox(
-              height: 300,
-              child: ChatScreen(initialMessage: _contentCtrl.text),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ChatScreen(initialMessage: _contentCtrl.text),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.chat),
+              label: Text(AppLocalizations.of(context)!.chatAI),
             ),
           ],
         ),
