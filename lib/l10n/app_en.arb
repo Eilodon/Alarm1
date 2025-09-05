@@ -71,6 +71,10 @@
   "scheduledDesc": "Scheduled notifications",
   "recurringDesc": "Recurring notifications",
   "dailyDesc": "Daily notifications",
-  "snoozeDesc": "Snoozed notifications"
+  "snoozeDesc": "Snoozed notifications",
+  "aiSuggestionsTitle": "AI Suggestions",
+  "summaryLabel": "Summary",
+  "actionItemsLabel": "Action items",
+  "datesLabel": "Dates"
 
 }
