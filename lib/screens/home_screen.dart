@@ -54,8 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     bool locked = false;
     var tags = <String>[];
-    final availableTags =
-        provider.notes.expand((n) => n.tags).toSet().toList();
+    final availableTags = provider.notes.expand((n) => n.tags).toSet().toList();
 
     showDialog(
       context: context,
@@ -95,7 +94,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () async {
                     final now = DateTime.now();
                     final picked = await showDatePicker(
-
                       context: context,
                       firstDate: now,
                       lastDate: DateTime(now.year + 2),
@@ -131,6 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ElevatedButton(
               onPressed: () async {
                 final nowId = DateTime.now().millisecondsSinceEpoch;
+                final notifId = alarmTime != null ? nowId % 100000 : null;
                 final note = Note(
                   id: nowId.toString(),
                   title: titleCtrl.text,
@@ -139,12 +138,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   locked: locked,
                   tags: tags,
                   updatedAt: DateTime.now(),
+                  notificationId: notifId,
                 );
                 await provider.addNote(note);
                 provider.setDraft('');
-                if (alarmTime != null) {
+                if (alarmTime != null && notifId != null) {
                   await NotificationService().scheduleNotification(
-                    id: nowId % 100000,
+                    id: notifId,
                     title: note.title,
                     body: note.content,
                     scheduledDate: alarmTime!,
@@ -167,19 +167,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Note> _notesForDay(DateTime day, List<Note> notes) {
     return notes
-        .where((n) =>
-            n.alarmTime != null &&
-            n.alarmTime!.year == day.year &&
-            n.alarmTime!.month == day.month &&
-            n.alarmTime!.day == day.day)
+        .where(
+          (n) =>
+              n.alarmTime != null &&
+              n.alarmTime!.year == day.year &&
+              n.alarmTime!.month == day.month &&
+              n.alarmTime!.day == day.day,
+        )
         .toList();
   }
 
   Widget _buildNotesList(List<Note> notes) {
     if (notes.isEmpty) {
-      return Center(
-        child: Text(AppLocalizations.of(context)!.noNotes),
-      );
+      return Center(child: Text(AppLocalizations.of(context)!.noNotes));
     }
 
     return ListView.builder(
@@ -198,16 +198,13 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => NoteDetailScreen(note: note),
-                ),
+                MaterialPageRoute(builder: (_) => NoteDetailScreen(note: note)),
               );
             },
             trailing: IconButton(
               icon: const Icon(Icons.delete),
               tooltip: AppLocalizations.of(context)!.delete,
-              onPressed: () =>
-                  context.read<NoteProvider>().removeNoteAt(index),
+              onPressed: () => context.read<NoteProvider>().removeNoteAt(index),
             ),
           ),
         );
@@ -305,4 +302,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
