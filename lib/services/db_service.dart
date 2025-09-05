@@ -67,4 +67,14 @@ class DbService {
       await saveNotes(notes);
     }
   }
+
+  Future<Map<String, dynamic>> encryptNote(Note note) async {
+    final key = await _getKey();
+    final encrypter = encrypt.Encrypter(encrypt.AES(key));
+    final m = note.toJson();
+    final iv = encrypt.IV.fromSecureRandom(16);
+    m['content'] = encrypter.encrypt(m['content'], iv: iv).base64;
+    m['iv'] = iv.base64;
+    return m;
+  }
 }

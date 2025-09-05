@@ -1,4 +1,7 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 
 import '../models/note.dart';
@@ -6,6 +9,8 @@ import '../services/note_repository.dart';
 
 class NoteProvider extends ChangeNotifier {
   final NoteRepository _repository;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   List<Note> _notes = [];
   String _draft = '';
 
@@ -25,6 +30,12 @@ class NoteProvider extends ChangeNotifier {
     _notes.add(note);
     await _repository.saveNotes(_notes);
     notifyListeners();
+    if (Firebase.apps.isNotEmpty) {
+      final user = _auth.currentUser ?? await _auth.signInAnonymously();
+      final data = await _repository.encryptNote(note);
+      data['userId'] = user.uid;
+      await _firestore.collection('notes').doc(note.id).set(data);
+    }
   }
 
   Future<void> updateNote(Note note) async {
@@ -33,14 +44,23 @@ class NoteProvider extends ChangeNotifier {
       _notes[index] = note;
       await _repository.saveNotes(_notes);
       notifyListeners();
+      if (Firebase.apps.isNotEmpty) {
+        final user = _auth.currentUser ?? await _auth.signInAnonymously();
+        final data = await _repository.encryptNote(note);
+        data['userId'] = user.uid;
+        await _firestore.collection('notes').doc(note.id).set(data);
+      }
     }
   }
 
 
   Future<void> removeNoteAt(int index) async {
-    _notes.removeAt(index);
+    final note = _notes.removeAt(index);
     await _repository.saveNotes(_notes);
     notifyListeners();
+    if (Firebase.apps.isNotEmpty) {
+      await _firestore.collection('notes').doc(note.id).delete();
+    }
   }
 
   void setDraft(String value) {
