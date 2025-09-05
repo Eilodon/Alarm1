@@ -12,6 +12,7 @@ import '../services/settings_service.dart';
 import '../widgets/tag_selector.dart';
 import 'note_detail_screen.dart';
 import 'note_list_for_day_screen.dart';
+import 'note_search_delegate.dart';
 import 'settings_screen.dart';
 import 'voice_to_note_screen.dart';
 
@@ -229,6 +230,14 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.appTitle),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () => showSearch(
+              context: context,
+              delegate:
+                  NoteSearchDelegate(context.read<NoteProvider>().notes),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.mic),
             onPressed: () async {
