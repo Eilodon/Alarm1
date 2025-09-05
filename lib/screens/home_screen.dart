@@ -50,90 +50,98 @@ class _HomeScreenState extends State<HomeScreen> {
     final titleCtrl = TextEditingController();
     final contentCtrl = TextEditingController(text: provider.draft);
     DateTime? alarmTime;
+    bool locked = false;
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.addNoteReminder),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: titleCtrl,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.titleLabel,
+      builder: (_) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: Text(AppLocalizations.of(context)!.addNoteReminder),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleCtrl,
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.titleLabel,
+                  ),
                 ),
-              ),
-              TextField(
-                controller: contentCtrl,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context)!.contentLabel,
+                TextField(
+                  controller: contentCtrl,
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.of(context)!.contentLabel,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton(
-                onPressed: () async {
-                  final now = DateTime.now();
-                  final picked = await showDatePicker(
-                    context: context,
-                    firstDate: now,
-                    lastDate: DateTime(now.year + 2),
-                    initialDate: now,
-                  );
-                  if (picked != null) {
-                    final time = await showTimePicker(
+                SwitchListTile(
+                  title: Text(AppLocalizations.of(context)!.lockNote),
+                  value: locked,
+                  onChanged: (value) => setState(() => locked = value),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () async {
+                    final now = DateTime.now();
+                    final picked = await showDatePicker(
                       context: context,
-                      initialTime: TimeOfDay.now(),
+                      firstDate: now,
+                      lastDate: DateTime(now.year + 2),
+                      initialDate: now,
                     );
-                    if (time != null) {
-                      alarmTime = DateTime(
-                        picked.year,
-                        picked.month,
-                        picked.day,
-                        time.hour,
-                        time.minute,
+                    if (picked != null) {
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
                       );
+                      if (time != null) {
+                        alarmTime = DateTime(
+                          picked.year,
+                          picked.month,
+                          picked.day,
+                          time.hour,
+                          time.minute,
+                        );
+                      }
                     }
-                  }
-                },
-                child: Text(AppLocalizations.of(context)!.selectReminderTime),
-              ),
-            ],
+                  },
+                  child: Text(AppLocalizations.of(context)!.selectReminderTime),
+                ),
+              ],
+            ),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(AppLocalizations.of(context)!.cancel),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final nowId = DateTime.now().millisecondsSinceEpoch;
-              final note = Note(
-                id: nowId.toString(),
-                title: titleCtrl.text,
-                content: contentCtrl.text,
-                alarmTime: alarmTime,
-                locked: locked,
-                updatedAt: DateTime.now(),
-              );
-              await provider.addNote(note);
-              provider.setDraft('');
-              if (alarmTime != null) {
-                await NotificationService().scheduleNotification(
-                  id: nowId % 100000,
-                  title: note.title,
-                  body: note.content,
-                  scheduledDate: alarmTime!,
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(AppLocalizations.of(context)!.cancel),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final nowId = DateTime.now().millisecondsSinceEpoch;
+                final note = Note(
+                  id: nowId.toString(),
+                  title: titleCtrl.text,
+                  content: contentCtrl.text,
+                  alarmTime: alarmTime,
+                  locked: locked,
+                  updatedAt: DateTime.now(),
                 );
-              }
-              if (!mounted) return;
-              Navigator.pop(context);
-            },
-            child: Text(AppLocalizations.of(context)!.save),
-          ),
-        ],
+                await provider.addNote(note);
+                provider.setDraft('');
+                if (alarmTime != null) {
+                  await NotificationService().scheduleNotification(
+                    id: nowId % 100000,
+                    title: note.title,
+                    body: note.content,
+                    scheduledDate: alarmTime!,
+                  );
+                }
+                if (!mounted) return;
+                Navigator.pop(context);
+              },
+              child: Text(AppLocalizations.of(context)!.save),
+            ),
+          ],
+        ),
       ),
     );
   }
