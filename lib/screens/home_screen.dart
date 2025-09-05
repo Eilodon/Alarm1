@@ -33,13 +33,59 @@ class _HomeScreenState extends State<HomeScreen> {
   final DateTime _today = DateTime.now();
   String? _selectedTag;
 
+  final ScrollController _scrollController = ScrollController();
+  bool _isLoadingMore = false;
+  bool _hasMore = true;
+  DateTime? _lastFetched;
+  static const _pageSize = 20;
+
   @override
   void initState() {
     super.initState();
     _loadMascot();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<NoteProvider>().loadNotes();
+    _scrollController.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final notes =
+          await context.read<NoteProvider>().fetchNotesPage(null, _pageSize);
+      if (!mounted) return;
+      setState(() {
+        if (notes.isNotEmpty) {
+          _lastFetched = notes.last.updatedAt;
+          _hasMore = notes.length == _pageSize;
+        }
+      });
     });
+  }
+
+  void _onScroll() {
+    if (!_hasMore || _isLoadingMore) return;
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      _loadMore();
+    }
+  }
+
+  Future<void> _loadMore() async {
+    setState(() => _isLoadingMore = true);
+    final notes = await context
+        .read<NoteProvider>()
+        .fetchNotesPage(_lastFetched, _pageSize);
+    if (!mounted) return;
+    setState(() {
+      _isLoadingMore = false;
+      if (notes.isNotEmpty) {
+        _lastFetched = notes.last.updatedAt;
+      }
+      if (notes.length < _pageSize) {
+        _hasMore = false;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadMascot() async {
@@ -71,9 +117,17 @@ class _HomeScreenState extends State<HomeScreen> {
       return Center(child: Text(AppLocalizations.of(context)!.noNotes));
     }
 
+    final itemCount = notes.length + (_isLoadingMore ? 1 : 0);
     return ListView.builder(
-      itemCount: notes.length,
+      controller: _scrollController,
+      itemCount: itemCount,
       itemBuilder: (context, index) {
+        if (index >= notes.length) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
         final note = notes[index];
         return Card(
           child: ListTile(
