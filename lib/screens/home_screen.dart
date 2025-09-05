@@ -138,6 +138,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   id: noteId,
                   title: titleCtrl.text,
                   content: contentCtrl.text,
+                  summary: '',
+                  actionItems: const [],
+                  dates: const [],
                   alarmTime: alarmTime,
                   locked: locked,
                   tags: tags,
@@ -147,7 +150,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 await provider.addNote(note);
                 provider.setDraft('');
 
-                if (notificationId != null && alarmTime != null) {
+                if (alarmTime != null) {
+                  final notificationId =
+                      DateTime.now().millisecondsSinceEpoch % 100000;
+
                   await NotificationService().scheduleNotification(
                     id: notificationId,
                     title: note.title,
