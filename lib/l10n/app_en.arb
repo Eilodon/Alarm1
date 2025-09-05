@@ -62,6 +62,7 @@
   "convertSpeechPrompt@placeholders": {
     "recognized": {}
   },
+  "offlineMode": "Offline Mode",
 
   "scheduled": "Scheduled",
   "recurring": "Recurring",
