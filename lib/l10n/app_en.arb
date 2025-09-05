@@ -3,6 +3,7 @@
   "addNoteReminder": "Add note / reminder",
   "titleLabel": "Title",
   "contentLabel": "Content",
+  "fieldRequired": "This field cannot be empty",
   "selectReminderTime": "Select reminder time",
   "cancel": "Cancel",
   "save": "Save",
