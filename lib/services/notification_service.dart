@@ -49,7 +49,7 @@ class NotificationService {
     final androidDetails = AndroidNotificationDetails(
       'scheduled_channel',
       l10n.scheduled,
-      channelDescription: 'Scheduled notifications',
+      channelDescription: l10n.scheduledDesc,
       importance: Importance.max,
       priority: Priority.high,
     );
@@ -77,7 +77,7 @@ class NotificationService {
     final androidDetails = AndroidNotificationDetails(
       'recurring_channel',
       l10n.recurring,
-      channelDescription: 'Recurring notifications',
+      channelDescription: l10n.recurringDesc,
       importance: Importance.max,
       priority: Priority.high,
     );
@@ -108,7 +108,7 @@ class NotificationService {
     final androidDetails = AndroidNotificationDetails(
       'daily_channel',
       l10n.daily,
-      channelDescription: 'Daily notifications',
+      channelDescription: l10n.dailyDesc,
       importance: Importance.max,
       priority: Priority.high,
     );
@@ -167,7 +167,7 @@ class NotificationService {
     final androidDetails = AndroidNotificationDetails(
       'snooze_channel',
       l10n.snooze,
-      channelDescription: 'Snoozed notifications',
+      channelDescription: l10n.snoozeDesc,
       importance: Importance.max,
       priority: Priority.high,
     );

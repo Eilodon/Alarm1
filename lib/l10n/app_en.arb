@@ -60,6 +60,10 @@
   "scheduled": "Scheduled",
   "recurring": "Recurring",
   "daily": "Daily",
-  "snooze": "Snooze"
+  "snooze": "Snooze",
+  "scheduledDesc": "Scheduled notifications",
+  "recurringDesc": "Recurring notifications",
+  "dailyDesc": "Daily notifications",
+  "snoozeDesc": "Snoozed notifications"
 
 }
