@@ -34,38 +34,47 @@ class NoteProvider extends ChangeNotifier {
   String get draft => _draft;
 
 
-  Future<void> loadNotes() async {
+  Future<bool> loadNotes() async {
     _notes = await _repository.getNotes();
+    var success = true;
     if (Firebase.apps.isNotEmpty) {
-      final user = _auth.currentUser ?? await _auth.signInAnonymously();
-      final snapshot = await _firestore
-          .collection('notes')
-          .where('userId', isEqualTo: user.uid)
-          .get();
-      final remoteIds = snapshot.docs.map((d) => d.id).toList();
-      final remoteNotes = await Future.wait(
-        snapshot.docs.map((d) => _repository.decryptNote(d.data())),
-      );
-      final map = {for (var n in _notes) n.id: n};
-      for (final n in remoteNotes) {
-        final local = map[n.id];
-        if (local == null) {
-          map[n.id] = n;
-        } else {
-          final localUpdated =
-              local.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-          final remoteUpdated =
-              n.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-          if (remoteUpdated.isAfter(localUpdated)) {
+      final originalNotes = List<Note>.from(_notes);
+      try {
+        final user = _auth.currentUser ?? await _auth.signInAnonymously();
+        final snapshot = await _firestore
+            .collection('notes')
+            .where('userId', isEqualTo: user.uid)
+            .get();
+        final remoteIds = snapshot.docs.map((d) => d.id).toList();
+        final remoteNotes = await Future.wait(
+          snapshot.docs.map((d) => _repository.decryptNote(d.data())),
+        );
+        final map = {for (var n in _notes) n.id: n};
+        for (final n in remoteNotes) {
+          final local = map[n.id];
+          if (local == null) {
             map[n.id] = n;
+          } else {
+            final localUpdated =
+                local.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+            final remoteUpdated =
+                n.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+            if (remoteUpdated.isAfter(localUpdated)) {
+              map[n.id] = n;
+            }
           }
         }
+        map.removeWhere((key, _) => !remoteIds.contains(key));
+        _notes = map.values.toList();
+        await _repository.saveNotes(_notes);
+      } catch (e, st) {
+        debugPrint('loadNotes error: $e\n$st');
+        _notes = originalNotes;
+        success = false;
       }
-      map.removeWhere((key, _) => !remoteIds.contains(key));
-      _notes = map.values.toList();
-      await _repository.saveNotes(_notes);
     }
     notifyListeners();
+    return success;
   }
 
   Future<void> createNote({
