@@ -3,6 +3,7 @@
   "addNoteReminder": "Thêm ghi chú / nhắc lịch",
   "titleLabel": "Tiêu đề",
   "contentLabel": "Nội dung",
+  "fieldRequired": "Không được để trống",
   "selectReminderTime": "Chọn thời gian nhắc",
   "cancel": "Hủy",
   "save": "Lưu",

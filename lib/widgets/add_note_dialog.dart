@@ -16,9 +16,11 @@ class AddNoteDialog extends StatefulWidget {
 class _AddNoteDialogState extends State<AddNoteDialog> {
   late final TextEditingController _titleCtrl;
   late final TextEditingController _contentCtrl;
+  final _formKey = GlobalKey<FormState>();
   DateTime? _alarmTime;
   bool _locked = false;
   List<String> _tags = [];
+  bool _isValid = false;
 
   @override
   void initState() {
@@ -62,6 +64,12 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
     }
   }
 
+  void _validate() {
+    setState(() {
+      _isValid = _formKey.currentState?.validate() ?? false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -71,45 +79,54 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
     return AlertDialog(
       title: Text(l10n.addNoteReminder),
       content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _titleCtrl,
-              decoration: InputDecoration(
-                labelText: l10n.titleLabel,
+        child: Form(
+          key: _formKey,
+          onChanged: _validate,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: _titleCtrl,
+                decoration: InputDecoration(
+                  labelText: l10n.titleLabel,
+                ),
+                validator: (v) =>
+                    v == null || v.trim().isEmpty ? l10n.fieldRequired : null,
               ),
-            ),
-            TextField(
-              controller: _contentCtrl,
-              decoration: InputDecoration(
-                labelText: l10n.contentLabel,
+              TextFormField(
+                controller: _contentCtrl,
+                decoration: InputDecoration(
+                  labelText: l10n.contentLabel,
+                ),
+                validator: (v) =>
+                    v == null || v.trim().isEmpty ? l10n.fieldRequired : null,
               ),
-            ),
-            TagSelector(
-              availableTags: availableTags,
-              selectedTags: _tags,
-              allowCreate: true,
-              label: l10n.tagsLabel,
-              onChanged: (v) => setState(() => _tags = v),
-            ),
-            SwitchListTile(
-              title: Text(l10n.lockNote),
-              value: _locked,
-              onChanged: (value) => setState(() => _locked = value),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: _pickAlarmTime,
-              child: Text(l10n.selectReminderTime),
-            ),
-            if (_alarmTime != null)
-              Text(
-                DateFormat.yMd(Localizations.localeOf(context).toString())
-                    .add_Hm()
-                    .format(_alarmTime!),
+              TagSelector(
+                availableTags: availableTags,
+                selectedTags: _tags,
+                allowCreate: true,
+                label: l10n.tagsLabel,
+                onChanged: (v) => setState(() => _tags = v),
               ),
-          ],
+              SwitchListTile(
+                title: Text(l10n.lockNote),
+                value: _locked,
+                onChanged: (value) => setState(() => _locked = value),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: _pickAlarmTime,
+                child: Text(l10n.selectReminderTime),
+              ),
+              if (_alarmTime != null)
+                Text(
+                  DateFormat.yMd(Localizations.localeOf(context).toString())
+                      .add_Hm()
+                      .format(_alarmTime!),
+                ),
+            ],
+          ),
         ),
       ),
       actions: [
@@ -118,19 +135,24 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
           child: Text(l10n.cancel),
         ),
         ElevatedButton(
-          onPressed: () async {
-            await provider.createNote(
-              title: _titleCtrl.text,
-              content: _contentCtrl.text,
-              tags: _tags,
-              locked: _locked,
-              alarmTime: _alarmTime,
-              l10n: l10n,
-            );
-            provider.setDraft('');
-            if (!mounted) return;
-            Navigator.pop(context);
-          },
+          onPressed: _isValid
+              ? () async {
+                  if (!(_formKey.currentState?.validate() ?? false)) {
+                    return;
+                  }
+                  await provider.createNote(
+                    title: _titleCtrl.text,
+                    content: _contentCtrl.text,
+                    tags: _tags,
+                    locked: _locked,
+                    alarmTime: _alarmTime,
+                    l10n: l10n,
+                  );
+                  provider.setDraft('');
+                  if (!mounted) return;
+                  Navigator.pop(context);
+                }
+              : null,
           child: Text(l10n.save),
         ),
       ],
