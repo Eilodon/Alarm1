@@ -201,7 +201,11 @@ class _HomeScreenState extends State<HomeScreen> {
             title: Text(note.title),
             subtitle: Text(
               note.alarmTime != null
-                  ? '${note.content}\n⏰ ${DateFormat('HH:mm dd/MM/yyyy').format(note.alarmTime!)}'
+                  ? '${note.content}\n⏰ ${DateFormat.yMd(
+                          Localizations.localeOf(context).toString(),
+                        )
+                          .add_Hm()
+                          .format(note.alarmTime!)}'
                   : note.content,
             ),
             onTap: () {
