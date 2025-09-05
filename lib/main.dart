@@ -31,14 +31,18 @@ void main() async {
     );
     return;
   }
+  var authFailed = false;
+  var notificationFailed = false;
   try {
     await FirebaseAuth.instance.signInAnonymously();
   } catch (e) {
+    authFailed = true;
     debugPrint('Anonymous sign-in failed: $e');
   }
   try {
     await NotificationService().init();
   } catch (e) {
+    notificationFailed = true;
     debugPrint('Notification setup failed: $e');
   }
   final settings = SettingsService();
@@ -56,7 +60,12 @@ void main() async {
   runApp(
     ChangeNotifierProvider(
       create: (_) => NoteProvider(),
-      child: MyApp(themeColor: themeColor, fontScale: fontScale),
+      child: MyApp(
+        themeColor: themeColor,
+        fontScale: fontScale,
+        authFailed: authFailed,
+        notificationFailed: notificationFailed,
+      ),
     ),
   );
 
@@ -65,7 +74,15 @@ void main() async {
 class MyApp extends StatefulWidget {
   final Color themeColor;
   final double fontScale;
-  const MyApp({super.key, required this.themeColor, required this.fontScale});
+  final bool authFailed;
+  final bool notificationFailed;
+  const MyApp({
+    super.key,
+    required this.themeColor,
+    required this.fontScale,
+    this.authFailed = false,
+    this.notificationFailed = false,
+  });
 
 
   @override
@@ -81,6 +98,22 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _themeColor = widget.themeColor;
     _fontScale = widget.fontScale;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.authFailed) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Anonymous sign-in failed. Limited functionality.'),
+          ),
+        );
+      }
+      if (widget.notificationFailed) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Notification setup failed.'),
+          ),
+        );
+      }
+    });
   }
 
   void updateTheme(Color newColor) async {
