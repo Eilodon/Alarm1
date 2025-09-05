@@ -40,6 +40,7 @@ class NoteProvider extends ChangeNotifier {
           .collection('notes')
           .where('userId', isEqualTo: user.uid)
           .get();
+      final remoteIds = snapshot.docs.map((d) => d.id).toList();
       final remoteNotes = await Future.wait(
         snapshot.docs.map((d) => _repository.decryptNote(d.data())),
       );
@@ -58,6 +59,7 @@ class NoteProvider extends ChangeNotifier {
           }
         }
       }
+      map.removeWhere((key, _) => !remoteIds.contains(key));
       _notes = map.values.toList();
       await _repository.saveNotes(_notes);
     }
