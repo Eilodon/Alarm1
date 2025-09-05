@@ -140,7 +140,7 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
                   if (!(_formKey.currentState?.validate() ?? false)) {
                     return;
                   }
-                  await provider.createNote(
+                  final ok = await provider.createNote(
                     title: _titleCtrl.text,
                     content: _contentCtrl.text,
                     tags: _tags,
@@ -148,9 +148,19 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
                     alarmTime: _alarmTime,
                     l10n: l10n,
                   );
-                  provider.setDraft('');
                   if (!mounted) return;
-                  Navigator.pop(context);
+                  if (ok) {
+                    provider.setDraft('');
+                    Navigator.pop(context);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          l10n.errorWithMessage(l10n.networkError),
+                        ),
+                      ),
+                    );
+                  }
                 }
               : null,
           child: Text(l10n.save),
