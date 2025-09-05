@@ -32,6 +32,7 @@
   "timeLabel": "Time",
 
   "tagsLabel": "Tags",
+  "addTag": "Add tag",
   "requireAuth": "Require authentication",
   "lockNote": "Lock note"
 

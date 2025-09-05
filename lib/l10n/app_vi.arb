@@ -32,6 +32,7 @@
   "timeLabel": "Thời gian",
 
   "tagsLabel": "Tag",
+  "addTag": "Thêm tag",
   "requireAuth": "Yêu cầu xác thực",
   "lockNote": "Khóa ghi chú"
 

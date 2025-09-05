@@ -114,7 +114,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               selectedTags: _tags,
               allowCreate: true,
               onChanged: (v) => setState(() => _tags = v),
-              label: 'Tags',
+              label: AppLocalizations.of(context)!.tagsLabel,
             ),
             const SizedBox(height: 12),
             Row(
