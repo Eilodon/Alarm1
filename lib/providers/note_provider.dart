@@ -94,9 +94,9 @@ class NoteProvider extends ChangeNotifier {
       notificationId: notificationId,
     );
 
-    await addNote(note);
+    final ok = await addNote(note);
 
-    if (alarmTime != null && notificationId != null) {
+    if (ok && alarmTime != null && notificationId != null) {
       await _notificationService.scheduleNotification(
         id: notificationId,
         title: title,
@@ -106,31 +106,38 @@ class NoteProvider extends ChangeNotifier {
       );
     }
   }
-
-  Future<void> addNote(Note note) async {
-    var toSave = note;
-    if (note.alarmTime != null) {
-      final eventId = await _calendarService.createEvent(
-        title: note.title,
-        description: note.content,
-        start: note.alarmTime!,
-      );
-      toSave = note.copyWith(eventId: eventId);
-    }
-    _notes.add(toSave);
-    await _repository.saveNotes(_notes);
-    notifyListeners();
-    if (Firebase.apps.isNotEmpty) {
-      final user = _auth.currentUser ?? await _auth.signInAnonymously();
-      final data = await _repository.encryptNote(toSave);
-      data['userId'] = user.uid;
-      await _firestore.collection('notes').doc(toSave.id).set(data);
+  
+  Future<bool> addNote(Note note) async {
+    try {
+      var toSave = note;
+      if (note.alarmTime != null) {
+        final eventId = await _calendarService.createEvent(
+          title: note.title,
+          description: note.content,
+          start: note.alarmTime!,
+        );
+        toSave = note.copyWith(eventId: eventId);
+      }
+      _notes.add(toSave);
+      await _repository.saveNotes(_notes);
+      notifyListeners();
+      if (Firebase.apps.isNotEmpty) {
+        final user = _auth.currentUser ?? await _auth.signInAnonymously();
+        final data = await _repository.encryptNote(toSave);
+        data['userId'] = user.uid;
+        await _firestore.collection('notes').doc(toSave.id).set(data);
+      }
+      return true;
+    } catch (e, st) {
+      debugPrint('addNote error: $e\n$st');
+      return false;
     }
   }
 
-  Future<void> updateNote(Note note) async {
-    final index = _notes.indexWhere((n) => n.id == note.id);
-    if (index != -1) {
+  Future<bool> updateNote(Note note) async {
+    try {
+      final index = _notes.indexWhere((n) => n.id == note.id);
+      if (index == -1) return false;
       var updated = note;
       final old = _notes[index];
       if (old.eventId != null && note.alarmTime == null) {
@@ -163,27 +170,31 @@ class NoteProvider extends ChangeNotifier {
         data['userId'] = user.uid;
         await _firestore.collection('notes').doc(updated.id).set(data);
       }
+      return true;
+    } catch (e, st) {
+      debugPrint('updateNote error: $e\n$st');
+      return false;
     }
   }
 
-
-  Future<void> removeNoteAt(int index) async {
-    final note = _notes.removeAt(index);
-
-    await _repository.saveNotes(_notes);
-    notifyListeners();
-
-
-    if (note.notificationId != null) {
-      await _notificationService.cancel(note.notificationId!);
-    }
-    if (note.eventId != null) {
-      await _calendarService.deleteEvent(note.eventId!);
-    }
-
-
-    if (Firebase.apps.isNotEmpty) {
-      await _firestore.collection('notes').doc(note.id).delete();
+  Future<bool> removeNoteAt(int index) async {
+    try {
+      final note = _notes.removeAt(index);
+      await _repository.saveNotes(_notes);
+      notifyListeners();
+      if (note.notificationId != null) {
+        await _notificationService.cancel(note.notificationId!);
+      }
+      if (note.eventId != null) {
+        await _calendarService.deleteEvent(note.eventId!);
+      }
+      if (Firebase.apps.isNotEmpty) {
+        await _firestore.collection('notes').doc(note.id).delete();
+      }
+      return true;
+    } catch (e, st) {
+      debugPrint('removeNoteAt error: $e\n$st');
+      return false;
     }
   }
 
