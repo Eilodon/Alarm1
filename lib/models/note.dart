@@ -14,6 +14,8 @@ class Note {
   final int snoozeMinutes;
   final DateTime? updatedAt;
   final int? notificationId;
+  final String? eventId;
+
 
   const Note({
     required this.id,
@@ -29,6 +31,9 @@ class Note {
     this.snoozeMinutes = 0,
     this.updatedAt,
     this.notificationId,
+
+    this.eventId,
+
   });
 
   Note copyWith({
@@ -45,6 +50,9 @@ class Note {
     int? snoozeMinutes,
     DateTime? updatedAt,
     Object? notificationId = _notificationIdSentinel,
+
+    Object? eventId = _eventIdSentinel,
+
   }) {
     return Note(
       id: id ?? this.id,
@@ -62,6 +70,10 @@ class Note {
       notificationId: notificationId == _notificationIdSentinel
           ? this.notificationId
           : notificationId as int?,
+
+      eventId:
+          eventId == _eventIdSentinel ? this.eventId : eventId as String?,
+
     );
   }
 
@@ -88,6 +100,9 @@ class Note {
           ? DateTime.parse(json['updatedAt'])
           : null,
       notificationId: json['notificationId'] as int?,
+
+      eventId: json['eventId'] as String?,
+
     );
   }
 
@@ -105,10 +120,14 @@ class Note {
     'snoozeMinutes': snoozeMinutes,
     'updatedAt': updatedAt?.toIso8601String(),
     'notificationId': notificationId,
+
+    'eventId': eventId,
+
   };
 }
 
 const _notificationIdSentinel = Object();
+const _eventIdSentinel = Object();
 
 RepeatInterval? _repeatIntervalFromString(String? value) {
   if (value == null) return null;
