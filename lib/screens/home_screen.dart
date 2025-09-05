@@ -3,6 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 
 import '../models/note.dart';
 import '../providers/note_provider.dart';
@@ -130,9 +131,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             ElevatedButton(
               onPressed: () async {
-                final nowId = DateTime.now().millisecondsSinceEpoch;
+                final noteId = const Uuid().v4();
                 final note = Note(
-                  id: nowId.toString(),
+                  id: noteId,
                   title: titleCtrl.text,
                   content: contentCtrl.text,
                   alarmTime: alarmTime,
@@ -143,8 +144,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 await provider.addNote(note);
                 provider.setDraft('');
                 if (alarmTime != null) {
+                  final notificationId =
+                      DateTime.now().millisecondsSinceEpoch % 100000;
                   await NotificationService().scheduleNotification(
-                    id: nowId % 100000,
+                    id: notificationId,
                     title: note.title,
                     body: note.content,
                     scheduledDate: alarmTime!,
