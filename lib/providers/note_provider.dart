@@ -14,6 +14,7 @@ class NoteProvider extends ChangeNotifier {
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final CalendarService _calendarService;
 
   List<Note> _notes = [];
   String _draft = '';
@@ -28,6 +29,33 @@ class NoteProvider extends ChangeNotifier {
 
   Future<void> loadNotes() async {
     _notes = await _repository.getNotes();
+    if (Firebase.apps.isNotEmpty) {
+      final user = _auth.currentUser ?? await _auth.signInAnonymously();
+      final snapshot = await _firestore
+          .collection('notes')
+          .where('userId', isEqualTo: user.uid)
+          .get();
+      final remoteNotes = await Future.wait(
+        snapshot.docs.map((d) => _repository.decryptNote(d.data())),
+      );
+      final map = {for (var n in _notes) n.id: n};
+      for (final n in remoteNotes) {
+        final local = map[n.id];
+        if (local == null) {
+          map[n.id] = n;
+        } else {
+          final localUpdated =
+              local.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+          final remoteUpdated =
+              n.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+          if (remoteUpdated.isAfter(localUpdated)) {
+            map[n.id] = n;
+          }
+        }
+      }
+      _notes = map.values.toList();
+      await _repository.saveNotes(_notes);
+    }
     notifyListeners();
   }
 
@@ -92,19 +120,14 @@ class NoteProvider extends ChangeNotifier {
 
 
   Future<void> removeNoteAt(int index) async {
-    final note = _notes[index];
 
-    if (note.notificationId != null) {
-      await NotificationService().cancel(note.notificationId!);
-    }
-    if (note.eventId != null) {
-      await _calendarService.deleteEvent(note.eventId!);
-    }
-
-    _notes.removeAt(index);
+    final note = _notes.removeAt(index);
 
     await _repository.saveNotes(_notes);
     notifyListeners();
+    if (note.eventId != null) {
+      await _calendarService.deleteEvent(note.eventId!);
+    }
     if (Firebase.apps.isNotEmpty) {
       await _firestore.collection('notes').doc(note.id).delete();
     }
