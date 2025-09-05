@@ -37,6 +37,9 @@
   "delete": "Delete",
   "timeLabel": "Time",
 
+  "noteDeleted": "Note deleted",
+  "undo": "Undo",
+
   "repeatLabel": "Repeat:",
   "repeatNone": "None",
   "repeatEveryMinute": "Every minute",

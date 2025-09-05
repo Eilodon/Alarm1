@@ -218,7 +218,22 @@ class _HomeScreenState extends State<HomeScreen> {
             trailing: IconButton(
               icon: const Icon(Icons.delete),
               tooltip: AppLocalizations.of(context)!.delete,
-              onPressed: () => context.read<NoteProvider>().removeNoteAt(index),
+              onPressed: () {
+                final note = context.read<NoteProvider>().notes[index];
+                context.read<NoteProvider>().removeNoteAt(index);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      AppLocalizations.of(context)!.noteDeleted,
+                    ),
+                    action: SnackBarAction(
+                      label: AppLocalizations.of(context)!.undo,
+                      onPressed: () =>
+                          context.read<NoteProvider>().addNote(note),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         );
