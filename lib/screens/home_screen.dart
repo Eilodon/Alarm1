@@ -52,6 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final contentCtrl = TextEditingController(text: provider.draft);
     DateTime? alarmTime;
 
+    bool locked = false;
     var tags = <String>[];
     final availableTags =
         provider.notes.expand((n) => n.tags).toSet().toList();
@@ -77,7 +78,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     labelText: AppLocalizations.of(context)!.contentLabel,
                   ),
                 ),
-
+                TagSelector(
+                  availableTags: availableTags,
+                  selectedTags: tags,
+                  allowCreate: true,
+                  label: AppLocalizations.of(context)!.tagsLabel,
+                  onChanged: (v) => setState(() => tags = v),
+                ),
                 SwitchListTile(
                   title: Text(AppLocalizations.of(context)!.lockNote),
                   value: locked,
@@ -130,8 +137,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   content: contentCtrl.text,
                   alarmTime: alarmTime,
                   locked: locked,
+                  tags: tags,
                   updatedAt: DateTime.now(),
->
                 );
                 await provider.addNote(note);
                 provider.setDraft('');
