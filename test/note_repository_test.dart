@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -28,6 +30,12 @@ void main() {
         snoozeMinutes: 10,
       );
       await repo.saveNotes([note]);
+      final sp = await SharedPreferences.getInstance();
+      final raw = sp.getString('notes_v1');
+      final stored =
+          (jsonDecode(raw!) as List).cast<Map<String, dynamic>>().first;
+      expect(stored['iv'], isNotEmpty);
+      expect(stored['content'], isNot('c'));
       final notes = await repo.getNotes();
       expect(notes.length, 1);
       expect(notes.first.title, 't');

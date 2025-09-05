@@ -29,10 +29,13 @@ class DbService {
     final raw = sp.getString(_kNotes);
     if (raw == null) return [];
     final key = await _getKey();
-    final iv = encrypt.IV.fromLength(16);
     final encrypter = encrypt.Encrypter(encrypt.AES(key));
     final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
     return list.map((m) {
+      final ivString = m['iv'];
+      final iv = ivString != null
+          ? encrypt.IV.fromBase64(ivString)
+          : encrypt.IV.fromLength(16);
       final decrypted = encrypter.decrypt64(m['content'], iv: iv);
       m['content'] = decrypted;
       return Note.fromJson(m);
@@ -42,11 +45,12 @@ class DbService {
   Future<void> saveNotes(List<Note> notes) async {
     final sp = await SharedPreferences.getInstance();
     final key = await _getKey();
-    final iv = encrypt.IV.fromLength(16);
     final encrypter = encrypt.Encrypter(encrypt.AES(key));
     final list = notes.map((n) {
       final m = n.toJson();
+      final iv = encrypt.IV.fromSecureRandom(16);
       m['content'] = encrypter.encrypt(m['content'], iv: iv).base64;
+      m['iv'] = iv.base64;
       return m;
     }).toList();
     final raw = jsonEncode(list);
