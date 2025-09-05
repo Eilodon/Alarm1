@@ -16,6 +16,12 @@
   "chatAI": "Chat AI",
   "enterMessage": "Enter message...",
   "send": "Send",
+  "geminiApiKeyNotConfigured": "Gemini API key is not configured.",
+  "noResponse": "No response.",
+  "geminiError": "Gemini error: {error}",
+  "geminiError@placeholders": {
+    "error": {}
+  },
   "errorWithMessage": "Error: {error}",
   "errorWithMessage@placeholders": {
     "error": {}

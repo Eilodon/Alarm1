@@ -16,6 +16,12 @@
   "chatAI": "Chat AI",
   "enterMessage": "Nhập tin nhắn...",
   "send": "Gửi",
+  "geminiApiKeyNotConfigured": "Chưa cấu hình khóa API Gemini.",
+  "noResponse": "Không có phản hồi.",
+  "geminiError": "Lỗi Gemini: {error}",
+  "geminiError@placeholders": {
+    "error": {}
+  },
   "errorWithMessage": "Lỗi: {error}",
   "errorWithMessage@placeholders": {
     "error": {}
