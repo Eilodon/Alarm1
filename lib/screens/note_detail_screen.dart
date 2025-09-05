@@ -213,32 +213,49 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               ],
             ),
             const SizedBox(height: 12),
-            ..._attachments.map((a) {
-              final ext = a.split('.').last.toLowerCase();
-              Widget child;
-              if (['jpg', 'jpeg', 'png', 'gif', 'bmp'].contains(ext)) {
-                child = Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Image.file(File(a)),
+
+            ..._attachments.asMap().entries.map(
+              (entry) {
+                final index = entry.key;
+                final a = entry.value;
+                final ext = a.split('.').last.toLowerCase();
+                if (['jpg', 'jpeg', 'png', 'gif', 'bmp'].contains(ext)) {
+                  return Stack(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Image.file(File(a)),
+                      ),
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () =>
+                              setState(() => _attachments.removeAt(index)),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                if (['mp3', 'wav'].contains(ext)) {
+                  return _AudioAttachment(
+                    path: a,
+                    onDelete: () =>
+                        setState(() => _attachments.removeAt(index)),
+                  );
+                }
+                return ListTile(
+                  title: Text(a.split('/').last),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () =>
+                        setState(() => _attachments.removeAt(index)),
+                  ),
                 );
-              } else if (['mp3', 'wav'].contains(ext)) {
-                child = _AudioAttachment(path: a);
-              } else {
-                child = ListTile(title: Text(a.split('/').last));
-              }
-              return Dismissible(
-                key: ValueKey(a),
-                direction: DismissDirection.endToStart,
-                onDismissed: (_) => setState(() => _attachments.remove(a)),
-                background: Container(
-                  color: Colors.red,
-                  alignment: Alignment.centerRight,
-                  padding: const EdgeInsets.only(right: 16),
-                  child: const Icon(Icons.delete, color: Colors.white),
-                ),
-                child: child,
-              );
-            }),
+              },
+            ),
+
             const SizedBox(height: 12),
             ElevatedButton.icon(
               onPressed: () {
@@ -436,7 +453,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
 
 class _AudioAttachment extends StatefulWidget {
   final String path;
-  const _AudioAttachment({required this.path});
+  final VoidCallback? onDelete;
+  const _AudioAttachment({required this.path, this.onDelete});
 
   @override
   State<_AudioAttachment> createState() => _AudioAttachmentState();
@@ -465,9 +483,19 @@ class _AudioAttachmentState extends State<_AudioAttachment> {
   Widget build(BuildContext context) {
     return ListTile(
       title: Text(widget.path.split('/').last),
-      trailing: IconButton(
-        icon: Icon(_playing ? Icons.pause : Icons.play_arrow),
-        onPressed: _toggle,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: Icon(_playing ? Icons.pause : Icons.play_arrow),
+            onPressed: _toggle,
+          ),
+          if (widget.onDelete != null)
+            IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: widget.onDelete,
+            ),
+        ],
       ),
     );
   }
