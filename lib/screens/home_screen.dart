@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter/services.dart';
+
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
+
 import 'package:provider/provider.dart';
 
 import '../models/note.dart';
@@ -33,7 +36,9 @@ class _HomeScreenState extends State<HomeScreen> {
   static const _platform = MethodChannel('notes_reminder_app/actions');
 
   String _mascotPath = 'assets/lottie/mascot.json';
+
   final DateTime _today = DateTime.now();
+
   final _db = DbService();
   final List<Note> _notes = [];
 
@@ -97,6 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       context: context,
                       initialTime: TimeOfDay.now(),
                     );
+
                     if (!mounted) return;
                     if (time != null) {
                       alarmTime = DateTime(
@@ -105,6 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         picked.day,
                         time.hour,
                         time.minute,
+
                       );
                     }
                   }
@@ -149,8 +156,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+
   List<Note> _notesForDay(DateTime day) {
     return _notes
+
         .where((n) =>
             n.alarmTime != null &&
             n.alarmTime!.year == day.year &&
@@ -158,6 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
             n.alarmTime!.day == day.day)
         .toList();
   }
+
 
   Widget _buildNotesList() {
     if (_notes.isEmpty) {
@@ -197,6 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -287,5 +298,123 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+
+  Widget _buildNotesList() {
+    if (notes.isEmpty)
+      return Center(child: Text(AppLocalizations.of(context)!.noNotes));
+
+    return ListView.builder(
+      itemCount: _notes.length,
+      itemBuilder: (context, index) {
+        final note = _notes[index];
+        return Card(
+          child: ListTile(
+            leading: note.locked ? const Icon(Icons.lock) : null,
+            title: Text(note.title),
+
+            subtitle: Text(note.alarmTime != null
+                ? '${note.content}\n⏰ ${DateFormat('HH:mm dd/MM/yyyy').format(note.alarmTime!)}'
+                : note.content),
+            onTap: () {
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => NoteDetailScreen(note: note),
+                ),
+              );
+            },
+            trailing: IconButton(
+              icon: const Icon(Icons.delete),
+              tooltip: AppLocalizations.of(context)!.delete,
+              onPressed: () => setState(() => notes.removeAt(index)),
+
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCalendarTab() {
+    final weekDays = List.generate(7, (i) => _today.add(Duration(days: i)));
+    return Column(
+      children: [
+        const SizedBox(height: 8),
+        SizedBox(width: 140, height: 140, child: Lottie.asset(_mascotPath)),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 80,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: weekDays.length,
+            itemBuilder: (context, i) {
+              final d = weekDays[i];
+              final hasNotes = _notesForDay(d).isNotEmpty;
+              return GestureDetector(
+                onTap: () {
+                  final dayNotes = _notesForDay(d);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          NoteListForDayScreen(date: d, notes: dayNotes),
+                    ),
+                  );
+                },
+                child: Container(
+                  width: 60,
+                  margin: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: hasNotes ? Colors.orange : Colors.white,
+                    border: Border.all(color: Colors.black),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(DateFormat('E').format(d)),
+                      Text('${d.day}'),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final titles = ['Notes', 'Calendar', 'Settings'];
+    final pages = [
+      _buildNotesTab(),
+      _buildCalendarTab(),
+      SettingsScreen(onThemeChanged: widget.onThemeChanged),
+    ];
+    return Scaffold(
+      appBar: AppBar(title: Text(titles[_currentIndex])),
+      body: pages[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (i) => setState(() => _currentIndex = i),
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.note), label: 'Notes'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_today), label: 'Calendar'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.settings), label: 'Settings'),
+        ],
+      ),
+      floatingActionButton: _currentIndex == 0
+          ? FloatingActionButton(
+              onPressed: _addNote, child: const Icon(Icons.add))
+          : null,
+    );
+  }
+
 }
 
