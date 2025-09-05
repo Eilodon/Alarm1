@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:uuid/uuid.dart';
 
 import '../models/note.dart';
 import '../services/note_repository.dart';
@@ -64,6 +66,45 @@ class NoteProvider extends ChangeNotifier {
       await _repository.saveNotes(_notes);
     }
     notifyListeners();
+  }
+
+  Future<void> createNote({
+    required String title,
+    required String content,
+    required AppLocalizations l10n,
+    List<String> tags = const [],
+    bool locked = false,
+    DateTime? alarmTime,
+  }) async {
+    final noteId = const Uuid().v4();
+    final notificationId =
+        alarmTime != null ? const Uuid().v4().hashCode : null;
+
+    final note = Note(
+      id: noteId,
+      title: title,
+      content: content,
+      summary: '',
+      actionItems: const [],
+      dates: const [],
+      alarmTime: alarmTime,
+      locked: locked,
+      tags: tags,
+      updatedAt: DateTime.now(),
+      notificationId: notificationId,
+    );
+
+    await addNote(note);
+
+    if (alarmTime != null && notificationId != null) {
+      await _notificationService.scheduleNotification(
+        id: notificationId,
+        title: title,
+        body: content,
+        scheduledDate: alarmTime,
+        l10n: l10n,
+      );
+    }
   }
 
   Future<void> addNote(Note note) async {

@@ -3,14 +3,11 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
-import 'package:uuid/uuid.dart';
-
 import '../models/note.dart';
 import '../providers/note_provider.dart';
-import '../services/notification_service.dart';
 import '../services/settings_service.dart';
 import '../services/auth_service.dart';
-import '../widgets/tag_selector.dart';
+import '../widgets/add_note_dialog.dart';
 import 'note_detail_screen.dart';
 import 'note_list_for_day_screen.dart';
 import 'note_search_delegate.dart';
@@ -51,137 +48,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _addNote() {
-    final provider = context.read<NoteProvider>();
-    final titleCtrl = TextEditingController();
-    final contentCtrl = TextEditingController(text: provider.draft);
-    DateTime? alarmTime;
-
-    bool locked = false;
-    var tags = <String>[];
-    final availableTags = provider.notes.expand((n) => n.tags).toSet().toList();
-
     showDialog(
       context: context,
-      builder: (_) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: Text(AppLocalizations.of(context)!.addNoteReminder),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: titleCtrl,
-                  decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.titleLabel,
-                  ),
-                ),
-                TextField(
-                  controller: contentCtrl,
-                  decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.contentLabel,
-                  ),
-                ),
-                TagSelector(
-                  availableTags: availableTags,
-                  selectedTags: tags,
-                  allowCreate: true,
-                  label: AppLocalizations.of(context)!.tagsLabel,
-                  onChanged: (v) => setState(() => tags = v),
-                ),
-                SwitchListTile(
-                  title: Text(AppLocalizations.of(context)!.lockNote),
-                  value: locked,
-                  onChanged: (value) => setState(() => locked = value),
-                ),
-                const SizedBox(height: 12),
-                ElevatedButton(
-                  onPressed: () async {
-                    final now = DateTime.now();
-                    final picked = await showDatePicker(
-                      context: context,
-                      firstDate: now,
-                      lastDate: DateTime(now.year + 2),
-                      initialDate: now,
-                    );
-                    if (picked != null) {
-                      final time = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay.now(),
-                      );
-                      if (time != null) {
-                        setState(() {
-                          alarmTime = DateTime(
-                            picked.year,
-                            picked.month,
-                            picked.day,
-                            time.hour,
-                            time.minute,
-                          );
-                        });
-                      }
-                    }
-                  },
-                  child: Text(AppLocalizations.of(context)!.selectReminderTime),
-                ),
-                if (alarmTime != null)
-                  Text(
-                    DateFormat.yMd(
-                            Localizations.localeOf(context).toString())
-                        .add_Hm()
-                        .format(alarmTime!),
-                  ),
-              ],
-            ),
-          ),
-
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(AppLocalizations.of(context)!.cancel),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                final noteId = const Uuid().v4();
-                final notificationId =
-                    alarmTime != null ? const Uuid().v4().hashCode : null;
-
-                final note = Note(
-                  id: noteId,
-                  title: titleCtrl.text,
-                  content: contentCtrl.text,
-                  summary: '',
-                  actionItems: const [],
-                  dates: const [],
-                  alarmTime: alarmTime,
-                  locked: locked,
-                  tags: tags,
-                  updatedAt: DateTime.now(),
-                  notificationId: notificationId,
-                );
-                await provider.addNote(note);
-                provider.setDraft('');
-
-                if (alarmTime != null) {
-                  await NotificationService().scheduleNotification(
-                    id: note.notificationId!,
-                    title: note.title,
-                    body: note.content,
-                    scheduledDate: alarmTime!,
-                    l10n: AppLocalizations.of(context)!,
-                  );
-                }
-                if (!mounted) return;
-                Navigator.pop(context);
-              },
-              child: Text(AppLocalizations.of(context)!.save),
-            ),
-          ],
-        ),
-      ),
-    ).whenComplete(() {
-      titleCtrl.dispose();
-      contentCtrl.dispose();
-    });
+      builder: (_) => const AddNoteDialog(),
+    );
   }
 
   List<Note> _notesForDay(DateTime day, List<Note> notes) {
