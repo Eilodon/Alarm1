@@ -9,7 +9,11 @@ void main() {
     await tester.pumpWidget(
       ChangeNotifierProvider(
         create: (_) => NoteProvider(),
-        child: MaterialApp(home: HomeScreen(onThemeChanged: (_) {})),
+        child: MaterialApp(
+            home: HomeScreen(
+          onThemeChanged: (_) {},
+          onFontScaleChanged: (_) {},
+        )),
       ),
     );
 
