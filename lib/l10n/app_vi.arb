@@ -54,6 +54,7 @@
   "audioLabel": "Âm thanh",
 
   "tagsLabel": "Tag",
+  "allTags": "Tất cả tag",
   "addTag": "Thêm tag",
   "requireAuth": "Yêu cầu xác thực",
   "lockNote": "Khóa ghi chú",
