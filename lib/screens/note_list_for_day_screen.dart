@@ -5,8 +5,6 @@ import 'package:provider/provider.dart';
 import '../models/note.dart';
 import '../providers/note_provider.dart';
 import 'note_detail_screen.dart';
-import '../models/note.dart';
-
 
 class NoteListForDayScreen extends StatelessWidget {
   final DateTime date;
