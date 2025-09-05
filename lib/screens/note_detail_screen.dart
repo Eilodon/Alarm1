@@ -30,6 +30,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   RepeatInterval? _repeat;
   int _snoozeMinutes = 5;
   late List<String> _tags;
+  final _ttsService = TTSService();
 
 
   @override
@@ -60,6 +61,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     }
   }
 
+  Future<void> _readNote() async {
+    await _ttsService.speak(_contentCtrl.text);
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<NoteProvider>();
@@ -69,6 +74,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       appBar: AppBar(
         title: Text(widget.note.title),
         actions: [
+          TextButton(
+            onPressed: _readNote,
+            child: const Text('Đọc Note'),
+          ),
           IconButton(
             icon: const Icon(Icons.save),
             onPressed: _save,
