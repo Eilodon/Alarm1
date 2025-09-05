@@ -72,25 +72,6 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
             icon: const Icon(Icons.save),
             onPressed: _save,
           ),
-
-          const Divider(),
-          ..._attachments.map((a) => ListTile(title: Text(a.split('/').last))),
-          const SizedBox(height: 8),
-          TagSelector(
-            availableTags: context
-                .watch<NoteProvider>()
-                .notes
-                .expand((n) => n.tags)
-                .toSet()
-                .toList(),
-            selectedTags: _tags,
-            onChanged: (v) => setState(() => _tags = v),
-            allowCreate: true,
-            label: AppLocalizations.of(context)!.tagsLabel,
-          ),
-          const Divider(),
-          Expanded(child: ChatScreen(initialMessage: _contentCtrl.text)),
-
         ],
       ),
       body: SingleChildScrollView(
@@ -154,6 +135,11 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
             const SizedBox(height: 12),
             ..._attachments.map(
               (a) => ListTile(title: Text(a.split('/').last)),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 300,
+              child: ChatScreen(initialMessage: _contentCtrl.text),
             ),
           ],
         ),
