@@ -8,7 +8,6 @@ import '../models/note.dart';
 import '../providers/note_provider.dart';
 import '../services/notification_service.dart';
 import '../services/tts_service.dart';
-import '../services/gemini_service.dart';
 import 'chat_screen.dart';
 import 'package:intl/intl.dart';
 import '../widgets/tag_selector.dart';
