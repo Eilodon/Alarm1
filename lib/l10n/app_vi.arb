@@ -70,6 +70,10 @@
   "scheduledDesc": "Thông báo đã lên lịch",
   "recurringDesc": "Thông báo định kỳ",
   "dailyDesc": "Thông báo hàng ngày",
-  "snoozeDesc": "Thông báo báo lại"
+  "snoozeDesc": "Thông báo báo lại",
+  "aiSuggestionsTitle": "Gợi ý AI",
+  "summaryLabel": "Tóm tắt",
+  "actionItemsLabel": "Cần làm",
+  "datesLabel": "Ngày"
 
 }

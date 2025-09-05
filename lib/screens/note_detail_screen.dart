@@ -11,6 +11,7 @@ import '../services/tts_service.dart';
 import 'chat_screen.dart';
 import 'package:intl/intl.dart';
 import '../widgets/tag_selector.dart';
+import '../services/gemini_service.dart';
 
 class NoteDetailScreen extends StatefulWidget {
   final Note note;
@@ -246,6 +247,87 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   }
 
   Future<void> _save() async {
+    final l10n = AppLocalizations.of(context)!;
+
+    final analysis = await GeminiService().analyzeNote(_contentCtrl.text);
+    String summary = widget.note.summary;
+    List<String> actionItems = List.from(widget.note.actionItems);
+    List<DateTime> dates = List.from(widget.note.dates);
+    var tags = List<String>.from(_tags);
+
+    if (analysis != null) {
+      final summaryCtrl = TextEditingController(text: analysis.summary);
+      final actionCtrl =
+          TextEditingController(text: analysis.actionItems.join('\n'));
+      final tagsCtrl =
+          TextEditingController(text: analysis.suggestedTags.join(', '));
+      final datesCtrl = TextEditingController(
+          text: analysis.dates
+              .map((d) => DateFormat('yyyy-MM-dd').format(d))
+              .join(', '));
+
+      final accepted = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(l10n.aiSuggestionsTitle),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: summaryCtrl,
+                  decoration: InputDecoration(labelText: l10n.summaryLabel),
+                ),
+                TextField(
+                  controller: actionCtrl,
+                  decoration:
+                      InputDecoration(labelText: l10n.actionItemsLabel),
+                  maxLines: null,
+                ),
+                TextField(
+                  controller: tagsCtrl,
+                  decoration: InputDecoration(labelText: l10n.tagsLabel),
+                ),
+                TextField(
+                  controller: datesCtrl,
+                  decoration: InputDecoration(labelText: l10n.datesLabel),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(l10n.cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(l10n.save),
+            ),
+          ],
+        ),
+      );
+
+      if (accepted == true) {
+        summary = summaryCtrl.text;
+        actionItems = actionCtrl.text
+            .split('\n')
+            .map((e) => e.trim())
+            .where((e) => e.isNotEmpty)
+            .toList();
+        tags = tagsCtrl.text
+            .split(',')
+            .map((e) => e.trim())
+            .where((e) => e.isNotEmpty)
+            .toList();
+        dates = datesCtrl.text
+            .split(',')
+            .map((e) => DateTime.tryParse(e.trim()))
+            .whereType<DateTime>()
+            .toList();
+      }
+    }
+
     final service = NotificationService();
     final oldId = widget.note.notificationId;
     if (oldId != null) {
@@ -263,7 +345,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     final updated = widget.note.copyWith(
       title: _titleCtrl.text,
       content: _contentCtrl.text,
-      tags: _tags,
+      tags: tags,
       attachments: _attachments,
       alarmTime: _alarmTime,
       repeatInterval: _repeat,
@@ -272,6 +354,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       snoozeMinutes: _snoozeMinutes,
       updatedAt: DateTime.now(),
       notificationId: newId,
+      summary: summary,
+      actionItems: actionItems,
+      dates: dates,
     );
     await context.read<NoteProvider>().updateNote(updated);
 
@@ -282,7 +367,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           title: updated.title,
           body: updated.content,
           time: Time(_alarmTime!.hour, _alarmTime!.minute),
-          l10n: AppLocalizations.of(context)!,
+          l10n: l10n,
         );
       } else if (_repeat != null) {
         await service.scheduleRecurring(
@@ -290,7 +375,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           title: updated.title,
           body: updated.content,
           repeatInterval: _repeat!,
-          l10n: AppLocalizations.of(context)!,
+          l10n: l10n,
         );
       } else {
         await service.scheduleNotification(
@@ -298,7 +383,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           title: updated.title,
           body: updated.content,
           scheduledDate: _alarmTime!,
-          l10n: AppLocalizations.of(context)!,
+          l10n: l10n,
         );
       }
     }
