@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
@@ -37,19 +38,28 @@ class TTSService {
     }
 
     final url = Uri.parse('https://api.elevenlabs.io/v1/text-to-speech/en-US');
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'xi-api-key': apiKey,
-      },
-      body: jsonEncode({'text': text}),
-    );
+    try {
+      final response = await http
+          .post(
+            url,
+            headers: {
+              'Content-Type': 'application/json',
+              'xi-api-key': apiKey,
+            },
+            body: jsonEncode({'text': text}),
+          )
+          .timeout(const Duration(seconds: 10));
 
-    if (response.statusCode != 200) {
-      throw Exception('TTS API error: ${response.statusCode}');
+      if (response.statusCode != 200) {
+        throw Exception('TTS API error: ${response.statusCode}');
+      }
+
+      await _player.play(BytesSource(response.bodyBytes));
+    } on TimeoutException {
+      // Fallback to local TTS when the request times out.
+      await speak(text);
+    } catch (e) {
+      throw Exception('TTS API request failed: $e');
     }
-
-    await _player.play(BytesSource(response.bodyBytes));
   }
 }
