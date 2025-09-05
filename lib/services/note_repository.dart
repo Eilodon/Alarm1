@@ -17,4 +17,8 @@ class NoteRepository {
   Future<void> updateNote(Note note) {
     return _dbService.updateNote(note);
   }
+
+  Future<Map<String, dynamic>> encryptNote(Note note) {
+    return _dbService.encryptNote(note);
+  }
 }
