@@ -29,5 +29,6 @@
   "addNoteTooltip": "Add note",
   "settingsTooltip": "Open settings",
   "delete": "Delete",
-  "timeLabel": "Time"
+  "timeLabel": "Time",
+  "tagsLabel": "Tags"
 }

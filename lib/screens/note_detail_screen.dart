@@ -10,6 +10,7 @@ import '../services/notification_service.dart';
 import '../services/tts_service.dart';
 import '../services/gemini_service.dart';
 import 'chat_screen.dart';
+import '../widgets/tag_selector.dart';
 
 
 class NoteDetailScreen extends StatefulWidget {
@@ -78,6 +79,19 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           ),
           const Divider(),
           ..._attachments.map((a) => ListTile(title: Text(a.split('/').last))),
+          const SizedBox(height: 8),
+          TagSelector(
+            availableTags: context
+                .watch<NoteProvider>()
+                .notes
+                .expand((n) => n.tags)
+                .toSet()
+                .toList(),
+            selectedTags: _tags,
+            onChanged: (v) => setState(() => _tags = v),
+            allowCreate: true,
+            label: AppLocalizations.of(context)!.tagsLabel,
+          ),
           const Divider(),
           Expanded(child: ChatScreen(initialMessage: _contentCtrl.text)),
         ],

@@ -8,6 +8,7 @@ import '../models/note.dart';
 import '../providers/note_provider.dart';
 import '../services/notification_service.dart';
 import '../services/settings_service.dart';
+import '../widgets/tag_selector.dart';
 import 'note_detail_screen.dart';
 import 'note_list_for_day_screen.dart';
 import 'settings_screen.dart';
@@ -50,6 +51,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final titleCtrl = TextEditingController();
     final contentCtrl = TextEditingController(text: provider.draft);
     DateTime? alarmTime;
+    var tags = <String>[];
+    final availableTags =
+        provider.notes.expand((n) => n.tags).toSet().toList();
 
     showDialog(
       context: context,
@@ -70,6 +74,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: InputDecoration(
                   labelText: AppLocalizations.of(context)!.contentLabel,
                 ),
+              ),
+              const SizedBox(height: 12),
+              TagSelector(
+                availableTags: availableTags,
+                selectedTags: tags,
+                onChanged: (v) => tags = v,
+                allowCreate: true,
+                label: AppLocalizations.of(context)!.tagsLabel,
               ),
               const SizedBox(height: 12),
               ElevatedButton(
@@ -115,6 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: titleCtrl.text,
                 content: contentCtrl.text,
                 alarmTime: alarmTime,
+                tags: tags,
                 locked: locked,
                 updatedAt: DateTime.now(),
               );

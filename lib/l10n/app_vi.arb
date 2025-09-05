@@ -29,5 +29,6 @@
   "addNoteTooltip": "Thêm ghi chú",
   "settingsTooltip": "Mở cài đặt",
   "delete": "Xóa",
-  "timeLabel": "Thời gian"
+  "timeLabel": "Thời gian",
+  "tagsLabel": "Tag"
 }
