@@ -179,29 +179,38 @@ class NoteProvider extends ChangeNotifier {
       if (startAfter != null) {
         query = query.startAfter([startAfter.toIso8601String()]);
       }
-      final snapshot = await query.get();
-      final remoteNotes = await Future.wait(
-        snapshot.docs.map((d) => _repository.decryptNote(d.data())),
-      );
-      final map = {for (var n in _notes) n.id: n};
-      for (final n in remoteNotes) {
-        final local = map[n.id];
-        if (local == null) {
-          map[n.id] = n;
-        } else {
-          final localUpdated =
-              local.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-          final remoteUpdated =
-              n.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-          if (remoteUpdated.isAfter(localUpdated)) {
+      try {
+        final snapshot = await query.get();
+        final remoteNotes = await Future.wait(
+          snapshot.docs.map((d) => _repository.decryptNote(d.data())),
+        );
+        final map = {for (var n in _notes) n.id: n};
+        for (final n in remoteNotes) {
+          final local = map[n.id];
+          if (local == null) {
             map[n.id] = n;
+          } else {
+            final localUpdated =
+                local.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+            final remoteUpdated =
+                n.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+            if (remoteUpdated.isAfter(localUpdated)) {
+              map[n.id] = n;
+            }
           }
         }
+        _notes = map.values.toList()
+          ..sort((a, b) =>
+              (b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0))
+                  .compareTo(
+                      a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0)));
+        await _repository.saveNotes(_notes);
+      } catch (e, st) {
+        debugPrint('fetchNotesPage error: $e\n$st');
+        if (_notes.isEmpty) {
+          return [];
+        }
       }
-      _notes = map.values.toList()
-        ..sort((a, b) => (b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0))
-            .compareTo(a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0)));
-      await _repository.saveNotes(_notes);
     }
 
     final sorted = _notes.toList()
