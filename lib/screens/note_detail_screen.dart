@@ -38,7 +38,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     _titleCtrl = TextEditingController(text: widget.note.title);
     _contentCtrl = TextEditingController(text: widget.note.content);
     _alarmTime = widget.note.alarmTime;
-    _repeat = widget.note.daily ? RepeatInterval.daily : null;
+    _repeat =
+        widget.note.repeatInterval ?? (widget.note.daily ? RepeatInterval.daily : null);
     _snoozeMinutes = widget.note.snoozeMinutes;
     _attachments = List.from(widget.note.attachments);
     _tags = List.from(widget.note.tags);
@@ -107,6 +108,49 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                     child: Text(DateFormat('HH:mm dd/MM/yyyy').format(_alarmTime!)),
                   ),
               ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                const Text('Repeat:'),
+                const SizedBox(width: 8),
+                DropdownButton<RepeatInterval?>(
+                  value: _repeat,
+                  onChanged: (value) => setState(() => _repeat = value),
+                  items: const [
+                    DropdownMenuItem<RepeatInterval?> (
+                      value: null,
+                      child: Text('None'),
+                    ),
+                    DropdownMenuItem<RepeatInterval?> (
+                      value: RepeatInterval.everyMinute,
+                      child: Text('Every minute'),
+                    ),
+                    DropdownMenuItem<RepeatInterval?> (
+                      value: RepeatInterval.hourly,
+                      child: Text('Hourly'),
+                    ),
+                    DropdownMenuItem<RepeatInterval?> (
+                      value: RepeatInterval.daily,
+                      child: Text('Daily'),
+                    ),
+                    DropdownMenuItem<RepeatInterval?> (
+                      value: RepeatInterval.weekly,
+                      child: Text('Weekly'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text('Snooze: $_snoozeMinutes min'),
+            Slider(
+              value: _snoozeMinutes.toDouble(),
+              min: 1,
+              max: 60,
+              divisions: 59,
+              label: _snoozeMinutes.toString(),
+              onChanged: (v) => setState(() => _snoozeMinutes = v.round()),
             ),
             const SizedBox(height: 12),
             TagSelector(
@@ -182,6 +226,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       tags: _tags,
       attachments: _attachments,
       alarmTime: _alarmTime,
+      repeatInterval: _repeat,
       daily: _repeat == RepeatInterval.daily,
       active: true,
       snoozeMinutes: _snoozeMinutes,

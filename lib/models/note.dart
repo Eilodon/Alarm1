@@ -1,8 +1,11 @@
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
 class Note {
   final String id;
   final String title;
   final String content;
   final DateTime? alarmTime;
+  final RepeatInterval? repeatInterval;
   final bool daily;
   final bool active;
   final List<String> tags;
@@ -16,6 +19,7 @@ class Note {
     required this.title,
     required this.content,
     this.alarmTime,
+    this.repeatInterval,
     this.daily = false,
     this.active = false,
     this.tags = const [],
@@ -30,6 +34,7 @@ class Note {
     String? title,
     String? content,
     DateTime? alarmTime,
+    RepeatInterval? repeatInterval,
     bool? daily,
     bool? active,
     List<String>? tags,
@@ -43,6 +48,7 @@ class Note {
       title: title ?? this.title,
       content: content ?? this.content,
       alarmTime: alarmTime ?? this.alarmTime,
+      repeatInterval: repeatInterval ?? this.repeatInterval,
       daily: daily ?? this.daily,
       active: active ?? this.active,
       tags: tags ?? this.tags,
@@ -63,6 +69,8 @@ class Note {
           : json['remindAt'] != null
               ? DateTime.parse(json['remindAt'])
               : null,
+      repeatInterval:
+          _repeatIntervalFromString(json['repeatInterval'] as String?),
       daily: json['daily'] ?? false,
       active: json['active'] ?? false,
       tags: (json['tags'] as List<dynamic>? ?? []).cast<String>(),
@@ -81,6 +89,7 @@ class Note {
         'title': title,
         'content': content,
         'alarmTime': alarmTime?.toIso8601String(),
+        'repeatInterval': repeatInterval?.toString().split('.').last,
         'daily': daily,
         'active': active,
         'tags': tags,
@@ -89,4 +98,12 @@ class Note {
         'snoozeMinutes': snoozeMinutes,
         'updatedAt': updatedAt?.toIso8601String(),
       };
+}
+
+RepeatInterval? _repeatIntervalFromString(String? value) {
+  if (value == null) return null;
+  for (final r in RepeatInterval.values) {
+    if (r.toString().split('.').last == value) return r;
+  }
+  return null;
 }
