@@ -13,7 +13,7 @@ class WidgetProvider : AppWidgetProvider() {
         for (id in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.widget_provider)
             val prefs = PreferenceManager.getDefaultSharedPreferences(context)
-            val note = prefs.getString("latest_note", "No notes")
+            val note = prefs.getString("latest_note", context.getString(R.string.no_notes))
             views.setTextViewText(R.id.widget_note, note)
 
             val intent = Intent(context, MainActivity::class.java)

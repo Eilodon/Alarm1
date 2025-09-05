@@ -12,7 +12,7 @@ class BackupService {
     String? path;
     try {
       path = await FilePicker.platform.saveFile(
-        dialogTitle: 'Export Notes',
+        dialogTitle: l10n.exportNotes,
         fileName: 'notes_backup.json',
         type: FileType.custom,
         allowedExtensions: ['json'],
@@ -35,6 +35,7 @@ class BackupService {
     FilePickerResult? result;
     try {
       result = await FilePicker.platform.pickFiles(
+        dialogTitle: l10n.importNotes,
         type: FileType.custom,
         allowedExtensions: ['json'],
       );

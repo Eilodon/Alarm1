@@ -180,11 +180,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: _changeFontScale,
           ),
           ListTile(
-            title: const Text('Export notes'),
+            title: Text(AppLocalizations.of(context)!.exportNotes),
             onTap: _exportNotes,
           ),
           ListTile(
-            title: const Text('Import notes'),
+            title: Text(AppLocalizations.of(context)!.importNotes),
             onTap: _importNotes,
           ),
           SwitchListTile(
