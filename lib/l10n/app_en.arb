@@ -62,8 +62,6 @@
 
   "exportNotes": "Export notes",
   "importNotes": "Import notes",
-  "notesExported": "Notes exported",
-  "notesImported": "Notes imported",
 
   "tagsLabel": "Tags",
   "allTags": "All tags",
