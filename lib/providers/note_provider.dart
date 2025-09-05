@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/note.dart';
@@ -200,6 +201,65 @@ class NoteProvider extends ChangeNotifier {
       return true;
     } catch (e, st) {
       debugPrint('updateNote error: $e\n$st');
+      return false;
+    }
+  }
+
+  Future<bool> saveNote(Note note, AppLocalizations l10n) async {
+    try {
+      final index = _notes.indexWhere((n) => n.id == note.id);
+      if (index == -1) return false;
+
+      final old = _notes[index];
+      if (old.notificationId != null) {
+        await _notificationService.cancel(old.notificationId!);
+      }
+
+      int? newId;
+      var toSave = note;
+      if (note.alarmTime != null) {
+        newId = DateTime.now().millisecondsSinceEpoch;
+        toSave = note.copyWith(notificationId: newId);
+      } else {
+        toSave = note.copyWith(
+          notificationId: null,
+          repeatInterval: null,
+          daily: false,
+        );
+      }
+
+      final ok = await updateNote(toSave);
+      if (ok && newId != null) {
+        if (toSave.daily) {
+          await _notificationService.scheduleDailyAtTime(
+            id: newId,
+            title: toSave.title,
+            body: toSave.content,
+            time: Time(toSave.alarmTime!.hour, toSave.alarmTime!.minute),
+            l10n: l10n,
+          );
+        } else if (toSave.repeatInterval != null) {
+          await _notificationService.scheduleRecurring(
+            id: newId,
+            title: toSave.title,
+            body: toSave.content,
+            repeatInterval: toSave.repeatInterval!,
+            l10n: l10n,
+          );
+        } else {
+          await _notificationService.scheduleNotification(
+            id: newId,
+            title: toSave.title,
+            body: toSave.content,
+            scheduledDate: toSave.alarmTime!,
+            l10n: l10n,
+          );
+        }
+      }
+
+      return ok;
+    } catch (e, st) {
+      debugPrint('saveNote error: $e\n$st');
       return false;
     }
   }
