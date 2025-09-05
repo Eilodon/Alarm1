@@ -142,21 +142,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _exportNotes() async {
     final l10n = AppLocalizations.of(context)!;
-    await _noteRepository.exportNotes(l10n);
+    final success = await _noteRepository.exportNotes(l10n);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.notesExported)),
+      SnackBar(
+        content: Text(success
+            ? l10n.notesExported
+            : l10n.errorWithMessage('Failed to export notes')),
+      ),
     );
   }
 
   Future<void> _importNotes() async {
     final l10n = AppLocalizations.of(context)!;
-    await _noteRepository.importNotes(l10n);
+    final notes = await _noteRepository.importNotes(l10n);
     if (!mounted) return;
-    await context.read<NoteProvider>().loadNotes();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.notesImported)),
-    );
+    if (notes.isNotEmpty) {
+      await context.read<NoteProvider>().loadNotes();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.notesImported)),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            l10n.errorWithMessage('Failed to import notes'),
+          ),
+        ),
+      );
+    }
   }
 
   @override

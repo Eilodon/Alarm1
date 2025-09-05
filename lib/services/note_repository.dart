@@ -34,9 +34,9 @@ class NoteRepository {
     return _dbService.decryptNote(data);
   }
 
-  Future<void> exportNotes(AppLocalizations l10n) async {
+  Future<bool> exportNotes(AppLocalizations l10n) async {
     final notes = await _dbService.getNotes();
-    await _backupService.exportNotes(notes, l10n);
+    return _backupService.exportNotes(notes, l10n);
   }
 
   Future<List<Note>> importNotes(AppLocalizations l10n) async {
