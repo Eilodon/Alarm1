@@ -62,6 +62,7 @@
   "convertSpeechPrompt@placeholders": {
     "recognized": {}
   },
+  "offlineMode": "Chế độ ngoại tuyến",
 
   "scheduled": "Lên lịch",
   "recurring": "Định kỳ",
