@@ -8,7 +8,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../models/note.dart';
 
 class BackupService {
-  Future<void> exportNotes(List<Note> notes, AppLocalizations l10n) async {
+  Future<bool> exportNotes(List<Note> notes, AppLocalizations l10n) async {
     String? path;
     try {
       path = await FilePicker.platform.saveFile(
@@ -19,15 +19,17 @@ class BackupService {
       );
     } catch (e) {
       debugPrint(l10n.errorWithMessage(e.toString()));
-      return;
+      return false;
     }
-    if (path == null) return;
+    if (path == null) return false;
     final file = File(path);
     final data = jsonEncode(notes.map((n) => n.toJson()).toList());
     try {
       await file.writeAsString(data);
+      return true;
     } catch (e) {
       debugPrint(l10n.errorWithMessage(e.toString()));
+      return false;
     }
   }
 
@@ -52,10 +54,15 @@ class BackupService {
       debugPrint(l10n.errorWithMessage(e.toString()));
       return [];
     }
-    final list = jsonDecode(content) as List<dynamic>;
-    return list
-        .map((e) => Note.fromJson(e as Map<String, dynamic>))
-        .toList();
+    try {
+      final list = jsonDecode(content) as List<dynamic>;
+      return list
+          .map((e) => Note.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      debugPrint(l10n.errorWithMessage(e.toString()));
+      return [];
+    }
   }
 }
 
