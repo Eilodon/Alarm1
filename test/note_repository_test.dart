@@ -25,6 +25,9 @@ void main() {
         id: '1',
         title: 't',
         content: 'c',
+        alarmTime: DateTime(2024, 1, 1),
+        attachments: ['a'],
+        locked: true,
         snoozeMinutes: 10,
       );
       await repo.saveNotes([note]);
@@ -32,6 +35,9 @@ void main() {
       expect(notes.length, 1);
       expect(notes.first.title, 't');
       expect(notes.first.snoozeMinutes, 10);
+      expect(notes.first.locked, true);
+      expect(notes.first.attachments, ['a']);
+      expect(notes.first.alarmTime, DateTime(2024, 1, 1));
     });
 
     test('updateNote persists changes', () async {
@@ -40,6 +46,7 @@ void main() {
         id: '1',
         title: 't',
         content: 'c',
+        attachments: ['a'],
         snoozeMinutes: 5,
       );
       await repo.saveNotes([note]);
@@ -47,6 +54,7 @@ void main() {
         id: '1',
         title: 't2',
         content: 'c2',
+        attachments: ['b'],
         snoozeMinutes: 15,
       );
       await repo.updateNote(updated);
@@ -55,6 +63,7 @@ void main() {
       expect(notes.first.title, 't2');
       expect(notes.first.content, 'c2');
       expect(notes.first.snoozeMinutes, 15);
+      expect(notes.first.attachments, ['b']);
     });
   });
 }

@@ -23,12 +23,11 @@ class NoteDetailScreen extends StatefulWidget {
 class _NoteDetailScreenState extends State<NoteDetailScreen> {
   late final TextEditingController _titleCtrl;
   late final TextEditingController _contentCtrl;
-  final List<String> _attachments = [];
+  late List<String> _attachments;
   DateTime? _alarmTime;
   RepeatInterval? _repeat;
   int _snoozeMinutes = 5;
-  List<String> _tags = [];
-  bool _editing = false;
+  late List<String> _tags;
 
 
   @override
@@ -39,7 +38,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     _alarmTime = widget.note.alarmTime;
     _repeat = widget.note.daily ? RepeatInterval.daily : null;
     _snoozeMinutes = widget.note.snoozeMinutes;
-
+    _attachments = List.from(widget.note.attachments);
+    _tags = List.from(widget.note.tags);
   }
 
   Future<void> _pickImage() async {
@@ -114,48 +114,48 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   }
 
   Future<void> _save() async {
-    widget.note
-      ..title = _titleCtrl.text
-      ..content = _contentCtrl.text
-      ..tags = _tags
-      ..attachments = _attachments
-      ..alarmTime = _alarmTime
-      ..daily = _repeat == RepeatInterval.daily
-      ..active = true
-      ..snoozeMinutes = _snoozeMinutes
-      ..updatedAt = DateTime.now();
-    await context.read<NoteProvider>().updateNote(widget.note);
+    final updated = widget.note.copyWith(
+      title: _titleCtrl.text,
+      content: _contentCtrl.text,
+      tags: _tags,
+      attachments: _attachments,
+      alarmTime: _alarmTime,
+      daily: _repeat == RepeatInterval.daily,
+      active: true,
+      snoozeMinutes: _snoozeMinutes,
+      updatedAt: DateTime.now(),
+    );
+    await context.read<NoteProvider>().updateNote(updated);
 
     if (_alarmTime != null) {
-      final id = int.tryParse(widget.note.id) ??
+      final id = int.tryParse(updated.id) ??
           DateTime.now().millisecondsSinceEpoch % 100000;
       final service = NotificationService();
       if (_repeat == RepeatInterval.daily) {
         await service.scheduleDailyAtTime(
           id: id,
-          title: widget.note.title,
-          body: widget.note.content,
+          title: updated.title,
+          body: updated.content,
           time: Time(_alarmTime!.hour, _alarmTime!.minute),
         );
       } else if (_repeat != null) {
         await service.scheduleRecurring(
           id: id,
-          title: widget.note.title,
-          body: widget.note.content,
+          title: updated.title,
+          body: updated.content,
           repeatInterval: _repeat!,
         );
       } else {
         await service.scheduleNotification(
           id: id,
-          title: widget.note.title,
-          body: widget.note.content,
+          title: updated.title,
+          body: updated.content,
           scheduledDate: _alarmTime!,
         );
       }
     }
 
     if (!mounted) return;
-    setState(() => _editing = false);
     Navigator.pop(context);
   }
 }
