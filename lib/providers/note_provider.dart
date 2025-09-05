@@ -7,9 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
 
 import '../models/note.dart';
 import '../services/note_repository.dart';
@@ -27,9 +25,6 @@ class NoteProvider extends ChangeNotifier {
   StreamSubscription<ConnectivityResult>? _connectivitySubscription;
 
   static const _unsyncedKey = 'unsyncedNoteIds';
-
-  final CalendarService _calendarService;
-  final NotificationService _notificationService;
 
   List<Note> _notes = [];
   String _draft = '';
@@ -221,6 +216,55 @@ class NoteProvider extends ChangeNotifier {
         .toList();
     notifyListeners();
     return page;
+  }
+
+
+  Future<bool> createNote({
+    required String title,
+    required String content,
+    List<String> tags = const [],
+    bool locked = false,
+    DateTime? alarmTime,
+    required AppLocalizations l10n,
+  }) async {
+    try {
+      final id = DateTime.now().microsecondsSinceEpoch.toString();
+      int? notificationId;
+      String? eventId;
+      if (alarmTime != null) {
+        notificationId =
+            DateTime.now().millisecondsSinceEpoch.remainder(1 << 31);
+        await _notificationService.scheduleNotification(
+          id: notificationId,
+          title: title,
+          body: content,
+          scheduledDate: alarmTime,
+          l10n: l10n,
+        );
+        eventId = await _calendarService.createEvent(
+          title: title,
+          description: content,
+          start: alarmTime,
+        );
+      }
+
+      final note = Note(
+        id: id,
+        title: title,
+        content: content,
+        tags: tags,
+        locked: locked,
+        alarmTime: alarmTime,
+        notificationId: notificationId,
+        eventId: eventId,
+        updatedAt: DateTime.now(),
+      );
+
+      await addNote(note);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
 
