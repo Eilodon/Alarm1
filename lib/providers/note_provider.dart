@@ -7,9 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
 
 import '../models/note.dart';
 import '../services/note_repository.dart';
@@ -27,9 +25,6 @@ class NoteProvider extends ChangeNotifier {
   StreamSubscription<ConnectivityResult>? _connectivitySubscription;
 
   static const _unsyncedKey = 'unsyncedNoteIds';
-
-  final CalendarService _calendarService;
-  final NotificationService _notificationService;
 
   List<Note> _notes = [];
   String _draft = '';
