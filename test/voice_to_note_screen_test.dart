@@ -55,6 +55,26 @@ void main() {
       verify(() => speech.listen(onResult: any(named: 'onResult'))).called(1);
     });
 
+    testWidgets('shows snackbar when permission denied', (tester) async {
+      final speech = MockSpeechToText();
+      when(() => speech.initialize()).thenAnswer((_) async => false);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: VoiceToNoteScreen(speech: speech),
+        ),
+      );
+
+      final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+      await tester.tap(find.text(l10n.speak));
+      await tester.pump();
+
+      expect(find.text(l10n.microphonePermissionMessage), findsOneWidget);
+    });
+
     testWidgets('offline mode uses Vosk', (tester) async {
       final speech = MockSpeechToText();
       when(() => speech.stop()).thenAnswer((_) async {});

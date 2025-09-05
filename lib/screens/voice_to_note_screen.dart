@@ -72,6 +72,14 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
         widget.speech.listen(onResult: (res) {
           setState(() => _recognized = res.recognizedWords);
         });
+      } else {
+        if (!mounted) return;
+        final l10n = AppLocalizations.of(context)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.microphonePermissionMessage),
+          ),
+        );
       }
     } else {
       await widget.speech.stop();

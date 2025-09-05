@@ -28,6 +28,8 @@
     "error": {}
   },
   "networkError": "Lỗi mạng. Vui lòng thử lại.",
+  "noInternetConnection": "Mất kết nối mạng.",
+  "microphonePermissionMessage": "Yêu cầu quyền micro. Vui lòng bật trong Cài đặt.",
   "readNote": "Đọc Note",
   "scheduleForDate": "Lịch ngày {date}",
   "scheduleForDate@placeholders": {

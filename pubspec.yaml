@@ -25,6 +25,7 @@ dependencies:
   speech_to_text: ^7.3.0
   vosk_flutter: ^0.3.48
   share_plus: ^10.0.2
+  connectivity_plus: ^6.1.5
 
   local_auth: ^2.1.7
 
