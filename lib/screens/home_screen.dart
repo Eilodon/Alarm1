@@ -35,6 +35,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String _mascotPath = 'assets/lottie/mascot.json';
   final DateTime _today = DateTime.now();
+  String? _selectedTag;
 
   @override
   void initState() {
@@ -228,13 +229,32 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final notes = context.watch<NoteProvider>().notes;
+    final provider = context.watch<NoteProvider>();
+    final notes = provider.notes;
+    final tags = notes.expand((n) => n.tags).toSet().toList();
+    final filteredNotes = _selectedTag == null
+        ? notes
+        : notes.where((n) => n.tags.contains(_selectedTag!)).toList();
     final weekDays = List.generate(7, (i) => _today.add(Duration(days: i)));
 
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.appTitle),
         actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.label),
+            onSelected: (value) {
+              setState(() {
+                _selectedTag = value == 'All' ? null : value;
+              });
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(value: 'All', child: Text('All')),
+              ...tags.map(
+                (t) => PopupMenuItem(value: t, child: Text(t)),
+              ),
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () => showSearch(
@@ -282,7 +302,7 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: weekDays.length,
               itemBuilder: (context, i) {
                 final d = weekDays[i];
-                final hasNotes = _notesForDay(d, notes).isNotEmpty;
+                final hasNotes = _notesForDay(d, filteredNotes).isNotEmpty;
                 return GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -313,7 +333,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          Expanded(child: _buildNotesList(notes)),
+          Expanded(child: _buildNotesList(filteredNotes)),
         ],
       ),
       floatingActionButton: FloatingActionButton(
