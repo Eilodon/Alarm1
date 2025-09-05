@@ -73,6 +73,7 @@ Run the tests with:
 flutter test
 ```
 
+
 ## Troubleshooting
 
 ### Firebase fails to connect
@@ -96,4 +97,10 @@ flutter test
 
 * Check that the device or emulator has internet access.
 * Once the network is restored, run the clean and run commands again to restart the app.
+
+
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
