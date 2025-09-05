@@ -11,12 +11,16 @@ class CalendarService {
       GoogleSignIn(scopes: <String>[calendar.CalendarApi.calendarScope]);
 
   Future<calendar.CalendarApi?> _getApi() async {
-    var account = await _signIn.signInSilently();
-    account ??= await _signIn.signIn();
-    if (account == null) return null;
-    final headers = await account.authHeaders;
-    final client = _AuthClient(headers);
-    return calendar.CalendarApi(client);
+    try {
+      var account = await _signIn.signInSilently();
+      account ??= await _signIn.signIn();
+      if (account == null) return null;
+      final headers = await account.authHeaders;
+      final client = _AuthClient(headers);
+      return calendar.CalendarApi(client);
+    } catch (e) {
+      return null;
+    }
   }
 
   Future<String?> createEvent({
@@ -35,8 +39,12 @@ class CalendarService {
         dateTime: end ?? start.add(const Duration(hours: 1)),
       ),
     );
-    final created = await api.events.insert(event, 'primary');
-    return created.id;
+    try {
+      final created = await api.events.insert(event, 'primary');
+      return created.id;
+    } catch (e) {
+      return null;
+    }
   }
 
   Future<void> updateEvent(
@@ -56,13 +64,21 @@ class CalendarService {
         dateTime: end ?? start.add(const Duration(hours: 1)),
       ),
     );
-    await api.events.patch(event, 'primary', eventId);
+    try {
+      await api.events.patch(event, 'primary', eventId);
+    } catch (e) {
+      return;
+    }
   }
 
   Future<void> deleteEvent(String eventId) async {
     final api = await _getApi();
     if (api == null) return;
-    await api.events.delete('primary', eventId);
+    try {
+      await api.events.delete('primary', eventId);
+    } catch (e) {
+      return;
+    }
   }
 }
 
