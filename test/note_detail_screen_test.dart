@@ -59,9 +59,11 @@ void main() {
     );
 
     expect(find.text('a.txt'), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.delete));
 
-    await tester.drag(find.byType(Dismissible).first, const Offset(-500, 0));
-    await tester.pumpAndSettle();
+    while (find.text('a.txt').evaluate().isNotEmpty) {
+      await tester.pumpAndSettle();
+    }
 
     expect(find.text('a.txt'), findsNothing);
 
