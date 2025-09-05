@@ -56,10 +56,10 @@
   "convertSpeechPrompt@placeholders": {
     "recognized": {}
   },
-  "geminiApiKeyNotConfigured": "Chưa cấu hình khóa Gemini API.",
-  "noResponse": "Không có phản hồi",
-  "geminiError": "Lỗi Gemini: {error}",
-  "geminiError@placeholders": {
-    "error": {}
-  }
+
+  "scheduled": "Lên lịch",
+  "recurring": "Định kỳ",
+  "daily": "Hàng ngày",
+  "snooze": "Báo lại"
+
 }

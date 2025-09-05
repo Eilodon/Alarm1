@@ -56,10 +56,10 @@
   "convertSpeechPrompt@placeholders": {
     "recognized": {}
   },
-  "geminiApiKeyNotConfigured": "Gemini API key is not configured.",
-  "noResponse": "No response",
-  "geminiError": "Gemini error: {error}",
-  "geminiError@placeholders": {
-    "error": {}
-  }
+
+  "scheduled": "Scheduled",
+  "recurring": "Recurring",
+  "daily": "Daily",
+  "snooze": "Snooze"
+
 }

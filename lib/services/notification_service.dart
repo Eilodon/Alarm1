@@ -1,4 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -41,16 +42,17 @@ class NotificationService {
     required String title,
     required String body,
     required DateTime scheduledDate,
+    required AppLocalizations l10n,
   }) async {
-    const androidDetails = AndroidNotificationDetails(
+    final androidDetails = AndroidNotificationDetails(
       'scheduled_channel',
-      'Scheduled',
+      l10n.scheduled,
       channelDescription: 'Scheduled notifications',
       importance: Importance.max,
       priority: Priority.high,
     );
 
-    const details = NotificationDetails(android: androidDetails);
+    final details = NotificationDetails(android: androidDetails);
 
     await _fln.zonedSchedule(
       id,
@@ -68,17 +70,18 @@ class NotificationService {
     required String title,
     required String body,
     required RepeatInterval repeatInterval,
+    required AppLocalizations l10n,
   }) async {
-    const androidDetails = AndroidNotificationDetails(
+    final androidDetails = AndroidNotificationDetails(
       'recurring_channel',
-      'Recurring',
+      l10n.recurring,
       channelDescription: 'Recurring notifications',
       importance: Importance.max,
       priority: Priority.high,
     );
 
     const iosDetails = DarwinNotificationDetails();
-    const details = NotificationDetails(
+    final details = NotificationDetails(
       android: androidDetails,
       iOS: iosDetails,
     );
@@ -98,17 +101,18 @@ class NotificationService {
     required String title,
     required String body,
     required Time time,
+    required AppLocalizations l10n,
   }) async {
-    const androidDetails = AndroidNotificationDetails(
+    final androidDetails = AndroidNotificationDetails(
       'daily_channel',
-      'Daily',
+      l10n.daily,
       channelDescription: 'Daily notifications',
       importance: Importance.max,
       priority: Priority.high,
     );
 
     const iosDetails = DarwinNotificationDetails();
-    const details = NotificationDetails(
+    final details = NotificationDetails(
       android: androidDetails,
       iOS: iosDetails,
     );
@@ -151,21 +155,22 @@ class NotificationService {
     required String title,
     required String body,
     required int minutes,
+    required AppLocalizations l10n,
   }) async {
     await _fln.cancel(id);
 
     final scheduledDate =
         tz.TZDateTime.now(tz.local).add(Duration(minutes: minutes));
 
-    const androidDetails = AndroidNotificationDetails(
+    final androidDetails = AndroidNotificationDetails(
       'snooze_channel',
-      'Snooze',
+      l10n.snooze,
       channelDescription: 'Snoozed notifications',
       importance: Importance.max,
       priority: Priority.high,
     );
 
-    const details = NotificationDetails(android: androidDetails);
+    final details = NotificationDetails(android: androidDetails);
 
     await _fln.zonedSchedule(
       id,

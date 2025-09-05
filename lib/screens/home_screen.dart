@@ -148,6 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     title: note.title,
                     body: note.content,
                     scheduledDate: alarmTime!,
+                    l10n: AppLocalizations.of(context)!,
                   );
                 }
                 if (!mounted) return;
