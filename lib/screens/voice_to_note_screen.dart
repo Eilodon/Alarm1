@@ -39,7 +39,8 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
     setState(() => _isProcessing = true);
     final prompt = AppLocalizations.of(context)!
         .convertSpeechPrompt(_recognized);
-    final reply = await GeminiService().chat(prompt);
+    final l10n = AppLocalizations.of(context)!;
+    final reply = await GeminiService().chat(prompt, l10n);
     if (!mounted) return;
     context.read<NoteProvider>().setDraft(reply);
     setState(() => _isProcessing = false);
