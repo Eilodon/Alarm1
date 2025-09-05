@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../models/note.dart';
 import '../providers/note_provider.dart';
 import 'note_detail_screen.dart';
+import '../services/auth_service.dart';
 
 class NoteListForDayScreen extends StatelessWidget {
   final DateTime date;
@@ -27,8 +28,9 @@ class NoteListForDayScreen extends StatelessWidget {
         .toList();
 
 
-    final title = AppLocalizations.of(context)!
-        .scheduleForDate(DateFormat('dd/MM/yyyy').format(date));
+    final title = AppLocalizations.of(context)!.scheduleForDate(
+      DateFormat.yMd(Localizations.localeOf(context).toString()).format(date),
+    );
     if (dayNotes.isEmpty) {
 
       return Scaffold(
@@ -46,7 +48,8 @@ class NoteListForDayScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           final note = dayNotes[index];
           final timeStr = note.alarmTime != null
-              ? DateFormat('HH:mm').format(note.alarmTime!)
+              ? DateFormat.Hm(Localizations.localeOf(context).toString())
+                  .format(note.alarmTime!)
               : null;
           return Card(
             child: ListTile(
@@ -72,7 +75,12 @@ class NoteListForDayScreen extends StatelessWidget {
                 ],
               ),
               isThreeLine: timeStr != null || note.tags.isNotEmpty,
-              onTap: () {
+              onTap: () async {
+                if (note.locked) {
+                  final ok = await AuthService()
+                      .authenticate(AppLocalizations.of(context)!);
+                  if (!ok) return;
+                }
                 Navigator.push(
                   context,
                   MaterialPageRoute(

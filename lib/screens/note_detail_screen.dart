@@ -1,20 +1,29 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:intl/intl.dart';
+
 import '../models/note.dart';
 import '../providers/note_provider.dart';
-import '../services/notification_service.dart';
 import '../services/tts_service.dart';
-import 'chat_screen.dart';
-import 'package:intl/intl.dart';
 import '../widgets/tag_selector.dart';
+import '../services/gemini_service.dart';
+import 'chat_screen.dart';
 
 class NoteDetailScreen extends StatefulWidget {
   final Note note;
-  const NoteDetailScreen({super.key, required this.note});
+  final TTSService ttsService;
+  const NoteDetailScreen({
+    super.key,
+    required this.note,
+    TTSService? ttsService,
+  }) : ttsService = ttsService ?? TTSService();
 
   @override
   State<NoteDetailScreen> createState() => _NoteDetailScreenState();
@@ -28,11 +37,12 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   RepeatInterval? _repeat;
   int _snoozeMinutes = 5;
   late List<String> _tags;
-  final _ttsService = TTSService();
+  late final TTSService _ttsService;
 
   @override
   void initState() {
     super.initState();
+    _ttsService = widget.ttsService;
     _titleCtrl = TextEditingController(text: widget.note.title);
     _contentCtrl = TextEditingController(text: widget.note.content);
     _alarmTime = widget.note.alarmTime;
@@ -85,6 +95,11 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
             onPressed: _readNote,
             child: Text(AppLocalizations.of(context)!.readNote),
           ),
+          IconButton(
+            icon: const Icon(Icons.share),
+            onPressed: () =>
+                Share.share('${_titleCtrl.text}\n${_contentCtrl.text}'),
+          ),
           IconButton(icon: const Icon(Icons.save), onPressed: _save),
         ],
       ),
@@ -118,7 +133,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                   Padding(
                     padding: const EdgeInsets.only(left: 8),
                     child: Text(
-                      DateFormat('HH:mm dd/MM/yyyy').format(_alarmTime!),
+                      DateFormat.yMd(
+                        Localizations.localeOf(context).toString(),
+                      ).add_Hm().format(_alarmTime!),
                     ),
                   ),
               ],
@@ -193,9 +210,49 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               ],
             ),
             const SizedBox(height: 12),
-            ..._attachments.map(
-              (a) => ListTile(title: Text(a.split('/').last)),
+
+            ..._attachments.asMap().entries.map(
+              (entry) {
+                final index = entry.key;
+                final a = entry.value;
+                final ext = a.split('.').last.toLowerCase();
+                if (['jpg', 'jpeg', 'png', 'gif', 'bmp'].contains(ext)) {
+                  return Stack(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Image.file(File(a)),
+                      ),
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () =>
+                              setState(() => _attachments.removeAt(index)),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                if (['mp3', 'wav'].contains(ext)) {
+                  return _AudioAttachment(
+                    path: a,
+                    onDelete: () =>
+                        setState(() => _attachments.removeAt(index)),
+                  );
+                }
+                return ListTile(
+                  title: Text(a.split('/').last),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () =>
+                        setState(() => _attachments.removeAt(index)),
+                  ),
+                );
+              },
             ),
+
             const SizedBox(height: 12),
             ElevatedButton.icon(
               onPressed: () {
@@ -246,24 +303,93 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   }
 
   Future<void> _save() async {
-    final service = NotificationService();
-    final oldId = widget.note.notificationId;
-    if (oldId != null) {
-      await service.cancel(oldId);
-    }
+    final l10n = AppLocalizations.of(context)!;
 
-    int? newId;
-    if (_alarmTime != null) {
-      newId =
-          oldId ??
-          int.tryParse(widget.note.id) ??
-          DateTime.now().millisecondsSinceEpoch % 100000;
+    final analysis = await GeminiService().analyzeNote(_contentCtrl.text);
+    String summary = widget.note.summary;
+    List<String> actionItems = List.from(widget.note.actionItems);
+    List<DateTime> dates = List.from(widget.note.dates);
+    var tags = List<String>.from(_tags);
+
+    if (analysis != null) {
+      final summaryCtrl = TextEditingController(text: analysis.summary);
+      final actionCtrl = TextEditingController(
+        text: analysis.actionItems.join('\n'),
+      );
+      final tagsCtrl = TextEditingController(
+        text: analysis.suggestedTags.join(', '),
+      );
+      final datesCtrl = TextEditingController(
+        text: analysis.dates
+            .map((d) => DateFormat('yyyy-MM-dd').format(d))
+            .join(', '),
+      );
+
+      final accepted = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(l10n.aiSuggestionsTitle),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: summaryCtrl,
+                  decoration: InputDecoration(labelText: l10n.summaryLabel),
+                ),
+                TextField(
+                  controller: actionCtrl,
+                  decoration: InputDecoration(labelText: l10n.actionItemsLabel),
+                  maxLines: null,
+                ),
+                TextField(
+                  controller: tagsCtrl,
+                  decoration: InputDecoration(labelText: l10n.tagsLabel),
+                ),
+                TextField(
+                  controller: datesCtrl,
+                  decoration: InputDecoration(labelText: l10n.datesLabel),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(l10n.cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(l10n.save),
+            ),
+          ],
+        ),
+      );
+
+      if (accepted == true) {
+        summary = summaryCtrl.text;
+        actionItems = actionCtrl.text
+            .split('\n')
+            .map((e) => e.trim())
+            .where((e) => e.isNotEmpty)
+            .toList();
+        tags = tagsCtrl.text
+            .split(',')
+            .map((e) => e.trim())
+            .where((e) => e.isNotEmpty)
+            .toList();
+        dates = datesCtrl.text
+            .split(',')
+            .map((e) => DateTime.tryParse(e.trim()))
+            .whereType<DateTime>()
+            .toList();
+      }
     }
 
     final updated = widget.note.copyWith(
       title: _titleCtrl.text,
       content: _contentCtrl.text,
-      tags: _tags,
+      tags: tags,
       attachments: _attachments,
       alarmTime: _alarmTime,
       repeatInterval: _repeat,
@@ -271,39 +397,81 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       active: true,
       snoozeMinutes: _snoozeMinutes,
       updatedAt: DateTime.now(),
-      notificationId: newId,
+      summary: summary,
+      actionItems: actionItems,
+      dates: dates,
     );
-    await context.read<NoteProvider>().updateNote(updated);
 
-    if (_alarmTime != null && newId != null) {
-      if (_repeat == RepeatInterval.daily) {
-        await service.scheduleDailyAtTime(
-          id: newId,
-          title: updated.title,
-          body: updated.content,
-          time: Time(_alarmTime!.hour, _alarmTime!.minute),
-          l10n: AppLocalizations.of(context)!,
-        );
-      } else if (_repeat != null) {
-        await service.scheduleRecurring(
-          id: newId,
-          title: updated.title,
-          body: updated.content,
-          repeatInterval: _repeat!,
-          l10n: AppLocalizations.of(context)!,
-        );
-      } else {
-        await service.scheduleNotification(
-          id: newId,
-          title: updated.title,
-          body: updated.content,
-          scheduledDate: _alarmTime!,
-          l10n: AppLocalizations.of(context)!,
-        );
-      }
-    }
+    final ok = await context.read<NoteProvider>().saveNote(updated, l10n);
 
     if (!mounted) return;
-    Navigator.pop(context);
+    if (ok) {
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.errorWithMessage('Failed to save note'))),
+      );
+    }
+  }
+}
+
+class _AudioAttachment extends StatefulWidget {
+  final String path;
+  final VoidCallback? onDelete;
+  const _AudioAttachment({required this.path, this.onDelete});
+
+  @override
+  State<_AudioAttachment> createState() => _AudioAttachmentState();
+}
+
+class _AudioAttachmentState extends State<_AudioAttachment> {
+  final AudioPlayer _player = AudioPlayer();
+  bool _playing = false;
+
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
+  }
+
+  Future<void> _toggle() async {
+    try {
+      if (_playing) {
+        await _player.pause();
+      } else {
+        await _player.play(DeviceFileSource(widget.path));
+      }
+      if (!mounted) return;
+      setState(() => _playing = !_playing);
+    } catch (e) {
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.errorWithMessage(e.toString())),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(widget.path.split('/').last),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: Icon(_playing ? Icons.pause : Icons.play_arrow),
+            onPressed: _toggle,
+          ),
+          if (widget.onDelete != null)
+            IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: widget.onDelete,
+            ),
+        ],
+      ),
+    );
   }
 }

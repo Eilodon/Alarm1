@@ -7,24 +7,41 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'screens/home_screen.dart';
 import 'services/notification_service.dart';
 import 'services/settings_service.dart';
+import 'services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'providers/note_provider.dart';
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await FirebaseAuth.instance.signInAnonymously();
   await NotificationService().init();
+
   final settings = SettingsService();
+  final requireAuth = await settings.loadRequireAuth();
+  if (requireAuth) {
+    final locale = WidgetsBinding.instance.platformDispatcher.locale;
+    final l10n = await AppLocalizations.delegate.load(locale);
+    final ok = await AuthService().authenticate(l10n);
+    if (!ok) {
+      return;
+    }
+  }
   final themeColor = await settings.loadThemeColor();
   final fontScale = await settings.loadFontScale();
   runApp(
     ChangeNotifierProvider(
       create: (_) => NoteProvider(),
-      child: MyApp(themeColor: themeColor, fontScale: fontScale),
+      child: MyApp(
+        themeColor: themeColor,
+        fontScale: fontScale,
+        authFailed: authFailed,
+        notificationFailed: notificationFailed,
+      ),
     ),
   );
 
@@ -33,7 +50,15 @@ void main() async {
 class MyApp extends StatefulWidget {
   final Color themeColor;
   final double fontScale;
-  const MyApp({super.key, required this.themeColor, required this.fontScale});
+  final bool authFailed;
+  final bool notificationFailed;
+  const MyApp({
+    super.key,
+    required this.themeColor,
+    required this.fontScale,
+    this.authFailed = false,
+    this.notificationFailed = false,
+  });
 
 
   @override
@@ -49,6 +74,23 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _themeColor = widget.themeColor;
     _fontScale = widget.fontScale;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final l10n = AppLocalizations.of(context)!;
+      if (widget.authFailed) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.authFailedMessage),
+          ),
+        );
+      }
+      if (widget.notificationFailed) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.notificationFailedMessage),
+          ),
+        );
+      }
+    });
   }
 
   void updateTheme(Color newColor) async {

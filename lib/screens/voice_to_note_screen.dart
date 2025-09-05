@@ -1,35 +1,80 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:vosk_flutter/vosk_flutter.dart' as vosk;
 
 import '../providers/note_provider.dart';
 import '../services/gemini_service.dart';
 
 class VoiceToNoteScreen extends StatefulWidget {
-  const VoiceToNoteScreen({super.key});
+  final stt.SpeechToText speech;
+  final vosk.VoskFlutterPlugin vosk;
+
+  const VoiceToNoteScreen({
+    super.key,
+    stt.SpeechToText? speech,
+    vosk.VoskFlutterPlugin? vosk,
+  })  : speech = speech ?? stt.SpeechToText(),
+        vosk = vosk ?? vosk.VoskFlutterPlugin();
 
   @override
   State<VoiceToNoteScreen> createState() => _VoiceToNoteScreenState();
 }
 
 class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
-  final stt.SpeechToText _speech = stt.SpeechToText();
+  vosk.SpeechService? _voskService;
+  vosk.Recognizer? _voskRecognizer;
+
   String _recognized = '';
   bool _isListening = false;
   bool _isProcessing = false;
+  bool _offlineMode = false;
+
+  Future<void> _startOffline() async {
+    if (_voskRecognizer == null) {
+      final locale = Localizations.localeOf(context);
+      final code = {
+            'vi': 'vi',
+            'en': 'en',
+          }[locale.languageCode] ??
+          'en';
+      final model = await widget.vosk
+          .createModel('assets/models/vosk-model-small-$code');
+      _voskRecognizer = await widget.vosk.createRecognizer(model: model);
+      _voskService = await widget.vosk.initSpeechService(_voskRecognizer!);
+      _voskService!.onResult().listen((event) {
+        final data = jsonDecode(event) as Map<String, dynamic>;
+        setState(() => _recognized = data['text'] ?? '');
+      });
+    }
+    await _voskService!.start();
+  }
 
   Future<void> _toggleListening() async {
+    if (_offlineMode) {
+      if (!_isListening) {
+        await _startOffline();
+        setState(() => _isListening = true);
+      } else {
+        await _voskService?.stop();
+        setState(() => _isListening = false);
+      }
+      return;
+    }
+
     if (!_isListening) {
-      final available = await _speech.initialize();
+      final available = await widget.speech.initialize();
       if (available) {
         setState(() => _isListening = true);
-        _speech.listen(onResult: (res) {
+        widget.speech.listen(onResult: (res) {
           setState(() => _recognized = res.recognizedWords);
         });
       }
     } else {
-      await _speech.stop();
+      await widget.speech.stop();
       setState(() => _isListening = false);
     }
   }
@@ -49,7 +94,8 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
 
   @override
   void dispose() {
-    _speech.stop();
+    widget.speech.stop();
+    _voskService?.stop();
     super.dispose();
   }
 
@@ -64,6 +110,11 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
           children: [
             Expanded(
               child: SingleChildScrollView(child: Text(_recognized)),
+            ),
+            SwitchListTile(
+              title: Text(AppLocalizations.of(context)!.offlineMode),
+              value: _offlineMode,
+              onChanged: (v) => setState(() => _offlineMode = v),
             ),
             if (_isProcessing) const CircularProgressIndicator(),
             Row(

@@ -3,6 +3,7 @@
   "addNoteReminder": "Add note / reminder",
   "titleLabel": "Title",
   "contentLabel": "Content",
+  "fieldRequired": "This field cannot be empty",
   "selectReminderTime": "Select reminder time",
   "cancel": "Cancel",
   "save": "Save",
@@ -26,6 +27,7 @@
   "errorWithMessage@placeholders": {
     "error": {}
   },
+  "networkError": "Network error. Please try again.",
   "readNote": "Read Note",
   "scheduleForDate": "Schedule for {date}",
   "scheduleForDate@placeholders": {
@@ -36,6 +38,9 @@
   "settingsTooltip": "Open settings",
   "delete": "Delete",
   "timeLabel": "Time",
+
+  "noteDeleted": "Note deleted",
+  "undo": "Undo",
 
   "repeatLabel": "Repeat:",
   "repeatNone": "None",
@@ -51,9 +56,11 @@
   "audioLabel": "Audio",
 
   "tagsLabel": "Tags",
+  "allTags": "All tags",
   "addTag": "Add tag",
   "requireAuth": "Require authentication",
   "lockNote": "Lock note",
+  "authReason": "Please authenticate to continue",
   "voiceToNote": "Voice To Note",
   "stop": "Stop",
   "speak": "Speak",
@@ -62,6 +69,7 @@
   "convertSpeechPrompt@placeholders": {
     "recognized": {}
   },
+  "offlineMode": "Offline Mode",
 
   "scheduled": "Scheduled",
   "recurring": "Recurring",
@@ -70,6 +78,12 @@
   "scheduledDesc": "Scheduled notifications",
   "recurringDesc": "Recurring notifications",
   "dailyDesc": "Daily notifications",
-  "snoozeDesc": "Snoozed notifications"
+  "snoozeDesc": "Snoozed notifications",
+  "aiSuggestionsTitle": "AI Suggestions",
+  "summaryLabel": "Summary",
+  "actionItemsLabel": "Action items",
+  "datesLabel": "Dates",
+  "authFailedMessage": "Anonymous sign-in failed. Limited functionality.",
+  "notificationFailedMessage": "Notification setup failed."
 
 }

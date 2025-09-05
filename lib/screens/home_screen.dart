@@ -3,15 +3,14 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
-import 'package:uuid/uuid.dart';
-
 import '../models/note.dart';
 import '../providers/note_provider.dart';
-import '../services/notification_service.dart';
 import '../services/settings_service.dart';
-import '../widgets/tag_selector.dart';
+import '../services/auth_service.dart';
+import '../widgets/add_note_dialog.dart';
 import 'note_detail_screen.dart';
 import 'note_list_for_day_screen.dart';
+import 'note_search_delegate.dart';
 import 'settings_screen.dart';
 import 'voice_to_note_screen.dart';
 
@@ -32,6 +31,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String _mascotPath = 'assets/lottie/mascot.json';
   final DateTime _today = DateTime.now();
+  String? _selectedTag;
 
   @override
   void initState() {
@@ -48,127 +48,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _addNote() {
-    final provider = context.read<NoteProvider>();
-    final titleCtrl = TextEditingController();
-    final contentCtrl = TextEditingController(text: provider.draft);
-    DateTime? alarmTime;
-
-    bool locked = false;
-    var tags = <String>[];
-    final availableTags = provider.notes.expand((n) => n.tags).toSet().toList();
-
     showDialog(
       context: context,
-      builder: (_) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: Text(AppLocalizations.of(context)!.addNoteReminder),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: titleCtrl,
-                  decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.titleLabel,
-                  ),
-                ),
-                TextField(
-                  controller: contentCtrl,
-                  decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.contentLabel,
-                  ),
-                ),
-                TagSelector(
-                  availableTags: availableTags,
-                  selectedTags: tags,
-                  allowCreate: true,
-                  label: AppLocalizations.of(context)!.tagsLabel,
-                  onChanged: (v) => setState(() => tags = v),
-                ),
-                SwitchListTile(
-                  title: Text(AppLocalizations.of(context)!.lockNote),
-                  value: locked,
-                  onChanged: (value) => setState(() => locked = value),
-                ),
-                const SizedBox(height: 12),
-                ElevatedButton(
-                  onPressed: () async {
-                    final now = DateTime.now();
-                    final picked = await showDatePicker(
-                      context: context,
-                      firstDate: now,
-                      lastDate: DateTime(now.year + 2),
-                      initialDate: now,
-                    );
-                    if (picked != null) {
-                      final time = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay.now(),
-                      );
-                      if (time != null) {
-                        alarmTime = DateTime(
-                          picked.year,
-                          picked.month,
-                          picked.day,
-                          time.hour,
-                          time.minute,
-                        );
-                      }
-                    }
-                  },
-                  child: Text(AppLocalizations.of(context)!.selectReminderTime),
-                ),
-              ],
-            ),
-          ),
-
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(AppLocalizations.of(context)!.cancel),
-            ),
-            ElevatedButton(
-              onPressed: () async {
- codex/add-uuid-dependency-and-update-tests
-                final noteId = const Uuid().v4();
-
-                final note = Note(
-                  id: noteId,
-                  title: titleCtrl.text,
-                  content: contentCtrl.text,
-                  alarmTime: alarmTime,
-                  locked: locked,
-                  tags: tags,
-                  updatedAt: DateTime.now(),
-                  notificationId: notifId,
-                );
-                await provider.addNote(note);
-                provider.setDraft('');
- codex/add-uuid-dependency-and-update-tests
-                if (alarmTime != null) {
-                  final notificationId =
-                      DateTime.now().millisecondsSinceEpoch % 100000;
-                  await NotificationService().scheduleNotification(
-                    id: notificationId,
-
-                    title: note.title,
-                    body: note.content,
-                    scheduledDate: alarmTime!,
-                    l10n: AppLocalizations.of(context)!,
-                  );
-                }
-                if (!mounted) return;
-                Navigator.pop(context);
-              },
-              child: Text(AppLocalizations.of(context)!.save),
-            ),
-          ],
-        ),
-      ),
-    ).whenComplete(() {
-      titleCtrl.dispose();
-      contentCtrl.dispose();
-    });
+      builder: (_) => const AddNoteDialog(),
+    );
   }
 
   List<Note> _notesForDay(DateTime day, List<Note> notes) {
@@ -198,10 +81,19 @@ class _HomeScreenState extends State<HomeScreen> {
             title: Text(note.title),
             subtitle: Text(
               note.alarmTime != null
-                  ? '${note.content}\n⏰ ${DateFormat('HH:mm dd/MM/yyyy').format(note.alarmTime!)}'
+                  ? '${note.content}\n⏰ ${DateFormat.yMd(
+                          Localizations.localeOf(context).toString(),
+                        )
+                          .add_Hm()
+                          .format(note.alarmTime!)}'
                   : note.content,
             ),
-            onTap: () {
+            onTap: () async {
+              if (note.locked) {
+                final ok = await AuthService()
+                    .authenticate(AppLocalizations.of(context)!);
+                if (!ok) return;
+              }
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => NoteDetailScreen(note: note)),
@@ -210,7 +102,22 @@ class _HomeScreenState extends State<HomeScreen> {
             trailing: IconButton(
               icon: const Icon(Icons.delete),
               tooltip: AppLocalizations.of(context)!.delete,
-              onPressed: () => context.read<NoteProvider>().removeNoteAt(index),
+              onPressed: () {
+                final note = context.read<NoteProvider>().notes[index];
+                context.read<NoteProvider>().removeNoteAt(index);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      AppLocalizations.of(context)!.noteDeleted,
+                    ),
+                    action: SnackBarAction(
+                      label: AppLocalizations.of(context)!.undo,
+                      onPressed: () =>
+                          context.read<NoteProvider>().addNote(note),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         );
@@ -220,13 +127,46 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final notes = context.watch<NoteProvider>().notes;
+    final provider = context.watch<NoteProvider>();
+    final notes = provider.notes;
+    final tags = notes.expand((n) => n.tags).toSet().toList();
+    final filteredNotes = _selectedTag == null
+        ? notes
+        : notes.where((n) => n.tags.contains(_selectedTag!)).toList();
     final weekDays = List.generate(7, (i) => _today.add(Duration(days: i)));
 
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.appTitle),
         actions: [
+          PopupMenuButton<String?>(
+            icon: const Icon(Icons.label),
+            onSelected: (value) {
+              setState(() {
+                _selectedTag = value;
+              });
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem<String?>(
+                value: null,
+                child: Text(AppLocalizations.of(context)!.allTags),
+              ),
+              ...tags.map(
+                (t) => PopupMenuItem<String?>(
+                  value: t,
+                  child: Text(t),
+                ),
+              ),
+            ],
+          ),
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () => showSearch(
+              context: context,
+              delegate:
+                  NoteSearchDelegate(context.read<NoteProvider>().notes),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.mic),
             onPressed: () async {
@@ -266,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: weekDays.length,
               itemBuilder: (context, i) {
                 final d = weekDays[i];
-                final hasNotes = _notesForDay(d, notes).isNotEmpty;
+                final hasNotes = _notesForDay(d, filteredNotes).isNotEmpty;
                 return GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -287,7 +227,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(DateFormat('E').format(d)),
+                        Text(DateFormat.E(Localizations.localeOf(context).toString()).format(d)),
                         Text('${d.day}'),
                       ],
                     ),
@@ -297,7 +237,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          Expanded(child: _buildNotesList(notes)),
+          Expanded(child: _buildNotesList(filteredNotes)),
         ],
       ),
       floatingActionButton: FloatingActionButton(

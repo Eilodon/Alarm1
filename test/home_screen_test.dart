@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:notes_reminder_app/providers/note_provider.dart';
 import 'package:notes_reminder_app/screens/home_screen.dart';
+import 'package:notes_reminder_app/models/note.dart';
 
 void main() {
   testWidgets('add and delete notes', (tester) async {
@@ -15,10 +16,7 @@ void main() {
           locale: const Locale('vi'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: HomeScreen(
-            onThemeChanged: (_) {},
-            onFontScaleChanged: (_) {},
-          ),
+          home: HomeScreen(onThemeChanged: (_) {}, onFontScaleChanged: (_) {}),
         ),
       ),
     );
@@ -40,5 +38,63 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text(l10n.noNotes), findsOneWidget);
+  });
+
+  testWidgets('filter notes by tag', (tester) async {
+    final provider = NoteProvider();
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: provider,
+        child: MaterialApp(
+          locale: const Locale('vi'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: HomeScreen(onThemeChanged: (_) {}, onFontScaleChanged: (_) {}),
+        ),
+      ),
+    );
+
+    await provider.addNote(
+      const Note(
+        id: '1',
+        title: 'n1',
+        content: 'c1',
+        summary: '',
+        actionItems: [],
+        dates: [],
+        tags: ['work'],
+      ),
+    );
+    await provider.addNote(
+      const Note(
+        id: '2',
+        title: 'n2',
+        content: 'c2',
+        summary: '',
+        actionItems: [],
+        dates: [],
+        tags: ['home'],
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('n1'), findsOneWidget);
+    expect(find.text('n2'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.label));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('work').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('n1'), findsOneWidget);
+    expect(find.text('n2'), findsNothing);
+
+    await tester.tap(find.byIcon(Icons.label));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('All').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('n1'), findsOneWidget);
+    expect(find.text('n2'), findsOneWidget);
   });
 }
