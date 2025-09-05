@@ -73,3 +73,27 @@ Run the tests with:
 flutter test
 ```
 
+## Troubleshooting
+
+### Firebase fails to connect
+
+* Ensure you are logged into Firebase and have access to the project by running `firebase login` and `firebase projects:list`.
+* Confirm `firebase_options.dart`, `google-services.json`, and `GoogleService-Info.plist` are correctly placed.
+* Rebuild after fixing the configuration:
+
+  ```bash
+  flutter clean
+  flutter run --dart-define=GEMINI_API_KEY=your_gemini_key \
+             --dart-define=TTS_API_KEY=your_tts_key
+  ```
+
+### Missing API key
+
+* Provide `GEMINI_API_KEY` and `TTS_API_KEY` using `--dart-define` or environment variables.
+* After adding the keys, rerun the app with the commands above.
+
+### No network connection
+
+* Check that the device or emulator has internet access.
+* Once the network is restored, run the clean and run commands again to restart the app.
+
