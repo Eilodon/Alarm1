@@ -129,13 +129,15 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             ElevatedButton(
               onPressed: () async {
- codex/add-uuid-dependency-and-update-tests
                 final noteId = const Uuid().v4();
 
                 final note = Note(
                   id: noteId,
                   title: titleCtrl.text,
                   content: contentCtrl.text,
+                  summary: '',
+                  actionItems: const [],
+                  dates: const [],
                   alarmTime: alarmTime,
                   locked: locked,
                   tags: tags,
@@ -144,7 +146,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
                 await provider.addNote(note);
                 provider.setDraft('');
- codex/add-uuid-dependency-and-update-tests
                 if (alarmTime != null) {
                   final notificationId =
                       DateTime.now().millisecondsSinceEpoch % 100000;

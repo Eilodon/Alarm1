@@ -4,6 +4,9 @@ class Note {
   final String id;
   final String title;
   final String content;
+  final String summary;
+  final List<String> actionItems;
+  final List<DateTime> dates;
   final DateTime? alarmTime;
   final RepeatInterval? repeatInterval;
   final bool daily;
@@ -21,6 +24,9 @@ class Note {
     required this.id,
     required this.title,
     required this.content,
+    this.summary = '',
+    this.actionItems = const [],
+    this.dates = const [],
     this.alarmTime,
     this.repeatInterval,
     this.daily = false,
@@ -46,6 +52,9 @@ class Note {
     bool? active,
     List<String>? tags,
     List<String>? attachments,
+    String? summary,
+    List<String>? actionItems,
+    List<DateTime>? dates,
     bool? locked,
     int? snoozeMinutes,
     DateTime? updatedAt,
@@ -58,6 +67,9 @@ class Note {
       id: id ?? this.id,
       title: title ?? this.title,
       content: content ?? this.content,
+      summary: summary ?? this.summary,
+      actionItems: actionItems ?? this.actionItems,
+      dates: dates ?? this.dates,
       alarmTime: alarmTime ?? this.alarmTime,
       repeatInterval: repeatInterval ?? this.repeatInterval,
       daily: daily ?? this.daily,
@@ -82,6 +94,12 @@ class Note {
       id: json['id'] as String,
       title: json['title'] as String,
       content: json['content'] as String,
+      summary: json['summary'] as String? ?? '',
+      actionItems:
+          (json['actionItems'] as List<dynamic>? ?? []).cast<String>(),
+      dates: (json['dates'] as List<dynamic>? ?? [])
+          .map((e) => DateTime.parse(e as String))
+          .toList(),
       alarmTime: json['alarmTime'] != null
           ? DateTime.parse(json['alarmTime'])
           : json['remindAt'] != null
@@ -110,6 +128,9 @@ class Note {
     'id': id,
     'title': title,
     'content': content,
+    'summary': summary,
+    'actionItems': actionItems,
+    'dates': dates.map((d) => d.toIso8601String()).toList(),
     'alarmTime': alarmTime?.toIso8601String(),
     'repeatInterval': repeatInterval?.toString().split('.').last,
     'daily': daily,

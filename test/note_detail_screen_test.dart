@@ -9,7 +9,14 @@ import 'package:notes_reminder_app/screens/note_detail_screen.dart';
 void main() {
 
   testWidgets('display note details', (tester) async {
-    final note = Note(id: '1', title: 'title', content: 'content');
+    final note = Note(
+      id: '1',
+      title: 'title',
+      content: 'content',
+      summary: '',
+      actionItems: const [],
+      dates: const [],
+    );
 
     await tester.pumpWidget(
       ChangeNotifierProvider(
