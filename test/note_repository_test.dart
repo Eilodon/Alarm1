@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:notes_reminder_app/services/note_repository.dart';
 import 'package:notes_reminder_app/models/note.dart';
+import 'package:uuid/uuid.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -23,8 +24,9 @@ void main() {
 
     test('saveNotes and getNotes persist data', () async {
       final repo = NoteRepository();
+      final id = const Uuid().v4();
       final note = Note(
-        id: '1',
+        id: id,
         title: 't',
         content: 'c',
         alarmTime: DateTime(2024, 1, 1),
@@ -50,8 +52,9 @@ void main() {
 
     test('updateNote persists changes', () async {
       final repo = NoteRepository();
+      final id = const Uuid().v4();
       final note = Note(
-        id: '1',
+        id: id,
         title: 't',
         content: 'c',
         attachments: ['a'],
@@ -59,7 +62,7 @@ void main() {
       );
       await repo.saveNotes([note]);
       final updated = Note(
-        id: '1',
+        id: id,
         title: 't2',
         content: 'c2',
         attachments: ['b'],
