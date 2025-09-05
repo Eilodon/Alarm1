@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:notes_reminder_app/main.dart';
 import 'package:notes_reminder_app/providers/note_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() {
   testWidgets('renders home screen title', (WidgetTester tester) async {
-    runApp(
-      ChangeNotifierProvider(
-        create: (_) => NoteProvider(),
-        child: MyApp(themeColor: Colors.blue, fontScale: 1.0),
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('vi'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: ChangeNotifierProvider(
+          create: (_) => NoteProvider(),
+          child: MyApp(themeColor: Colors.blue, fontScale: 1.0),
+        ),
       ),
     );
     await tester.pumpAndSettle();
