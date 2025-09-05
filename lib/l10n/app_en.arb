@@ -92,6 +92,7 @@
   "actionItemsLabel": "Action items",
   "datesLabel": "Dates",
   "authFailedMessage": "Anonymous sign-in failed. Limited functionality.",
-  "notificationFailedMessage": "Notification setup failed."
+  "notificationFailedMessage": "Notification setup failed.",
+  "saveNoteFailed": "Failed to save note"
 
 }
