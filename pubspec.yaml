@@ -18,7 +18,7 @@ dependencies:
   http: ^1.2.2
   shared_preferences: ^2.3.2
   audioplayers: ^6.5.0
-  intl: ^0.18.1
+  intl: ^0.20.2
   provider: ^6.1.2
   flutter_tts: ^4.2.3
   uuid: ^4.5.1
@@ -41,6 +41,10 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^2.0.0
   mocktail: ^1.0.4
+
+dependency_overrides:
+  http: ^0.13.5
+  archive: ^4.0.0
 
 flutter:
   generate: true

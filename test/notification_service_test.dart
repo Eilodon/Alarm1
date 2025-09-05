@@ -4,6 +4,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:ui';
 import 'package:notes_reminder_app/services/notification_service.dart';
+import 'package:timezone/data/latest.dart' as tzdata;
+import 'package:timezone/timezone.dart' as tz;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -41,8 +43,10 @@ void main() {
     expect(log.any((c) => c.method == 'zonedSchedule'), isTrue);
   });
 
-  test('scheduleDailyAtTime schedules daily notification', () async {
+  test('scheduleDailyAtTime uses tz and localizations', () async {
     final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    tzdata.initializeTimeZones();
+    tz.setLocalLocation(tz.getLocation('America/Detroit'));
     final service = NotificationService();
     await service.scheduleDailyAtTime(
       id: 2,
@@ -51,10 +55,15 @@ void main() {
       time: const Time(10, 0, 0),
       l10n: l10n,
     );
-    expect(log.any((c) => c.method == 'zonedSchedule'), isTrue);
+    final call = log.singleWhere((c) => c.method == 'zonedSchedule');
+    final args = call.arguments as Map<dynamic, dynamic>;
+    expect(args['timeZoneName'], 'America/Detroit');
+    final androidDetails = args['androidDetails'] as Map<dynamic, dynamic>;
+    expect(androidDetails['channelName'], l10n.daily);
+    expect(androidDetails['channelDescription'], l10n.dailyDesc);
   });
 
-  test('scheduleRecurring schedules recurring notification', () async {
+  test('scheduleRecurring uses localizations', () async {
     final l10n = await AppLocalizations.delegate.load(const Locale('en'));
     final service = NotificationService();
     await service.scheduleRecurring(
@@ -64,6 +73,10 @@ void main() {
       repeatInterval: RepeatInterval.daily,
       l10n: l10n,
     );
-    expect(log.any((c) => c.method == 'periodicallyShow'), isTrue);
+    final call = log.singleWhere((c) => c.method == 'periodicallyShow');
+    final args = call.arguments as Map<dynamic, dynamic>;
+    final androidDetails = args['androidDetails'] as Map<dynamic, dynamic>;
+    expect(androidDetails['channelName'], l10n.recurring);
+    expect(androidDetails['channelDescription'], l10n.recurringDesc);
   });
 }
