@@ -1,16 +1,16 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
- codex/enable-flutter_localizations-and-update-ui
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../models/note.dart';
 import '../providers/note_provider.dart';
- codex/convert-notedetailscreen-to-statefulwidget
 import '../services/notification_service.dart';
 
 import '../services/tts_service.dart';
- codex/add-ask-ai-button-to-notedetailscreen
 import '../services/gemini_service.dart';
+import 'chat_screen.dart';
 
 
 class NoteDetailScreen extends StatefulWidget {
@@ -22,7 +22,6 @@ class NoteDetailScreen extends StatefulWidget {
 }
 
 class _NoteDetailScreenState extends State<NoteDetailScreen> {
- codex/convert-notedetailscreen-to-statefulwidget
   late final TextEditingController _titleCtrl;
   late final TextEditingController _contentCtrl;
   final List<String> _attachments = [];
@@ -36,7 +35,6 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     super.initState();
     _titleCtrl = TextEditingController(text: widget.note.title);
     _contentCtrl = TextEditingController(text: widget.note.content);
- codex/convert-notedetailscreen-to-statefulwidget
     _alarmTime = widget.note.alarmTime;
     _repeat = widget.note.daily ? RepeatInterval.daily : null;
     _snoozeMinutes = widget.note.snoozeMinutes;
@@ -74,7 +72,6 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   Widget build(BuildContext context) {
     final provider = context.watch<NoteProvider>();
     return Scaffold(
- codex/enable-flutter_localizations-and-update-ui
       appBar: AppBar(title: Text(note.title)),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

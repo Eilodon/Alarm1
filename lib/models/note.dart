@@ -2,50 +2,53 @@ class Note {
   String id;
   String title;
   String content;
-  DateTime? remindAt;
+  DateTime? alarmTime;
   bool daily;
   bool active;
- codex/add-tag-chips-to-note-list
+  int snoozeMinutes;
   List<String> tags;
-
+  List<String> attachments;
+  DateTime? updatedAt;
 
   Note({
     String? id,
     required this.title,
     required this.content,
-    this.remindAt,
+    this.alarmTime,
     this.daily = false,
     this.active = false,
- codex/add-tag-chips-to-note-list
+    this.snoozeMinutes = 5,
     this.tags = const [],
-
-  });
-
+    this.attachments = const [],
+    this.updatedAt,
+  }) : id = id ?? DateTime.now().millisecondsSinceEpoch.toString();
 
   factory Note.fromJson(Map<String, dynamic> j) => Note(
         id: j['id'],
         title: j['title'],
         content: j['content'],
-codex/implement-note-repository-and-provider
-        alarmTime: j['alarmTime'] != null ? DateTime.parse(j['alarmTime']) : null,
- codex/expand-note-model-with-new-fields
+        alarmTime:
+            j['alarmTime'] != null ? DateTime.parse(j['alarmTime']) : null,
         daily: j['daily'] ?? false,
         active: j['active'] ?? false,
- codex/add-tag-chips-to-note-list
+        snoozeMinutes: j['snoozeMinutes'] ?? 5,
         tags: (j['tags'] as List<dynamic>? ?? []).cast<String>(),
-
+        attachments:
+            (j['attachments'] as List<dynamic>? ?? []).cast<String>(),
+        updatedAt:
+            j['updatedAt'] != null ? DateTime.parse(j['updatedAt']) : null,
       );
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'title': title,
         'content': content,
- codex/update-homescreenstate-to-manage-notes
-        'remindAt': remindAt?.toIso8601String(),
+        'alarmTime': alarmTime?.toIso8601String(),
         'daily': daily,
         'active': active,
- codex/add-tag-chips-to-note-list
+        'snoozeMinutes': snoozeMinutes,
         'tags': tags,
-
+        'attachments': attachments,
+        'updatedAt': updatedAt?.toIso8601String(),
       };
 }
