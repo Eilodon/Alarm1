@@ -26,6 +26,7 @@
   "errorWithMessage@placeholders": {
     "error": {}
   },
+  "networkError": "Lỗi mạng. Vui lòng thử lại.",
   "readNote": "Đọc Note",
   "scheduleForDate": "Lịch ngày {date}",
   "scheduleForDate@placeholders": {

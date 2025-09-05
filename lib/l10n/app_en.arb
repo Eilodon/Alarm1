@@ -26,6 +26,7 @@
   "errorWithMessage@placeholders": {
     "error": {}
   },
+  "networkError": "Network error. Please try again.",
   "readNote": "Read Note",
   "scheduleForDate": "Schedule for {date}",
   "scheduleForDate@placeholders": {

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -18,18 +19,24 @@ class GeminiService {
       ]
     };
 
-    final res = await http.post(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(body),
-    );
+    try {
+      final res = await http
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 10));
 
-    if (res.statusCode == 200) {
-      final data = jsonDecode(res.body);
-      final text = (data['candidates']?[0]?['content']?['parts']?[0]?['text'] ?? '').toString();
-      return text.isEmpty ? l10n.noResponse : text;
-    } else {
-      return l10n.geminiError('${res.statusCode} ${res.body}');
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body);
+        final text = (data['candidates']?[0]?['content']?['parts']?[0]?['text'] ?? '').toString();
+        return text.isEmpty ? l10n.noResponse : text;
+      } else {
+        return l10n.geminiError('${res.statusCode} ${res.body}');
+      }
+    } catch (_) {
+      return l10n.errorWithMessage(l10n.networkError);
     }
   }
 
@@ -49,11 +56,18 @@ class GeminiService {
       ]
     };
 
-    final res = await http.post(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(body),
-    );
+    http.Response res;
+    try {
+      res = await http
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 10));
+    } catch (_) {
+      return null;
+    }
 
     if (res.statusCode != 200) return null;
 
