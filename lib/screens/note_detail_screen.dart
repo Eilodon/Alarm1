@@ -12,7 +12,6 @@ import 'chat_screen.dart';
 import 'package:intl/intl.dart';
 import '../widgets/tag_selector.dart';
 
-
 class NoteDetailScreen extends StatefulWidget {
   final Note note;
   const NoteDetailScreen({super.key, required this.note});
@@ -31,7 +30,6 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   late List<String> _tags;
   final _ttsService = TTSService();
 
-
   @override
   void initState() {
     super.initState();
@@ -39,7 +37,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     _contentCtrl = TextEditingController(text: widget.note.content);
     _alarmTime = widget.note.alarmTime;
     _repeat =
-        widget.note.repeatInterval ?? (widget.note.daily ? RepeatInterval.daily : null);
+        widget.note.repeatInterval ??
+        (widget.note.daily ? RepeatInterval.daily : null);
     _snoozeMinutes = widget.note.snoozeMinutes;
     _attachments = List.from(widget.note.attachments);
     _tags = List.from(widget.note.tags);
@@ -77,8 +76,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<NoteProvider>();
-    final availableTags =
-        provider.notes.expand((n) => n.tags).toSet().toList();
+    final availableTags = provider.notes.expand((n) => n.tags).toSet().toList();
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.note.title),
@@ -87,10 +85,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
             onPressed: _readNote,
             child: Text(AppLocalizations.of(context)!.readNote),
           ),
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: _save,
-          ),
+          IconButton(icon: const Icon(Icons.save), onPressed: _save),
         ],
       ),
       body: SingleChildScrollView(
@@ -117,13 +112,14 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               children: [
                 ElevatedButton(
                   onPressed: _pickAlarmTime,
-                  child: Text(
-                      AppLocalizations.of(context)!.selectReminderTime),
+                  child: Text(AppLocalizations.of(context)!.selectReminderTime),
                 ),
                 if (_alarmTime != null)
                   Padding(
                     padding: const EdgeInsets.only(left: 8),
-                    child: Text(DateFormat('HH:mm dd/MM/yyyy').format(_alarmTime!)),
+                    child: Text(
+                      DateFormat('HH:mm dd/MM/yyyy').format(_alarmTime!),
+                    ),
                   ),
               ],
             ),
@@ -136,23 +132,25 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                   value: _repeat,
                   onChanged: (value) => setState(() => _repeat = value),
                   items: [
-                    DropdownMenuItem<RepeatInterval?> (
+                    DropdownMenuItem<RepeatInterval?>(
                       value: null,
                       child: Text(AppLocalizations.of(context)!.repeatNone),
                     ),
-                    DropdownMenuItem<RepeatInterval?> (
+                    DropdownMenuItem<RepeatInterval?>(
                       value: RepeatInterval.everyMinute,
-                      child: Text(AppLocalizations.of(context)!.repeatEveryMinute),
+                      child: Text(
+                        AppLocalizations.of(context)!.repeatEveryMinute,
+                      ),
                     ),
-                    DropdownMenuItem<RepeatInterval?> (
+                    DropdownMenuItem<RepeatInterval?>(
                       value: RepeatInterval.hourly,
                       child: Text(AppLocalizations.of(context)!.repeatHourly),
                     ),
-                    DropdownMenuItem<RepeatInterval?> (
+                    DropdownMenuItem<RepeatInterval?>(
                       value: RepeatInterval.daily,
                       child: Text(AppLocalizations.of(context)!.repeatDaily),
                     ),
-                    DropdownMenuItem<RepeatInterval?> (
+                    DropdownMenuItem<RepeatInterval?>(
                       value: RepeatInterval.weekly,
                       child: Text(AppLocalizations.of(context)!.repeatWeekly),
                     ),
@@ -220,8 +218,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     if (picked != null) {
       final time = await showTimePicker(
         context: context,
-        initialTime:
-            _alarmTime != null ? TimeOfDay.fromDateTime(_alarmTime!) : TimeOfDay.now(),
+        initialTime: _alarmTime != null
+            ? TimeOfDay.fromDateTime(_alarmTime!)
+            : TimeOfDay.now(),
       );
       if (time != null) {
         setState(() {
@@ -238,6 +237,20 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   }
 
   Future<void> _save() async {
+    final service = NotificationService();
+    final oldId = widget.note.notificationId;
+    if (oldId != null) {
+      await service.cancel(oldId);
+    }
+
+    int? newId;
+    if (_alarmTime != null) {
+      newId =
+          oldId ??
+          int.tryParse(widget.note.id) ??
+          DateTime.now().millisecondsSinceEpoch % 100000;
+    }
+
     final updated = widget.note.copyWith(
       title: _titleCtrl.text,
       content: _contentCtrl.text,
@@ -249,16 +262,14 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       active: true,
       snoozeMinutes: _snoozeMinutes,
       updatedAt: DateTime.now(),
+      notificationId: newId,
     );
     await context.read<NoteProvider>().updateNote(updated);
 
-    if (_alarmTime != null) {
-      final id = int.tryParse(updated.id) ??
-          DateTime.now().millisecondsSinceEpoch % 100000;
-      final service = NotificationService();
+    if (_alarmTime != null && newId != null) {
       if (_repeat == RepeatInterval.daily) {
         await service.scheduleDailyAtTime(
-          id: id,
+          id: newId,
           title: updated.title,
           body: updated.content,
           time: Time(_alarmTime!.hour, _alarmTime!.minute),
@@ -266,7 +277,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         );
       } else if (_repeat != null) {
         await service.scheduleRecurring(
-          id: id,
+          id: newId,
           title: updated.title,
           body: updated.content,
           repeatInterval: _repeat!,
@@ -274,7 +285,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         );
       } else {
         await service.scheduleNotification(
-          id: id,
+          id: newId,
           title: updated.title,
           body: updated.content,
           scheduledDate: _alarmTime!,
@@ -287,4 +298,3 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     Navigator.pop(context);
   }
 }
-

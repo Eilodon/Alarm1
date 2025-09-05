@@ -13,6 +13,7 @@ class Note {
   final bool locked;
   final int snoozeMinutes;
   final DateTime? updatedAt;
+  final int? notificationId;
 
   const Note({
     required this.id,
@@ -27,6 +28,7 @@ class Note {
     this.locked = false,
     this.snoozeMinutes = 0,
     this.updatedAt,
+    this.notificationId,
   });
 
   Note copyWith({
@@ -42,6 +44,7 @@ class Note {
     bool? locked,
     int? snoozeMinutes,
     DateTime? updatedAt,
+    Object? notificationId = _notificationIdSentinel,
   }) {
     return Note(
       id: id ?? this.id,
@@ -56,6 +59,9 @@ class Note {
       locked: locked ?? this.locked,
       snoozeMinutes: snoozeMinutes ?? this.snoozeMinutes,
       updatedAt: updatedAt ?? this.updatedAt,
+      notificationId: notificationId == _notificationIdSentinel
+          ? this.notificationId
+          : notificationId as int?,
     );
   }
 
@@ -67,38 +73,42 @@ class Note {
       alarmTime: json['alarmTime'] != null
           ? DateTime.parse(json['alarmTime'])
           : json['remindAt'] != null
-              ? DateTime.parse(json['remindAt'])
-              : null,
-      repeatInterval:
-          _repeatIntervalFromString(json['repeatInterval'] as String?),
+          ? DateTime.parse(json['remindAt'])
+          : null,
+      repeatInterval: _repeatIntervalFromString(
+        json['repeatInterval'] as String?,
+      ),
       daily: json['daily'] ?? false,
       active: json['active'] ?? false,
       tags: (json['tags'] as List<dynamic>? ?? []).cast<String>(),
-      attachments:
-          (json['attachments'] as List<dynamic>? ?? []).cast<String>(),
+      attachments: (json['attachments'] as List<dynamic>? ?? []).cast<String>(),
       locked: json['locked'] ?? false,
       snoozeMinutes: json['snoozeMinutes'] ?? 0,
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'])
           : null,
+      notificationId: json['notificationId'] as int?,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'content': content,
-        'alarmTime': alarmTime?.toIso8601String(),
-        'repeatInterval': repeatInterval?.toString().split('.').last,
-        'daily': daily,
-        'active': active,
-        'tags': tags,
-        'attachments': attachments,
-        'locked': locked,
-        'snoozeMinutes': snoozeMinutes,
-        'updatedAt': updatedAt?.toIso8601String(),
-      };
+    'id': id,
+    'title': title,
+    'content': content,
+    'alarmTime': alarmTime?.toIso8601String(),
+    'repeatInterval': repeatInterval?.toString().split('.').last,
+    'daily': daily,
+    'active': active,
+    'tags': tags,
+    'attachments': attachments,
+    'locked': locked,
+    'snoozeMinutes': snoozeMinutes,
+    'updatedAt': updatedAt?.toIso8601String(),
+    'notificationId': notificationId,
+  };
 }
+
+const _notificationIdSentinel = Object();
 
 RepeatInterval? _repeatIntervalFromString(String? value) {
   if (value == null) return null;
