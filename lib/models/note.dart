@@ -1,6 +1,7 @@
 class Note {
 
 
+
   final String id;
   final String title;
   final String content;
@@ -14,11 +15,13 @@ class Note {
     required this.id,
 
 
+
     required this.title,
     required this.content,
-    this.remindAt,
+    this.alarmTime,
     this.daily = false,
     this.active = false,
+
     this.tags = const [],
     this.snoozeMinutes = 0,
   });
@@ -38,12 +41,14 @@ class Note {
         active: j['active'] ?? false,
         tags: (j['tags'] as List<dynamic>? ?? []).cast<String>(),
         snoozeMinutes: j['snoozeMinutes'] ?? 0,
+
       );
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'title': title,
         'content': content,
+
         'remindAt': remindAt?.toIso8601String(),
         'daily': daily,
         'active': active,

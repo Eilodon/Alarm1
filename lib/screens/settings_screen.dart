@@ -15,6 +15,7 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
+
     void _pickColor() async {
       final colors = [Colors.blue, Colors.green, Colors.red, Colors.purple, Colors.orange, Colors.teal];
       await showDialog(
@@ -55,6 +56,24 @@ class SettingsScreen extends StatefulWidget {
               onPressed: () {
                 _settings.saveMascotPath(path);
 
+  void _pickColor() async {
+    final colors = [
+      Colors.blue,
+      Colors.green,
+      Colors.red,
+      Colors.purple,
+      Colors.orange,
+      Colors.teal,
+    ];
+    await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.chooseThemeColor),
+        content: Wrap(
+          children: colors.map((c) {
+            return GestureDetector(
+              onTap: () {
+                widget.onThemeChanged(c);
                 Navigator.pop(context);
               },
               child: Container(
@@ -70,25 +89,36 @@ class SettingsScreen extends StatefulWidget {
     );
   }
 
-  void _pickMascot() async {
-    final options = [
-      'assets/lottie/mascot.json',
-      'assets/lottie/mascot2.json',
-      'assets/lottie/mascot3.json'
-    ];
+  void _changeFontScale() async {
+    final current = await _settings.loadFontScale();
+    double temp = current;
     await showDialog(
       context: context,
-      builder: (_) => SimpleDialog(
-        title: const Text('Chọn mascot'),
-        children: options.map((path) {
-          return SimpleDialogOption(
+      builder: (_) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.fontSize),
+        content: StatefulBuilder(
+          builder: (context, setState) => Slider(
+            min: 0.8,
+            max: 2.0,
+            divisions: 12,
+            value: temp,
+            label: temp.toStringAsFixed(1),
+            onChanged: (v) => setState(() => temp = v),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppLocalizations.of(context)!.cancel),
+          ),
+          TextButton(
             onPressed: () {
-              _settings.saveMascotPath(path);
+              widget.onFontScaleChanged(temp);
               Navigator.pop(context);
             },
-            child: Text(path.split('/').last),
-          );
-        }).toList(),
+            child: Text(AppLocalizations.of(context)!.save),
+          ),
+        ],
       ),
     );
   }
@@ -114,42 +144,10 @@ class SettingsScreen extends StatefulWidget {
           ),
           ListTile(
             title: Text(AppLocalizations.of(context)!.fontSize),
-            onTap: () async {
-              final current = await _settings.loadFontScale();
-              double temp = current;
-              await showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                  title: Text(AppLocalizations.of(context)!.fontSize),
-                  content: StatefulBuilder(
-                    builder: (context, setState) => Slider(
-                      min: 0.8,
-                      max: 2.0,
-                      divisions: 12,
-                      value: temp,
-                      label: temp.toStringAsFixed(1),
-                      onChanged: (v) => setState(() => temp = v),
-                    ),
-                  ),
-                  actions: [
-                    TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(AppLocalizations.of(context)!.cancel)),
-                    TextButton(
-                        onPressed: () {
-                          onFontScaleChanged(temp);
-                          Navigator.pop(context);
-                        },
-                        child: Text(AppLocalizations.of(context)!.save)),
-                  ],
-                ),
-              );
-            },
-
+            onTap: _changeFontScale,
           ),
         ],
       ),
-
     );
   }
 }

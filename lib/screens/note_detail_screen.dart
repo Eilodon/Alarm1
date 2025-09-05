@@ -4,11 +4,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
 import '../models/note.dart';
 import '../providers/note_provider.dart';
 import '../services/notification_service.dart';
-
 import '../services/tts_service.dart';
 import '../services/gemini_service.dart';
 import 'chat_screen.dart';
