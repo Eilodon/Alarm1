@@ -57,8 +57,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final availableTags =
         provider.notes.expand((n) => n.tags).toSet().toList();
 
-    bool locked = false;
-
     showDialog(
       context: context,
       builder: (_) => StatefulBuilder(
