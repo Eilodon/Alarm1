@@ -1,4 +1,3 @@
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -36,6 +35,5 @@ class SettingsService {
   Future<double> loadFontScale() async {
     final sp = await SharedPreferences.getInstance();
     return sp.getDouble(_kFontScale) ?? 1.0;
-
   }
 }
