@@ -41,10 +41,21 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
             'en': 'en',
           }[locale.languageCode] ??
           'en';
-      final model = await widget.vosk
-          .createModel('assets/models/vosk-model-small-$code');
-      _voskRecognizer = await widget.vosk.createRecognizer(model: model);
-      _voskService = await widget.vosk.initSpeechService(_voskRecognizer!);
+      try {
+        final model = await widget.vosk
+            .createModel('assets/models/vosk-model-small-$code');
+        _voskRecognizer = await widget.vosk.createRecognizer(model: model);
+        _voskService = await widget.vosk.initSpeechService(_voskRecognizer!);
+      } catch (e) {
+        if (!mounted) return;
+        final l10n = AppLocalizations.of(context)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.errorWithMessage(e.toString())),
+          ),
+        );
+        return;
+      }
       _voskService!.onResult().listen((event) {
         final data = jsonDecode(event) as Map<String, dynamic>;
         setState(() => _recognized = data['text'] ?? '');
