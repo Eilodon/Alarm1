@@ -55,5 +55,11 @@
   "convertSpeechPrompt": "Convert the following speech into a note: {recognized}",
   "convertSpeechPrompt@placeholders": {
     "recognized": {}
+  },
+  "geminiApiKeyNotConfigured": "Gemini API key is not configured.",
+  "noResponse": "No response",
+  "geminiError": "Gemini error: {error}",
+  "geminiError@placeholders": {
+    "error": {}
   }
 }
