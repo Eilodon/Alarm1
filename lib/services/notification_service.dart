@@ -9,14 +9,17 @@ class NotificationService {
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin _fln = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _fln =
+      FlutterLocalNotificationsPlugin();
 
   Future<void> init() async {
     tzdata.initializeTimeZones();
     final tzName = await FlutterNativeTimezone.getLocalTimezone();
     tz.setLocalLocation(tz.getLocation(tzName));
 
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const iosSettings = DarwinInitializationSettings();
     const settings = InitializationSettings(
       android: androidSettings,
@@ -25,18 +28,17 @@ class NotificationService {
 
     await _fln.initialize(settings);
 
-    final androidImpl =
-        _fln.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    final androidImpl = _fln
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     await androidImpl?.requestNotificationsPermission();
 
     await _fln
         .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>()
-        ?.requestPermissions(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
+          IOSFlutterLocalNotificationsPlugin
+        >()
+        ?.requestPermissions(alert: true, badge: true, sound: true);
   }
 
   Future<void> scheduleNotification({
@@ -63,7 +65,8 @@ class NotificationService {
       tz.TZDateTime.from(scheduledDate, tz.local),
       details,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      matchDateTimeComponents: null, // Không còn dùng uiLocalNotificationDateInterpretation
+      matchDateTimeComponents:
+          null, // Không còn dùng uiLocalNotificationDateInterpretation
     );
   }
 
@@ -161,8 +164,9 @@ class NotificationService {
   }) async {
     await _fln.cancel(id);
 
-    final scheduledDate =
-        tz.TZDateTime.now(tz.local).add(Duration(minutes: minutes));
+    final scheduledDate = tz.TZDateTime.now(
+      tz.local,
+    ).add(Duration(minutes: minutes));
 
     final androidDetails = AndroidNotificationDetails(
       'snooze_channel',
@@ -183,5 +187,9 @@ class NotificationService {
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       matchDateTimeComponents: null,
     );
+  }
+
+  Future<void> cancel(int id) {
+    return _fln.cancel(id);
   }
 }
