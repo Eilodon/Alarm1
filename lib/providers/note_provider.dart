@@ -219,6 +219,55 @@ class NoteProvider extends ChangeNotifier {
   }
 
 
+  Future<bool> createNote({
+    required String title,
+    required String content,
+    List<String> tags = const [],
+    bool locked = false,
+    DateTime? alarmTime,
+    required AppLocalizations l10n,
+  }) async {
+    try {
+      final id = DateTime.now().microsecondsSinceEpoch.toString();
+      int? notificationId;
+      String? eventId;
+      if (alarmTime != null) {
+        notificationId =
+            DateTime.now().millisecondsSinceEpoch.remainder(1 << 31);
+        await _notificationService.scheduleNotification(
+          id: notificationId,
+          title: title,
+          body: content,
+          scheduledDate: alarmTime,
+          l10n: l10n,
+        );
+        eventId = await _calendarService.createEvent(
+          title: title,
+          description: content,
+          start: alarmTime,
+        );
+      }
+
+      final note = Note(
+        id: id,
+        title: title,
+        content: content,
+        tags: tags,
+        locked: locked,
+        alarmTime: alarmTime,
+        notificationId: notificationId,
+        eventId: eventId,
+        updatedAt: DateTime.now(),
+      );
+
+      await addNote(note);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+
   Future<void> addNote(Note note) async {
     _notes.add(note);
     _notes.sort((a, b) => (b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0))
