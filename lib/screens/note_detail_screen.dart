@@ -6,6 +6,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:share_plus/share_plus.dart';
 import '../models/note.dart';
 import '../providers/note_provider.dart';
 import '../services/notification_service.dart';
@@ -90,6 +91,11 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           TextButton(
             onPressed: _readNote,
             child: Text(AppLocalizations.of(context)!.readNote),
+          ),
+          IconButton(
+            icon: const Icon(Icons.share),
+            onPressed: () =>
+                Share.share('${_titleCtrl.text}\n${_contentCtrl.text}'),
           ),
           IconButton(icon: const Icon(Icons.save), onPressed: _save),
         ],

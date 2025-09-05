@@ -24,6 +24,7 @@ dependencies:
   uuid: ^4.5.1
   speech_to_text: ^7.3.0
   vosk_flutter: ^0.3.48
+  share_plus: ^10.0.2
 
   encrypt: ^5.0.1
   flutter_secure_storage: ^9.0.0
