@@ -270,17 +270,23 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.appTitle),
         actions: [
-          PopupMenuButton<String>(
+          PopupMenuButton<String?>(
             icon: const Icon(Icons.label),
             onSelected: (value) {
               setState(() {
-                _selectedTag = value == 'All' ? null : value;
+                _selectedTag = value;
               });
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(value: 'All', child: Text('All')),
+              PopupMenuItem<String?>(
+                value: null,
+                child: Text(AppLocalizations.of(context)!.allTags),
+              ),
               ...tags.map(
-                (t) => PopupMenuItem(value: t, child: Text(t)),
+                (t) => PopupMenuItem<String?>(
+                  value: t,
+                  child: Text(t),
+                ),
               ),
             ],
           ),
