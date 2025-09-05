@@ -31,8 +31,8 @@
   "delete": "Xóa",
   "timeLabel": "Thời gian",
 
-  "tagsLabel": "Tag"
-
+  "tagsLabel": "Tag",
+  "requireAuth": "Yêu cầu xác thực",
   "lockNote": "Khóa ghi chú"
 
 }

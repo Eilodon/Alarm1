@@ -22,6 +22,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final SettingsService _settings = SettingsService();
   bool _requireAuth = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _settings.loadRequireAuth().then((v) {
+      if (mounted) {
+        setState(() => _requireAuth = v);
+      }
+    });
+  }
+
   Future<void> _pickColor() async {
     final colors = [
       Colors.blue,
@@ -145,6 +155,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ListTile(
             title: Text(AppLocalizations.of(context)!.fontSize),
             onTap: _changeFontScale,
+          ),
+          SwitchListTile(
+            title: Text(AppLocalizations.of(context)!.requireAuth),
+            value: _requireAuth,
+            onChanged: _toggleAuth,
           ),
         ],
       ),
