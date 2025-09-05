@@ -116,9 +116,9 @@ class NoteProvider extends ChangeNotifier {
       notifyListeners();
       if (Firebase.apps.isNotEmpty) {
         final user = _auth.currentUser ?? await _auth.signInAnonymously();
-        final data = await _repository.encryptNote(note);
+        final data = await _repository.encryptNote(updated);
         data['userId'] = user.uid;
-        await _firestore.collection('notes').doc(note.id).set(data);
+        await _firestore.collection('notes').doc(updated.id).set(data);
       }
     }
   }
