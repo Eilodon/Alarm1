@@ -31,9 +31,29 @@
   "delete": "Delete",
   "timeLabel": "Time",
 
+  "repeatLabel": "Repeat:",
+  "repeatNone": "None",
+  "repeatEveryMinute": "Every minute",
+  "repeatHourly": "Hourly",
+  "repeatDaily": "Daily",
+  "repeatWeekly": "Weekly",
+  "snoozeLabel": "Snooze: {minutes} min",
+  "snoozeLabel@placeholders": {
+    "minutes": {}
+  },
+  "imageLabel": "Image",
+  "audioLabel": "Audio",
+
   "tagsLabel": "Tags",
   "addTag": "Add tag",
   "requireAuth": "Require authentication",
-  "lockNote": "Lock note"
-
+  "lockNote": "Lock note",
+  "voiceToNote": "Voice To Note",
+  "stop": "Stop",
+  "speak": "Speak",
+  "convertToNote": "Convert to note",
+  "convertSpeechPrompt": "Convert the following speech into a note: {recognized}",
+  "convertSpeechPrompt@placeholders": {
+    "recognized": {}
+  }
 }

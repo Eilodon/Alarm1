@@ -30,6 +30,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   RepeatInterval? _repeat;
   int _snoozeMinutes = 5;
   late List<String> _tags;
+  final _ttsService = TTSService();
 
 
   @override
@@ -60,6 +61,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     }
   }
 
+  Future<void> _readNote() async {
+    await _ttsService.speak(_contentCtrl.text);
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<NoteProvider>();
@@ -69,6 +74,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       appBar: AppBar(
         title: Text(widget.note.title),
         actions: [
+          TextButton(
+            onPressed: _readNote,
+            child: const Text('Đọc Note'),
+          ),
           IconButton(
             icon: const Icon(Icons.save),
             onPressed: _save,
@@ -112,38 +121,38 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
             const SizedBox(height: 12),
             Row(
               children: [
-                const Text('Repeat:'),
+                Text(AppLocalizations.of(context)!.repeatLabel),
                 const SizedBox(width: 8),
                 DropdownButton<RepeatInterval?>(
                   value: _repeat,
                   onChanged: (value) => setState(() => _repeat = value),
-                  items: const [
+                  items: [
                     DropdownMenuItem<RepeatInterval?> (
                       value: null,
-                      child: Text('None'),
+                      child: Text(AppLocalizations.of(context)!.repeatNone),
                     ),
                     DropdownMenuItem<RepeatInterval?> (
                       value: RepeatInterval.everyMinute,
-                      child: Text('Every minute'),
+                      child: Text(AppLocalizations.of(context)!.repeatEveryMinute),
                     ),
                     DropdownMenuItem<RepeatInterval?> (
                       value: RepeatInterval.hourly,
-                      child: Text('Hourly'),
+                      child: Text(AppLocalizations.of(context)!.repeatHourly),
                     ),
                     DropdownMenuItem<RepeatInterval?> (
                       value: RepeatInterval.daily,
-                      child: Text('Daily'),
+                      child: Text(AppLocalizations.of(context)!.repeatDaily),
                     ),
                     DropdownMenuItem<RepeatInterval?> (
                       value: RepeatInterval.weekly,
-                      child: Text('Weekly'),
+                      child: Text(AppLocalizations.of(context)!.repeatWeekly),
                     ),
                   ],
                 ),
               ],
             ),
             const SizedBox(height: 12),
-            Text('Snooze: $_snoozeMinutes min'),
+            Text(AppLocalizations.of(context)!.snoozeLabel(_snoozeMinutes)),
             Slider(
               value: _snoozeMinutes.toDouble(),
               min: 1,
@@ -166,13 +175,13 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                 ElevatedButton.icon(
                   onPressed: _pickImage,
                   icon: const Icon(Icons.image),
-                  label: const Text('Image'),
+                  label: Text(AppLocalizations.of(context)!.imageLabel),
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton.icon(
                   onPressed: _pickAudio,
                   icon: const Icon(Icons.audiotrack),
-                  label: const Text('Audio'),
+                  label: Text(AppLocalizations.of(context)!.audioLabel),
                 ),
               ],
             ),
