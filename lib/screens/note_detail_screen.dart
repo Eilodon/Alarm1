@@ -414,7 +414,18 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       actionItems: actionItems,
       dates: dates,
     );
-    await context.read<NoteProvider>().updateNote(updated);
+    final ok = await context.read<NoteProvider>().updateNote(updated);
+
+    if (!ok) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.errorWithMessage('Failed to save note')),
+        ),
+      );
+      Navigator.pop(context);
+      return;
+    }
 
     if (_alarmTime != null && newId != null) {
       if (_repeat == RepeatInterval.daily) {
