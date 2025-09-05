@@ -151,11 +151,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 provider.setDraft('');
 
                 if (alarmTime != null) {
-                  final notificationId =
-                      DateTime.now().millisecondsSinceEpoch % 100000;
-
                   await NotificationService().scheduleNotification(
-                    id: notificationId,
+                    id: note.notificationId!,
                     title: note.title,
                     body: note.content,
                     scheduledDate: alarmTime!,
