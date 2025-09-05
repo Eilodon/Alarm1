@@ -75,6 +75,9 @@ void main() {
       await tester.pump();
 
       expect(find.text('offline'), findsOneWidget);
+      verify(() => voskPlugin.createModel(any())).called(1);
+      verify(() => voskPlugin.createRecognizer(model: model)).called(1);
+      verify(() => voskPlugin.initSpeechService(recognizer)).called(1);
       verify(() => service.start()).called(1);
       await controller.close();
     });
