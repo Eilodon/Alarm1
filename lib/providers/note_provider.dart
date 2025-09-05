@@ -68,7 +68,7 @@ class NoteProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> createNote({
+  Future<bool> createNote({
     required String title,
     required String content,
     required AppLocalizations l10n,
@@ -105,6 +105,8 @@ class NoteProvider extends ChangeNotifier {
         l10n: l10n,
       );
     }
+
+    return ok;
   }
   
   Future<bool> addNote(Note note) async {
