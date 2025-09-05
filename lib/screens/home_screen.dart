@@ -8,6 +8,7 @@ import '../models/note.dart';
 import '../providers/note_provider.dart';
 import '../services/notification_service.dart';
 import '../services/settings_service.dart';
+import '../widgets/tag_selector.dart';
 import 'note_detail_screen.dart';
 import 'note_list_for_day_screen.dart';
 import 'settings_screen.dart';
@@ -50,7 +51,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final titleCtrl = TextEditingController();
     final contentCtrl = TextEditingController(text: provider.draft);
     DateTime? alarmTime;
-    bool locked = false;
+
+    var tags = <String>[];
+    final availableTags =
+        provider.notes.expand((n) => n.tags).toSet().toList();
 
     showDialog(
       context: context,
@@ -73,6 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     labelText: AppLocalizations.of(context)!.contentLabel,
                   ),
                 ),
+
                 SwitchListTile(
                   title: Text(AppLocalizations.of(context)!.lockNote),
                   value: locked,
@@ -83,6 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () async {
                     final now = DateTime.now();
                     final picked = await showDatePicker(
+
                       context: context,
                       firstDate: now,
                       lastDate: DateTime(now.year + 2),
@@ -109,6 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
+
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -124,6 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   alarmTime: alarmTime,
                   locked: locked,
                   updatedAt: DateTime.now(),
+>
                 );
                 await provider.addNote(note);
                 provider.setDraft('');

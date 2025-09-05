@@ -7,8 +7,10 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../models/note.dart';
 import '../providers/note_provider.dart';
 import '../services/notification_service.dart';
+import '../services/tts_service.dart';
+import '../services/gemini_service.dart';
+import 'chat_screen.dart';
 import 'package:intl/intl.dart';
-
 import '../widgets/tag_selector.dart';
 
 
@@ -70,6 +72,25 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
             icon: const Icon(Icons.save),
             onPressed: _save,
           ),
+
+          const Divider(),
+          ..._attachments.map((a) => ListTile(title: Text(a.split('/').last))),
+          const SizedBox(height: 8),
+          TagSelector(
+            availableTags: context
+                .watch<NoteProvider>()
+                .notes
+                .expand((n) => n.tags)
+                .toSet()
+                .toList(),
+            selectedTags: _tags,
+            onChanged: (v) => setState(() => _tags = v),
+            allowCreate: true,
+            label: AppLocalizations.of(context)!.tagsLabel,
+          ),
+          const Divider(),
+          Expanded(child: ChatScreen(initialMessage: _contentCtrl.text)),
+
         ],
       ),
       body: SingleChildScrollView(
