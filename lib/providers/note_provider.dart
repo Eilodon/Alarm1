@@ -78,7 +78,7 @@ class NoteProvider extends ChangeNotifier {
   }) async {
     final noteId = const Uuid().v4();
     final notificationId =
-        alarmTime != null ? const Uuid().v4().hashCode : null;
+        alarmTime != null ? DateTime.now().millisecondsSinceEpoch : null;
 
     final note = Note(
       id: noteId,

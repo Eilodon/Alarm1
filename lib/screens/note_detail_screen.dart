@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
-import 'package:uuid/uuid.dart';
 
 import '../models/note.dart';
 import '../providers/note_provider.dart';
@@ -396,7 +395,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
 
     int? newId;
     if (_alarmTime != null) {
-      newId = const Uuid().v4().hashCode;
+      newId = DateTime.now().millisecondsSinceEpoch;
     }
 
     final updated = widget.note.copyWith(
