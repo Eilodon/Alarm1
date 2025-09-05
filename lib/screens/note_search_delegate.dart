@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/note.dart';
 import 'note_detail_screen.dart';
+import '../services/auth_service.dart';
 
 class NoteSearchDelegate extends SearchDelegate {
   final List<Note> notes;
@@ -45,7 +46,11 @@ class NoteSearchDelegate extends SearchDelegate {
           .map((n) => ListTile(
                 title: Text(n.title),
                 subtitle: Text(n.content),
-                onTap: () {
+                onTap: () async {
+                  if (n.locked) {
+                    final ok = await AuthService().authenticate();
+                    if (!ok) return;
+                  }
                   Navigator.push(
                     context,
                     MaterialPageRoute(
