@@ -7,8 +7,12 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:http/http.dart' as http;
 
 class TTSService {
-  final FlutterTts _tts = FlutterTts();
-  final AudioPlayer _player = AudioPlayer();
+  final FlutterTts _tts;
+  final AudioPlayer _player;
+
+  TTSService({FlutterTts? tts, AudioPlayer? player})
+      : _tts = tts ?? FlutterTts(),
+        _player = player ?? AudioPlayer();
 
   String _ttsCodeForLocale(Locale locale) {
     const mapping = {

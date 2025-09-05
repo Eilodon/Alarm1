@@ -7,9 +7,12 @@ import 'package:flutter/foundation.dart';
 import '../models/note.dart';
 import '../services/note_repository.dart';
 import '../services/calendar_service.dart';
+import '../services/notification_service.dart';
 
 class NoteProvider extends ChangeNotifier {
   final NoteRepository _repository;
+  final CalendarService _calendarService;
+  final NotificationService _notificationService;
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -17,9 +20,13 @@ class NoteProvider extends ChangeNotifier {
   List<Note> _notes = [];
   String _draft = '';
 
-  NoteProvider({NoteRepository? repository, CalendarService? calendarService})
-      : _repository = repository ?? NoteRepository(),
-        _calendarService = calendarService ?? CalendarService.instance;
+  NoteProvider({
+    NoteRepository? repository,
+    CalendarService? calendarService,
+    NotificationService? notificationService,
+  })  : _repository = repository ?? NoteRepository(),
+        _calendarService = calendarService ?? CalendarService.instance,
+        _notificationService = notificationService ?? NotificationService();
 
   List<Note> get notes => List.unmodifiable(_notes);
   String get draft => _draft;
@@ -91,11 +98,18 @@ class NoteProvider extends ChangeNotifier {
 
 
   Future<void> removeNoteAt(int index) async {
-
     final note = _notes.removeAt(index);
 
     await _repository.saveNotes(_notes);
     notifyListeners();
+
+    if (note.notificationId != null) {
+      await _notificationService.cancel(note.notificationId!);
+    }
+    if (note.eventId != null) {
+      await _calendarService.deleteEvent(note.eventId!);
+    }
+
     if (Firebase.apps.isNotEmpty) {
       await _firestore.collection('notes').doc(note.id).delete();
     }
