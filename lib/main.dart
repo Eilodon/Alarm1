@@ -14,7 +14,12 @@ void main() async {
   final settings = SettingsService();
   final themeColor = await settings.loadThemeColor();
   final fontScale = await settings.loadFontScale();
-  runApp(MyApp(themeColor: themeColor, fontScale: fontScale));
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => NoteProvider(),
+      child: MyApp(themeColor: themeColor, fontScale: fontScale),
+    ),
+  );
 
 }
 

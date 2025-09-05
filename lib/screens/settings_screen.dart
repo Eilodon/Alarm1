@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:lottie/lottie.dart';
 
 import '../services/settings_service.dart';
 
@@ -17,46 +18,11 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
+class _SettingsScreenState extends State<SettingsScreen> {
+  final SettingsService _settings = SettingsService();
+  bool _requireAuth = false;
 
-
-    void _pickColor() async {
-      final colors = [Colors.blue, Colors.green, Colors.red, Colors.purple, Colors.orange, Colors.teal];
-      await showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: Text(AppLocalizations.of(context)!.chooseThemeColor),
-          content: Wrap(
-            children: colors.map((c) {
-              return GestureDetector(
-                onTap: () {
-                  onThemeChanged(c);
-                  Navigator.pop(context);
-                },
-                child: Container(
-                  width: 40, height: 40,
-                  margin: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(color: c, shape: BoxShape.circle),
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-      );
-    }
-
-
-  void _pickColor() async {
-    final colors = [
-      Colors.blue,
-      Colors.green,
-      Colors.red,
-      Colors.purple,
-      Colors.orange,
-      Colors.teal,
-    ];
-
-
-  void _pickColor() async {
+  Future<void> _pickColor() async {
     final colors = [
       Colors.blue,
       Colors.green,
@@ -70,21 +36,18 @@ class SettingsScreen extends StatefulWidget {
       builder: (_) => AlertDialog(
         title: Text(AppLocalizations.of(context)!.chooseThemeColor),
         content: Wrap(
-
           children: colors.map((c) {
             return GestureDetector(
               onTap: () {
                 widget.onThemeChanged(c);
+                _settings.saveThemeColor(c);
                 Navigator.pop(context);
               },
               child: Container(
                 width: 40,
                 height: 40,
                 margin: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                ),
+                decoration: BoxDecoration(color: c, shape: BoxShape.circle),
               ),
             );
           }).toList(),
@@ -93,8 +56,37 @@ class SettingsScreen extends StatefulWidget {
     );
   }
 
+  Future<void> _pickMascot() async {
+    final paths = [
+      'assets/lottie/mascot.json',
+      'assets/lottie/mascot2.json',
+      'assets/lottie/mascot3.json',
+    ];
+    await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.chooseMascot),
+        content: Wrap(
+          children: paths.map((p) {
+            return GestureDetector(
+              onTap: () {
+                _settings.saveMascotPath(p);
+                Navigator.pop(context);
+              },
+              child: Container(
+                width: 80,
+                height: 80,
+                margin: const EdgeInsets.all(8),
+                child: Lottie.asset(p),
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
 
-  void _changeFontScale() async {
+  Future<void> _changeFontScale() async {
     final current = await _settings.loadFontScale();
     double temp = current;
     await showDialog(
@@ -119,6 +111,7 @@ class SettingsScreen extends StatefulWidget {
           TextButton(
             onPressed: () {
               widget.onFontScaleChanged(temp);
+              _settings.saveFontScale(temp);
               Navigator.pop(context);
             },
             child: Text(AppLocalizations.of(context)!.save),
@@ -127,7 +120,6 @@ class SettingsScreen extends StatefulWidget {
       ),
     );
   }
-
 
   void _toggleAuth(bool v) {
     setState(() => _requireAuth = v);
@@ -159,4 +151,3 @@ class SettingsScreen extends StatefulWidget {
     );
   }
 }
-

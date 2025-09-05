@@ -24,11 +24,29 @@ void main() {
     expect(path, 'path.json');
   });
 
+  test('save and load font scale', () async {
+    final service = SettingsService();
+    await service.saveFontScale(1.5);
+    final scale = await service.loadFontScale();
+    expect(scale, 1.5);
+  });
+
+  test('save and load require auth', () async {
+    final service = SettingsService();
+    await service.saveRequireAuth(true);
+    final value = await service.loadRequireAuth();
+    expect(value, true);
+  });
+
   test('default values returned when not set', () async {
     final service = SettingsService();
     final color = await service.loadThemeColor();
     final path = await service.loadMascotPath();
+    final scale = await service.loadFontScale();
+    final auth = await service.loadRequireAuth();
     expect(color, Colors.blue);
     expect(path, 'assets/lottie/mascot.json');
+    expect(scale, 1.0);
+    expect(auth, false);
   });
 }

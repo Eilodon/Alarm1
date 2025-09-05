@@ -30,5 +30,9 @@
   "settingsTooltip": "Open settings",
   "delete": "Delete",
   "timeLabel": "Time",
+
   "tagsLabel": "Tags"
+
+  "lockNote": "Lock note"
+
 }
