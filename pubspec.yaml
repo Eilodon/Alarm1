@@ -20,8 +20,6 @@ dependencies:
   intl: ^0.18.1
   provider: ^6.1.2
   flutter_tts: ^4.2.3
- codex/convert-notedetailscreen-to-statefulwidget
-  provider: ^6.1.2
 
 
 dev_dependencies:
