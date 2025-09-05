@@ -94,6 +94,7 @@
   "actionItemsLabel": "Cần làm",
   "datesLabel": "Ngày",
   "authFailedMessage": "Đăng nhập ẩn danh thất bại. Chức năng bị hạn chế.",
-  "notificationFailedMessage": "Thiết lập thông báo thất bại."
+  "notificationFailedMessage": "Thiết lập thông báo thất bại.",
+  "saveNoteFailed": "Lưu ghi chú thất bại"
 
 }

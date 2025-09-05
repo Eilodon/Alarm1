@@ -409,7 +409,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.errorWithMessage('Failed to save note'))),
+        SnackBar(content: Text(l10n.saveNoteFailed)),
       );
     }
   }
