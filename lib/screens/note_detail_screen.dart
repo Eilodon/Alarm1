@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:audioplayers/audioplayers.dart';
 import '../models/note.dart';
 import '../providers/note_provider.dart';
 import '../services/notification_service.dart';
@@ -202,7 +204,19 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
             ),
             const SizedBox(height: 12),
             ..._attachments.map(
-              (a) => ListTile(title: Text(a.split('/').last)),
+              (a) {
+                final ext = a.split('.').last.toLowerCase();
+                if (['jpg', 'jpeg', 'png', 'gif', 'bmp'].contains(ext)) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Image.file(File(a)),
+                  );
+                }
+                if (['mp3', 'wav'].contains(ext)) {
+                  return _AudioAttachment(path: a);
+                }
+                return ListTile(title: Text(a.split('/').last));
+              },
             ),
             const SizedBox(height: 12),
             ElevatedButton.icon(
@@ -394,5 +408,44 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
 
     if (!mounted) return;
     Navigator.pop(context);
+  }
+}
+
+class _AudioAttachment extends StatefulWidget {
+  final String path;
+  const _AudioAttachment({required this.path});
+
+  @override
+  State<_AudioAttachment> createState() => _AudioAttachmentState();
+}
+
+class _AudioAttachmentState extends State<_AudioAttachment> {
+  final AudioPlayer _player = AudioPlayer();
+  bool _playing = false;
+
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
+  }
+
+  Future<void> _toggle() async {
+    if (_playing) {
+      await _player.pause();
+    } else {
+      await _player.play(DeviceFileSource(widget.path));
+    }
+    setState(() => _playing = !_playing);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(widget.path.split('/').last),
+      trailing: IconButton(
+        icon: Icon(_playing ? Icons.pause : Icons.play_arrow),
+        onPressed: _toggle,
+      ),
+    );
   }
 }
