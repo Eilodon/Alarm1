@@ -55,5 +55,11 @@
   "convertSpeechPrompt": "Chuyển đoạn nói sau thành ghi chú: {recognized}",
   "convertSpeechPrompt@placeholders": {
     "recognized": {}
+  },
+  "geminiApiKeyNotConfigured": "Chưa cấu hình khóa Gemini API.",
+  "noResponse": "Không có phản hồi",
+  "geminiError": "Lỗi Gemini: {error}",
+  "geminiError@placeholders": {
+    "error": {}
   }
 }
