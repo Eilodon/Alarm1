@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
- codex/enable-flutter_localizations-and-update-ui
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -14,7 +13,6 @@ void main() async {
   await NotificationService().init();
   final settings = SettingsService();
   final themeColor = await settings.loadThemeColor();
- codex/enable-flutter_localizations-and-update-ui
   final fontScale = await settings.loadFontScale();
   runApp(MyApp(themeColor: themeColor, fontScale: fontScale));
 
@@ -22,7 +20,6 @@ void main() async {
 
 class MyApp extends StatefulWidget {
   final Color themeColor;
- codex/enable-flutter_localizations-and-update-ui
   final double fontScale;
   const MyApp({super.key, required this.themeColor, required this.fontScale});
 
@@ -54,7 +51,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
- codex/enable-flutter_localizations-and-update-ui
     return MaterialApp(
       onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
       localizationsDelegates: const [
