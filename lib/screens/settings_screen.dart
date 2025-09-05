@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 import '../services/settings_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
   final Function(double) onFontScaleChanged;
+
   const SettingsScreen({
     super.key,
     required this.onThemeChanged,
@@ -14,6 +16,7 @@ class SettingsScreen extends StatefulWidget {
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
+
 
 
     void _pickColor() async {
@@ -41,20 +44,17 @@ class SettingsScreen extends StatefulWidget {
       );
     }
 
-    void _pickMascot() async {
-      final options = [
-        'assets/lottie/mascot.json',
-        'assets/lottie/mascot2.json',
-        'assets/lottie/mascot3.json'
-      ];
-      await showDialog(
-        context: context,
-        builder: (_) => SimpleDialog(
-          title: Text(AppLocalizations.of(context)!.chooseMascot),
-          children: options.map((path) {
-            return SimpleDialogOption(
-              onPressed: () {
-                _settings.saveMascotPath(path);
+
+  void _pickColor() async {
+    final colors = [
+      Colors.blue,
+      Colors.green,
+      Colors.red,
+      Colors.purple,
+      Colors.orange,
+      Colors.teal,
+    ];
+
 
   void _pickColor() async {
     final colors = [
@@ -70,6 +70,7 @@ class SettingsScreen extends StatefulWidget {
       builder: (_) => AlertDialog(
         title: Text(AppLocalizations.of(context)!.chooseThemeColor),
         content: Wrap(
+
           children: colors.map((c) {
             return GestureDetector(
               onTap: () {
@@ -80,7 +81,10 @@ class SettingsScreen extends StatefulWidget {
                 width: 40,
                 height: 40,
                 margin: const EdgeInsets.all(4),
-                decoration: BoxDecoration(color: c, shape: BoxShape.circle),
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                ),
               ),
             );
           }).toList(),
@@ -88,6 +92,7 @@ class SettingsScreen extends StatefulWidget {
       ),
     );
   }
+
 
   void _changeFontScale() async {
     final current = await _settings.loadFontScale();
@@ -123,6 +128,7 @@ class SettingsScreen extends StatefulWidget {
     );
   }
 
+
   void _toggleAuth(bool v) {
     setState(() => _requireAuth = v);
     _settings.saveRequireAuth(v);
@@ -131,7 +137,9 @@ class SettingsScreen extends StatefulWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context)!.settings)),
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context)!.settings),
+      ),
       body: ListView(
         children: [
           ListTile(
@@ -151,3 +159,4 @@ class SettingsScreen extends StatefulWidget {
     );
   }
 }
+

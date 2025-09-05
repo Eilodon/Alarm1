@@ -7,7 +7,6 @@ class SettingsService {
   static const _kMascotPath = 'mascot_path';
   static const _kFontScale = 'font_scale';
 
-
   Future<void> saveThemeColor(Color color) async {
     final sp = await SharedPreferences.getInstance();
     await sp.setInt(_kThemeColor, color.value);
