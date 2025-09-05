@@ -7,9 +7,9 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../models/note.dart';
 import '../providers/note_provider.dart';
 import '../services/notification_service.dart';
-import '../services/tts_service.dart';
-import '../services/gemini_service.dart';
-import 'chat_screen.dart';
+import 'package:intl/intl.dart';
+
+import '../widgets/tag_selector.dart';
 
 
 class NoteDetailScreen extends StatefulWidget {
@@ -59,28 +59,83 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    context.watch<NoteProvider>();
-    final note = widget.note;
+    final provider = context.watch<NoteProvider>();
+    final availableTags =
+        provider.notes.expand((n) => n.tags).toSet().toList();
     return Scaffold(
-      appBar: AppBar(title: Text(note.title)),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('${AppLocalizations.of(context)!.contentLabel}: ${note.content}',
-              style: const TextStyle(fontSize: 16)),
-          if (note.alarmTime != null)
-            Text('${AppLocalizations.of(context)!.timeLabel}: ${note.alarmTime}',
-                style: const TextStyle(fontSize: 16)),
-          const SizedBox(height: 10),
-          ElevatedButton(
-            onPressed: () => TTSService().speak(note.content),
-            child: Text(AppLocalizations.of(context)!.readNote),
+      appBar: AppBar(
+        title: Text(widget.note.title),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.save),
+            onPressed: _save,
           ),
-          const Divider(),
-          ..._attachments.map((a) => ListTile(title: Text(a.split('/').last))),
-          const Divider(),
-          Expanded(child: ChatScreen(initialMessage: _contentCtrl.text)),
         ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: _titleCtrl,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.titleLabel,
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _contentCtrl,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.contentLabel,
+              ),
+              maxLines: null,
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                ElevatedButton(
+                  onPressed: _pickAlarmTime,
+                  child: Text(
+                      AppLocalizations.of(context)!.selectReminderTime),
+                ),
+                if (_alarmTime != null)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8),
+                    child: Text(DateFormat('HH:mm dd/MM/yyyy').format(_alarmTime!)),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            TagSelector(
+              availableTags: availableTags,
+              selectedTags: _tags,
+              allowCreate: true,
+              onChanged: (v) => setState(() => _tags = v),
+              label: 'Tags',
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                ElevatedButton.icon(
+                  onPressed: _pickImage,
+                  icon: const Icon(Icons.image),
+                  label: const Text('Image'),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton.icon(
+                  onPressed: _pickAudio,
+                  icon: const Icon(Icons.audiotrack),
+                  label: const Text('Audio'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            ..._attachments.map(
+              (a) => ListTile(title: Text(a.split('/').last)),
+            ),
+          ],
+        ),
       ),
     );
   }
