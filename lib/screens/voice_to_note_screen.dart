@@ -10,15 +10,21 @@ import '../providers/note_provider.dart';
 import '../services/gemini_service.dart';
 
 class VoiceToNoteScreen extends StatefulWidget {
-  const VoiceToNoteScreen({super.key});
+  final stt.SpeechToText speech;
+  final vosk.VoskFlutterPlugin vosk;
+
+  const VoiceToNoteScreen({
+    super.key,
+    stt.SpeechToText? speech,
+    vosk.VoskFlutterPlugin? vosk,
+  })  : speech = speech ?? stt.SpeechToText(),
+        vosk = vosk ?? vosk.VoskFlutterPlugin();
 
   @override
   State<VoiceToNoteScreen> createState() => _VoiceToNoteScreenState();
 }
 
 class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
-  final stt.SpeechToText _speech = stt.SpeechToText();
-  final vosk.VoskFlutterPlugin _vosk = vosk.VoskFlutterPlugin();
   vosk.SpeechService? _voskService;
   vosk.Recognizer? _voskRecognizer;
 
@@ -29,10 +35,10 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
 
   Future<void> _startOffline() async {
     if (_voskRecognizer == null) {
-      final model =
-          await _vosk.createModel('assets/models/vosk-model-small-en-us-0.15');
-      _voskRecognizer = await _vosk.createRecognizer(model: model);
-      _voskService = await _vosk.initSpeechService(_voskRecognizer!);
+      final model = await widget.vosk
+          .createModel('assets/models/vosk-model-small-en-us-0.15');
+      _voskRecognizer = await widget.vosk.createRecognizer(model: model);
+      _voskService = await widget.vosk.initSpeechService(_voskRecognizer!);
       _voskService!.onResult().listen((event) {
         final data = jsonDecode(event) as Map<String, dynamic>;
         setState(() => _recognized = data['text'] ?? '');
@@ -54,15 +60,15 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
     }
 
     if (!_isListening) {
-      final available = await _speech.initialize();
+      final available = await widget.speech.initialize();
       if (available) {
         setState(() => _isListening = true);
-        _speech.listen(onResult: (res) {
+        widget.speech.listen(onResult: (res) {
           setState(() => _recognized = res.recognizedWords);
         });
       }
     } else {
-      await _speech.stop();
+      await widget.speech.stop();
       setState(() => _isListening = false);
     }
   }
@@ -82,7 +88,7 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
 
   @override
   void dispose() {
-    _speech.stop();
+    widget.speech.stop();
     _voskService?.stop();
     super.dispose();
   }

@@ -15,7 +15,9 @@ import '../services/gemini_service.dart';
 
 class NoteDetailScreen extends StatefulWidget {
   final Note note;
-  const NoteDetailScreen({super.key, required this.note});
+  final TTSService ttsService;
+  const NoteDetailScreen({super.key, required this.note, TTSService? ttsService})
+      : ttsService = ttsService ?? TTSService();
 
   @override
   State<NoteDetailScreen> createState() => _NoteDetailScreenState();
@@ -29,11 +31,12 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   RepeatInterval? _repeat;
   int _snoozeMinutes = 5;
   late List<String> _tags;
-  final _ttsService = TTSService();
+  late final TTSService _ttsService;
 
   @override
   void initState() {
     super.initState();
+    _ttsService = widget.ttsService;
     _titleCtrl = TextEditingController(text: widget.note.title);
     _contentCtrl = TextEditingController(text: widget.note.content);
     _alarmTime = widget.note.alarmTime;
