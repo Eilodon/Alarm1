@@ -44,6 +44,9 @@
   "noteDeleted": "Đã xóa ghi chú",
   "undo": "Hoàn tác",
 
+  "notesExported": "Đã xuất ghi chú",
+  "notesImported": "Đã nhập ghi chú",
+
   "repeatLabel": "Lặp lại:",
   "repeatNone": "Không",
   "repeatEveryMinute": "Mỗi phút",

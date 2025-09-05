@@ -44,6 +44,9 @@
   "noteDeleted": "Note deleted",
   "undo": "Undo",
 
+  "notesExported": "Notes exported",
+  "notesImported": "Notes imported",
+
   "repeatLabel": "Repeat:",
   "repeatNone": "None",
   "repeatEveryMinute": "Every minute",
