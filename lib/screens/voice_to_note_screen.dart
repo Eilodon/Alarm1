@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
@@ -36,8 +37,9 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
   Future<void> _convertToNote() async {
     if (_recognized.isEmpty) return;
     setState(() => _isProcessing = true);
-    final reply = await GeminiService()
-        .chat('Chuyển đoạn nói sau thành ghi chú: $_recognized');
+    final prompt = AppLocalizations.of(context)!
+        .convertSpeechPrompt(_recognized);
+    final reply = await GeminiService().chat(prompt);
     if (!mounted) return;
     context.read<NoteProvider>().setDraft(reply);
     setState(() => _isProcessing = false);
@@ -53,7 +55,8 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Voice To Note')),
+      appBar: AppBar(
+          title: Text(AppLocalizations.of(context)!.voiceToNote)),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -66,12 +69,15 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
               children: [
                 ElevatedButton(
                   onPressed: _toggleListening,
-                  child: Text(_isListening ? 'Dừng' : 'Nói'),
+                  child: Text(_isListening
+                      ? AppLocalizations.of(context)!.stop
+                      : AppLocalizations.of(context)!.speak),
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: _isProcessing ? null : _convertToNote,
-                  child: const Text('Chuyển thành ghi chú'),
+                  child:
+                      Text(AppLocalizations.of(context)!.convertToNote),
                 ),
               ],
             )

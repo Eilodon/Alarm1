@@ -34,6 +34,13 @@
   "tagsLabel": "Tag",
   "addTag": "Thêm tag",
   "requireAuth": "Yêu cầu xác thực",
-  "lockNote": "Khóa ghi chú"
-
+  "lockNote": "Khóa ghi chú",
+  "voiceToNote": "Giọng nói thành ghi chú",
+  "stop": "Dừng",
+  "speak": "Nói",
+  "convertToNote": "Chuyển thành ghi chú",
+  "convertSpeechPrompt": "Chuyển đoạn nói sau thành ghi chú: {recognized}",
+  "convertSpeechPrompt@placeholders": {
+    "recognized": {}
+  }
 }
