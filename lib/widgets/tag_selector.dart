@@ -73,5 +73,11 @@ class _TagSelectorState extends State<TagSelector> {
       ],
     );
   }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
 }
 
