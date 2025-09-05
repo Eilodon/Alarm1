@@ -480,12 +480,23 @@ class _AudioAttachmentState extends State<_AudioAttachment> {
   }
 
   Future<void> _toggle() async {
-    if (_playing) {
-      await _player.pause();
-    } else {
-      await _player.play(DeviceFileSource(widget.path));
+    try {
+      if (_playing) {
+        await _player.pause();
+      } else {
+        await _player.play(DeviceFileSource(widget.path));
+      }
+      if (!mounted) return;
+      setState(() => _playing = !_playing);
+    } catch (e) {
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.errorWithMessage(e.toString())),
+        ),
+      );
     }
-    setState(() => _playing = !_playing);
   }
 
   @override
