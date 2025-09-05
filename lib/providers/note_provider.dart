@@ -16,7 +16,6 @@ class NoteProvider extends ChangeNotifier {
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final CalendarService _calendarService;
 
   List<Note> _notes = [];
   String _draft = '';
