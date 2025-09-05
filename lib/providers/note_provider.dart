@@ -21,6 +21,9 @@ class NoteProvider extends ChangeNotifier {
 
   List<Note> _notes = [];
   String _draft = '';
+  final Set<String> _unsyncedNoteIds = {};
+
+  Set<String> get unsyncedNoteIds => Set.unmodifiable(_unsyncedNoteIds);
 
   NoteProvider({
     NoteRepository? repository,
@@ -36,6 +39,7 @@ class NoteProvider extends ChangeNotifier {
 
   Future<bool> loadNotes() async {
     _notes = await _repository.getNotes();
+    _unsyncedNoteIds.clear();
     var success = true;
     if (Firebase.apps.isNotEmpty) {
       final originalNotes = List<Note>.from(_notes);
@@ -64,9 +68,21 @@ class NoteProvider extends ChangeNotifier {
             }
           }
         }
-        map.removeWhere((key, _) => !remoteIds.contains(key));
+        for (final id in map.keys) {
+          if (!remoteIds.contains(id)) {
+            _unsyncedNoteIds.add(id);
+          }
+        }
         _notes = map.values.toList();
         await _repository.saveNotes(_notes);
+        if (remoteIds.isEmpty && _notes.isNotEmpty) {
+          for (final n in _notes) {
+            final data = await _repository.encryptNote(n);
+            data['userId'] = user.uid;
+            await _firestore.collection('notes').doc(n.id).set(data);
+          }
+          _unsyncedNoteIds.clear();
+        }
       } catch (e, st) {
         debugPrint('loadNotes error: $e\n$st');
         _notes = originalNotes;
