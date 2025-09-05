@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class TagSelector extends StatefulWidget {
   final List<String> availableTags;
@@ -64,7 +65,9 @@ class _TagSelectorState extends State<TagSelector> {
         if (widget.allowCreate)
           TextField(
             controller: _ctrl,
-            decoration: const InputDecoration(labelText: 'Thêm tag'),
+            decoration: InputDecoration(
+              labelText: AppLocalizations.of(context)!.addTag,
+            ),
             onSubmitted: _addTag,
           ),
       ],
