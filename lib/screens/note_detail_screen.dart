@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -7,17 +6,17 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
 import 'package:share_plus/share_plus.dart';
+import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart';
 
 import '../models/note.dart';
 import '../providers/note_provider.dart';
 import '../services/notification_service.dart';
 import '../services/tts_service.dart';
-import 'chat_screen.dart';
-import 'package:intl/intl.dart';
 import '../widgets/tag_selector.dart';
 import '../services/gemini_service.dart';
+import 'chat_screen.dart';
 
 class NoteDetailScreen extends StatefulWidget {
   final Note note;
@@ -397,7 +396,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
 
     int? newId;
     if (_alarmTime != null) {
-      newId = Random().nextInt(1 << 31);
+      newId = const Uuid().v4().hashCode;
     }
 
     final updated = widget.note.copyWith(
