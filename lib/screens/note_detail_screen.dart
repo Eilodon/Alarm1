@@ -122,7 +122,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                   Padding(
                     padding: const EdgeInsets.only(left: 8),
                     child: Text(
-                      DateFormat('HH:mm dd/MM/yyyy').format(_alarmTime!),
+                      DateFormat.yMd(Localizations.localeOf(context).toString())
+                          .add_Hm()
+                          .format(_alarmTime!),
                     ),
                   ),
               ],
