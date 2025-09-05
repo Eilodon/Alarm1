@@ -11,7 +11,6 @@ import 'package:intl/intl.dart';
 
 import '../models/note.dart';
 import '../providers/note_provider.dart';
-import '../services/notification_service.dart';
 import '../services/tts_service.dart';
 import '../widgets/tag_selector.dart';
 import '../services/gemini_service.dart';
@@ -387,17 +386,6 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       }
     }
 
-    final service = NotificationService();
-    final oldId = widget.note.notificationId;
-    if (oldId != null) {
-      await service.cancel(oldId);
-    }
-
-    int? newId;
-    if (_alarmTime != null) {
-      newId = DateTime.now().millisecondsSinceEpoch;
-    }
-
     final updated = widget.note.copyWith(
       title: _titleCtrl.text,
       content: _contentCtrl.text,
@@ -409,43 +397,19 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       active: true,
       snoozeMinutes: _snoozeMinutes,
       updatedAt: DateTime.now(),
-      notificationId: newId,
       summary: summary,
       actionItems: actionItems,
       dates: dates,
     );
-    await context.read<NoteProvider>().updateNote(updated);
-
-    if (_alarmTime != null && newId != null) {
-      if (_repeat == RepeatInterval.daily) {
-        await service.scheduleDailyAtTime(
-          id: newId,
-          title: updated.title,
-          body: updated.content,
-          time: Time(_alarmTime!.hour, _alarmTime!.minute),
-          l10n: l10n,
-        );
-      } else if (_repeat != null) {
-        await service.scheduleRecurring(
-          id: newId,
-          title: updated.title,
-          body: updated.content,
-          repeatInterval: _repeat!,
-          l10n: l10n,
-        );
-      } else {
-        await service.scheduleNotification(
-          id: newId,
-          title: updated.title,
-          body: updated.content,
-          scheduledDate: _alarmTime!,
-          l10n: l10n,
-        );
-      }
-    }
-
+    final ok = await context.read<NoteProvider>().saveNote(updated, l10n);
     if (!mounted) return;
-    Navigator.pop(context);
+    if (ok) {
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.errorWithMessage('Failed to save note'))),
+      );
+    }
   }
 }
 
