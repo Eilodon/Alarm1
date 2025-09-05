@@ -1,10 +1,14 @@
 
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/note.dart';
@@ -17,6 +21,12 @@ class NoteProvider extends ChangeNotifier {
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final CalendarService _calendarService;
+  final NotificationService _notificationService;
+  final Connectivity _connectivity = Connectivity();
+  StreamSubscription<ConnectivityResult>? _connectivitySubscription;
+
+  static const _unsyncedKey = 'unsyncedNoteIds';
 
   List<Note> _notes = [];
   String _draft = '';
@@ -30,14 +40,76 @@ class NoteProvider extends ChangeNotifier {
     NotificationService? notificationService,
   })  : _repository = repository ?? NoteRepository(),
         _calendarService = calendarService ?? CalendarService.instance,
-        _notificationService = notificationService ?? NotificationService();
+        _notificationService = notificationService ?? NotificationService() {
+    _init();
+  }
 
   List<Note> get notes => List.unmodifiable(_notes);
   String get draft => _draft;
 
+  Future<void> _init() async {
+    await _loadUnsyncedNoteIds();
+    // Enable Firestore offline persistence for better offline support.
+    if (Firebase.apps.isNotEmpty) {
+      _firestore.settings = const Settings(persistenceEnabled: true);
+    }
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen((result) {
+      if (result != ConnectivityResult.none) {
+        _syncUnsyncedNotes();
+      }
+    });
+  }
+
+  Future<void> _loadUnsyncedNoteIds() async {
+    final prefs = await SharedPreferences.getInstance();
+    _unsyncedNoteIds
+        .addAll(prefs.getStringList(_unsyncedKey) ?? const <String>[]);
+  }
+
+  Future<void> _saveUnsyncedNoteIds() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_unsyncedKey, _unsyncedNoteIds.toList());
+  }
+
+  Future<void> _syncUnsyncedNotes() async {
+    if (_unsyncedNoteIds.isEmpty || Firebase.apps.isEmpty) return;
+    try {
+      final user = _auth.currentUser ?? await _auth.signInAnonymously();
+      final ids = List<String>.from(_unsyncedNoteIds);
+      for (final id in ids) {
+        Note? note;
+        try {
+          note = _notes.firstWhere((n) => n.id == id);
+        } catch (_) {
+          note = null;
+        }
+        if (note != null) {
+          final data = await _repository.encryptNote(note);
+          data['userId'] = user.uid;
+          await _firestore.collection('notes').doc(id).set(data);
+        } else {
+          await _firestore.collection('notes').doc(id).delete();
+        }
+        _unsyncedNoteIds.remove(id);
+      }
+      await _saveUnsyncedNoteIds();
+    } catch (e, st) {
+      debugPrint('syncUnsyncedNotes error: $e\n$st');
+    }
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription?.cancel();
+    super.dispose();
+  }
+
 
   Future<bool> loadNotes() async {
     _notes = await _repository.getNotes();
+    await _loadUnsyncedNoteIds();
+    final existingUnsynced = Set<String>.from(_unsyncedNoteIds);
     _unsyncedNoteIds.clear();
     var success = true;
     if (Firebase.apps.isNotEmpty) {
@@ -72,6 +144,7 @@ class NoteProvider extends ChangeNotifier {
             _unsyncedNoteIds.add(id);
           }
         }
+        _unsyncedNoteIds.addAll(existingUnsynced);
         _notes = map.values.toList();
         await _repository.saveNotes(_notes);
         if (remoteIds.isEmpty && _notes.isNotEmpty) {
@@ -88,6 +161,7 @@ class NoteProvider extends ChangeNotifier {
         success = false;
       }
     }
+    await _saveUnsyncedNoteIds();
     notifyListeners();
     return success;
   }
@@ -98,11 +172,18 @@ class NoteProvider extends ChangeNotifier {
     await _repository.saveNotes(_notes);
     notifyListeners();
     if (Firebase.apps.isNotEmpty) {
-      final user = _auth.currentUser ?? await _auth.signInAnonymously();
-      final data = await _repository.encryptNote(note);
-      data['userId'] = user.uid;
-      await _firestore.collection('notes').doc(note.id).set(data);
-
+      try {
+        final user = _auth.currentUser ?? await _auth.signInAnonymously();
+        final data = await _repository.encryptNote(note);
+        data['userId'] = user.uid;
+        await _firestore.collection('notes').doc(note.id).set(data);
+      } catch (e) {
+        _unsyncedNoteIds.add(note.id);
+        await _saveUnsyncedNoteIds();
+      }
+    } else {
+      _unsyncedNoteIds.add(note.id);
+      await _saveUnsyncedNoteIds();
     }
   }
 
@@ -137,13 +218,23 @@ class NoteProvider extends ChangeNotifier {
       await _repository.saveNotes(_notes);
       notifyListeners();
       if (Firebase.apps.isNotEmpty) {
-        final user = _auth.currentUser ?? await _auth.signInAnonymously();
-
-        final data = await _repository.encryptNote(note);
-        data['userId'] = user.uid;
-        await _firestore.collection('notes').doc(note.id).set(data);
+        try {
+          final user = _auth.currentUser ?? await _auth.signInAnonymously();
+          final data = await _repository.encryptNote(updated);
+          data['userId'] = user.uid;
+          await _firestore.collection('notes').doc(updated.id).set(data);
+        } catch (e) {
+          _unsyncedNoteIds.add(updated.id);
+        }
+      } else {
+        _unsyncedNoteIds.add(updated.id);
       }
-
+      await _saveUnsyncedNoteIds();
+      return true;
+    } catch (e) {
+      _unsyncedNoteIds.add(note.id);
+      await _saveUnsyncedNoteIds();
+      return false;
     }
   }
 
@@ -151,16 +242,44 @@ class NoteProvider extends ChangeNotifier {
     try {
       final index = _notes.indexWhere((n) => n.id == note.id);
       if (index == -1) return false;
-
+      _notes[index] = note;
+      await _repository.saveNotes(_notes);
+      notifyListeners();
+      if (Firebase.apps.isNotEmpty) {
+        try {
+          final user = _auth.currentUser ?? await _auth.signInAnonymously();
+          final data = await _repository.encryptNote(note);
+          data['userId'] = user.uid;
+          await _firestore.collection('notes').doc(note.id).set(data);
+        } catch (e) {
+          _unsyncedNoteIds.add(note.id);
+        }
+      } else {
+        _unsyncedNoteIds.add(note.id);
+      }
+      await _saveUnsyncedNoteIds();
+      return true;
+    } catch (e) {
+      _unsyncedNoteIds.add(note.id);
+      await _saveUnsyncedNoteIds();
+      return false;
+    }
+  }
 
   Future<void> removeNoteAt(int index) async {
     final note = _notes.removeAt(index);
     await _repository.saveNotes(_notes);
     notifyListeners();
     if (Firebase.apps.isNotEmpty) {
-      await _firestore.collection('notes').doc(note.id).delete();
-
+      try {
+        await _firestore.collection('notes').doc(note.id).delete();
+      } catch (e) {
+        _unsyncedNoteIds.add(note.id);
+      }
+    } else {
+      _unsyncedNoteIds.add(note.id);
     }
+    await _saveUnsyncedNoteIds();
   }
 
   void setDraft(String value) {
