@@ -31,8 +31,8 @@
   "delete": "Delete",
   "timeLabel": "Time",
 
-  "tagsLabel": "Tags"
-
+  "tagsLabel": "Tags",
+  "requireAuth": "Require authentication",
   "lockNote": "Lock note"
 
 }
