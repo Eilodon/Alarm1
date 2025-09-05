@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+
 import 'package:flutter/services.dart';
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
+
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'package:provider/provider.dart';
 
@@ -67,6 +72,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final contentCtrl = TextEditingController(text: provider.draft);
     DateTime? alarmTime;
 
+    bool locked = false;
+
+
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -103,6 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       initialTime: TimeOfDay.now(),
                     );
 
+
                     if (!mounted) return;
                     if (time != null) {
                       alarmTime = DateTime(
@@ -111,6 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         picked.day,
                         time.hour,
                         time.minute,
+
 
                       );
                     }
@@ -157,8 +167,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
 
+
   List<Note> _notesForDay(DateTime day) {
     return _notes
+
 
         .where((n) =>
             n.alarmTime != null &&
@@ -167,6 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
             n.alarmTime!.day == day.day)
         .toList();
   }
+
 
 
   Widget _buildNotesList() {
@@ -207,6 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+
 
 
   @override

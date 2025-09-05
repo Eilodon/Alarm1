@@ -1,5 +1,6 @@
 class Note {
 
+
   final String id;
   final String title;
   final String content;
@@ -12,6 +13,7 @@ class Note {
   const Note({
     required this.id,
 
+
     required this.title,
     required this.content,
     this.remindAt,
@@ -23,12 +25,14 @@ class Note {
 
   factory Note.fromJson(Map<String, dynamic> j) => Note(
 
+
         id: j['id'] as String,
         title: j['title'] as String,
         content: j['content'] as String,
         remindAt: j['remindAt'] != null
             ? DateTime.parse(j['remindAt'])
             : null,
+
 
         daily: j['daily'] ?? false,
         active: j['active'] ?? false,
