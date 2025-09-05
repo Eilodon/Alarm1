@@ -27,8 +27,9 @@ class NoteListForDayScreen extends StatelessWidget {
         .toList();
 
 
-    final title = AppLocalizations.of(context)!
-        .scheduleForDate(DateFormat('dd/MM/yyyy').format(date));
+    final title = AppLocalizations.of(context)!.scheduleForDate(
+      DateFormat.yMd(Localizations.localeOf(context).toString()).format(date),
+    );
     if (dayNotes.isEmpty) {
 
       return Scaffold(
@@ -46,7 +47,8 @@ class NoteListForDayScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           final note = dayNotes[index];
           final timeStr = note.alarmTime != null
-              ? DateFormat('HH:mm').format(note.alarmTime!)
+              ? DateFormat.Hm(Localizations.localeOf(context).toString())
+                  .format(note.alarmTime!)
               : null;
           return Card(
             child: ListTile(
