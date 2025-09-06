@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'screens/home_screen.dart';
 import 'screens/onboarding_screen.dart';
@@ -20,6 +21,7 @@ import 'package:provider/provider.dart';
 import 'providers/note_provider.dart';
 import 'models/note.dart';
 import 'firebase_options.dart';
+import 'pandora_ui/tokens.dart';
 
 final messengerKey = GlobalKey<ScaffoldMessengerState>();
 late final NoteProvider noteProvider;
@@ -93,10 +95,7 @@ void main() async {
       child: MyApp(
         themeColor: themeColor,
         fontScale: fontScale,
-
-        themeMode: await settings.loadThemeMode(),
-
-
+        themeMode: themeMode,
         hasSeenOnboarding: hasSeenOnboarding,
 
         authFailed: authFailed,
@@ -119,7 +118,6 @@ class MyApp extends StatefulWidget {
     required this.themeColor,
     required this.fontScale,
     required this.themeMode,
-
     required this.hasSeenOnboarding,
 
     this.authFailed = false,
@@ -144,7 +142,6 @@ class _MyAppState extends State<MyApp> {
     _themeColor = widget.themeColor;
     _fontScale = widget.fontScale;
     _themeMode = widget.themeMode;
-
     _hasSeenOnboarding = widget.hasSeenOnboarding;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -195,7 +192,6 @@ class _MyAppState extends State<MyApp> {
     await SettingsService().saveThemeMode(newMode);
   }
 
-
   void _completeOnboarding() {
     setState(() => _hasSeenOnboarding = true);
 
@@ -220,12 +216,24 @@ class _MyAppState extends State<MyApp> {
       ],
       supportedLocales: const [Locale('en'), Locale('vi')],
       theme: ThemeData(
-        colorSchemeSeed: _themeColor,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: PandoraTokens.primary,
+          background: PandoraTokens.lightBg,
+          surface: PandoraTokens.neutral100,
+        ),
+        textTheme: GoogleFonts.interTextTheme(),
         useMaterial3: true,
       ),
       darkTheme: ThemeData(
-        colorSchemeSeed: _themeColor,
-        brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: PandoraTokens.primary,
+          background: PandoraTokens.darkBg,
+          surface: PandoraTokens.neutral900,
+          brightness: Brightness.dark,
+        ),
+        textTheme: GoogleFonts.interTextTheme(
+          ThemeData.dark().textTheme,
+        ),
         useMaterial3: true,
       ),
       themeMode: _themeMode,

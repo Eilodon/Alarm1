@@ -5,6 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../pandora_ui/result_card.dart';
+import '../pandora_ui/toolbar_button.dart';
+
 import '../models/note.dart';
 import '../providers/note_provider.dart';
 import '../services/auth_service.dart';
@@ -104,8 +107,7 @@ class _NotesListState extends State<NotesList> {
           );
         }
         final note = notes[index];
-        return Card(
-
+        return ResultCard(
           child: ListTile(
 
             leading: Container(
@@ -162,18 +164,18 @@ class _NotesListState extends State<NotesList> {
                   const Icon(Icons.push_pin, size: 20),
                 if (!provider.isSynced(note.id))
                   const Icon(Icons.sync_problem, color: Colors.orange),
-                IconButton(
+                ToolbarButton(
                   icon: const Icon(Icons.delete),
-                  tooltip: AppLocalizations.of(context)!.delete,
+                  label: AppLocalizations.of(context)!.delete,
                   onPressed: () {
                     final provider = context.read<NoteProvider>();
                     final idx = provider.notes.indexWhere(
                       (n) => n.id == note.id,
-
                     );
+                    if (idx != -1) {
+                      provider.removeNoteAt(idx);
+                    }
                   },
-                  icon: Icons.push_pin,
-                  label: AppLocalizations.of(context)!.pin,
                 ),
               ],
             ),
