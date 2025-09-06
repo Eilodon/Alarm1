@@ -42,6 +42,7 @@ void main() {
 
   testWidgets('filter notes by tag', (tester) async {
     final provider = NoteProvider();
+    final l10n = await AppLocalizations.delegate.load(const Locale('vi'));
     await tester.pumpWidget(
       ChangeNotifierProvider.value(
         value: provider,
@@ -91,7 +92,7 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.label));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('All').last);
+    await tester.tap(find.text(l10n.allTags).last);
     await tester.pumpAndSettle();
 
     expect(find.text('n1'), findsOneWidget);
