@@ -3,6 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:flutter/foundation.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -48,6 +49,10 @@ class NotificationService {
     required DateTime scheduledDate,
     required AppLocalizations l10n,
   }) async {
+    if (scheduledDate.isBefore(DateTime.now())) {
+      throw ArgumentError('scheduledDate must be in the future');
+    }
+
     final androidDetails = AndroidNotificationDetails(
       'scheduled_channel',
       l10n.scheduled,
@@ -58,16 +63,20 @@ class NotificationService {
 
     final details = NotificationDetails(android: androidDetails);
 
-    await _fln.zonedSchedule(
-      id,
-      title,
-      body,
-      tz.TZDateTime.from(scheduledDate, tz.local),
-      details,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      matchDateTimeComponents:
-          null, // Không còn dùng uiLocalNotificationDateInterpretation
-    );
+    try {
+      await _fln.zonedSchedule(
+        id,
+        title,
+        body,
+        tz.TZDateTime.from(scheduledDate, tz.local),
+        details,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        matchDateTimeComponents:
+            null, // Không còn dùng uiLocalNotificationDateInterpretation
+      );
+    } catch (e) {
+      debugPrint('Error scheduling notification: $e');
+    }
   }
 
   Future<void> scheduleRecurring({
@@ -91,14 +100,18 @@ class NotificationService {
       iOS: iosDetails,
     );
 
-    await _fln.periodicallyShow(
-      id,
-      title,
-      body,
-      repeatInterval,
-      details,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-    );
+    try {
+      await _fln.periodicallyShow(
+        id,
+        title,
+        body,
+        repeatInterval,
+        details,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      );
+    } catch (e) {
+      debugPrint('Error scheduling recurring notification: $e');
+    }
   }
 
   Future<void> scheduleDailyAtTime({
@@ -123,16 +136,23 @@ class NotificationService {
     );
 
     final scheduledDate = _nextInstanceOfTime(time);
+    if (scheduledDate.isBefore(DateTime.now())) {
+      throw ArgumentError('scheduledDate must be in the future');
+    }
 
-    await _fln.zonedSchedule(
-      id,
-      title,
-      body,
-      scheduledDate,
-      details,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      matchDateTimeComponents: DateTimeComponents.time,
-    );
+    try {
+      await _fln.zonedSchedule(
+        id,
+        title,
+        body,
+        scheduledDate,
+        details,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+    } catch (e) {
+      debugPrint('Error scheduling daily notification: $e');
+    }
   }
 
   /// Finds the next instance of [time] in the local timezone.
