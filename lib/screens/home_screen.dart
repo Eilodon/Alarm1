@@ -117,6 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return Center(child: Text(AppLocalizations.of(context)!.noNotes));
     }
 
+    final provider = context.watch<NoteProvider>();
     final itemCount = notes.length + (_isLoadingMore ? 1 : 0);
     return ListView.builder(
       controller: _scrollController,
@@ -153,29 +154,36 @@ class _HomeScreenState extends State<HomeScreen> {
                 MaterialPageRoute(builder: (_) => NoteDetailScreen(note: note)),
               );
             },
-            trailing: IconButton(
-              icon: const Icon(Icons.delete),
-              tooltip: AppLocalizations.of(context)!.delete,
-              onPressed: () {
-                final provider = context.read<NoteProvider>();
-                final note = notes[index];
-                final idx =
-                    provider.notes.indexWhere((n) => n.id == note.id);
-                if (idx != -1) {
-                  provider.removeNoteAt(idx);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        AppLocalizations.of(context)!.noteDeleted,
-                      ),
-                      action: SnackBarAction(
-                        label: AppLocalizations.of(context)!.undo,
-                        onPressed: () => provider.addNote(note),
-                      ),
-                    ),
-                  );
-                }
-              },
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (!provider.isSynced(note.id))
+                  const Icon(Icons.sync_problem, color: Colors.orange),
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  tooltip: AppLocalizations.of(context)!.delete,
+                  onPressed: () {
+                    final provider = context.read<NoteProvider>();
+                    final note = notes[index];
+                    final idx =
+                        provider.notes.indexWhere((n) => n.id == note.id);
+                    if (idx != -1) {
+                      provider.removeNoteAt(idx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            AppLocalizations.of(context)!.noteDeleted,
+                          ),
+                          action: SnackBarAction(
+                            label: AppLocalizations.of(context)!.undo,
+                            onPressed: () => provider.addNote(note),
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ],
             ),
           ),
         );

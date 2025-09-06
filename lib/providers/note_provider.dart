@@ -37,6 +37,7 @@ class NoteProvider extends ChangeNotifier {
   final Set<String> _unsyncedNoteIds = {};
 
   Set<String> get unsyncedNoteIds => Set.unmodifiable(_unsyncedNoteIds);
+  bool isSynced(String id) => !_unsyncedNoteIds.contains(id);
 
   NoteProvider({
     NoteRepository? repository,
@@ -69,6 +70,7 @@ class NoteProvider extends ChangeNotifier {
   Future<void> _loadUnsyncedNoteIds() async {
     _unsyncedNoteIds
         .addAll(_prefs!.getStringList(_unsyncedKey) ?? const <String>[]);
+    notifyListeners();
   }
 
   Future<void> _saveUnsyncedNoteIds() async {
@@ -100,6 +102,7 @@ class NoteProvider extends ChangeNotifier {
       }
       await batch.commit();
       await _saveUnsyncedNoteIds();
+      notifyListeners();
     } catch (e, st) {
       debugPrint('syncUnsyncedNotes error: $e\n$st');
     }
@@ -320,10 +323,12 @@ class NoteProvider extends ChangeNotifier {
       } catch (e) {
         _unsyncedNoteIds.add(note.id);
         await _saveUnsyncedNoteIds();
+        notifyListeners();
       }
     } else {
       _unsyncedNoteIds.add(note.id);
       await _saveUnsyncedNoteIds();
+      notifyListeners();
     }
   }
 
@@ -415,15 +420,18 @@ class NoteProvider extends ChangeNotifier {
           await _firestore.collection('notes').doc(updated.id).set(data);
         } catch (e) {
           _unsyncedNoteIds.add(updated.id);
+          notifyListeners();
         }
       } else {
         _unsyncedNoteIds.add(updated.id);
+        notifyListeners();
       }
       await _saveUnsyncedNoteIds();
       return true;
     } catch (e) {
       _unsyncedNoteIds.add(note.id);
       await _saveUnsyncedNoteIds();
+      notifyListeners();
       return false;
     }
   }
@@ -459,9 +467,11 @@ class NoteProvider extends ChangeNotifier {
         await _firestore.collection('notes').doc(note.id).delete();
       } catch (e) {
         _unsyncedNoteIds.add(note.id);
+        notifyListeners();
       }
     } else {
       _unsyncedNoteIds.add(note.id);
+      notifyListeners();
     }
     await _saveUnsyncedNoteIds();
   }
