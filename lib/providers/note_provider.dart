@@ -25,6 +25,8 @@ class NoteProvider extends ChangeNotifier {
   final Connectivity _connectivity = Connectivity();
   StreamSubscription<ConnectivityResult>? _connectivitySubscription;
 
+  SharedPreferences? _prefs;
+
   static const _unsyncedKey = 'unsyncedNoteIds';
 
   List<Note> _notes = [];
@@ -47,6 +49,7 @@ class NoteProvider extends ChangeNotifier {
   String get draft => _draft;
 
   Future<void> _init() async {
+    _prefs = await SharedPreferences.getInstance();
     await _loadUnsyncedNoteIds();
     // Enable Firestore offline persistence for better offline support.
     if (Firebase.apps.isNotEmpty) {
@@ -61,14 +64,12 @@ class NoteProvider extends ChangeNotifier {
   }
 
   Future<void> _loadUnsyncedNoteIds() async {
-    final prefs = await SharedPreferences.getInstance();
     _unsyncedNoteIds
-        .addAll(prefs.getStringList(_unsyncedKey) ?? const <String>[]);
+        .addAll(_prefs!.getStringList(_unsyncedKey) ?? const <String>[]);
   }
 
   Future<void> _saveUnsyncedNoteIds() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(_unsyncedKey, _unsyncedNoteIds.toList());
+    await _prefs!.setStringList(_unsyncedKey, _unsyncedNoteIds.toList());
   }
 
   Future<void> _syncUnsyncedNotes() async {
