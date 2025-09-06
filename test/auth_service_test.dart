@@ -41,12 +41,13 @@ void main() {
     expect(ok, isFalse);
   });
 
-  test('authenticate rethrows on generic exception', () async {
+  test('authenticate returns false on generic exception', () async {
     when(() => mock.authenticate(
           localizedReason: any(named: 'localizedReason'),
           options: any(named: 'options'),
         )).thenThrow(Exception('fail'));
 
-    expect(() => service.authenticate(l10n), throwsException);
+    final ok = await service.authenticate(l10n);
+    expect(ok, isFalse);
   });
 }
