@@ -12,6 +12,9 @@ class SettingsService {
   static const _kRequireAuth = 'require_auth';
   static const _kBackupFormat = 'backup_format';
 
+  static const _kHasSeenOnboarding = 'has_seen_onboarding';
+
+
   SharedPreferences? _preferences;
 
   Future<SharedPreferences> get _sp async {
@@ -60,6 +63,7 @@ class SettingsService {
     return sp.getBool(_kRequireAuth) ?? false;
   }
 
+
   Future<void> saveBackupFormat(BackupFormat format) async {
     final sp = await _sp;
     await sp.setString(_kBackupFormat, format.name);
@@ -72,5 +76,6 @@ class SettingsService {
       (f) => f.name == value,
       orElse: () => BackupFormat.json,
     );
+
   }
 }

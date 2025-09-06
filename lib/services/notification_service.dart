@@ -13,7 +13,10 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin _fln =
       FlutterLocalNotificationsPlugin();
 
-  Future<void> init() async {
+  Future<void> init({
+    Future<void> Function(NotificationResponse)?
+        onDidReceiveNotificationResponse,
+  }) async {
     tzdata.initializeTimeZones();
     final tzName = await FlutterNativeTimezone.getLocalTimezone();
     tz.setLocalLocation(tz.getLocation(tzName));
@@ -27,7 +30,10 @@ class NotificationService {
       iOS: iosSettings,
     );
 
-    await _fln.initialize(settings);
+    await _fln.initialize(
+      settings,
+      onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
+    );
 
     final androidImpl = _fln
         .resolvePlatformSpecificImplementation<
@@ -48,6 +54,7 @@ class NotificationService {
     required String body,
     required DateTime scheduledDate,
     required AppLocalizations l10n,
+    required String payload,
   }) async {
     if (scheduledDate.isBefore(DateTime.now())) {
       throw ArgumentError('scheduledDate must be in the future');
@@ -59,6 +66,20 @@ class NotificationService {
       channelDescription: l10n.scheduledDesc,
       importance: Importance.max,
       priority: Priority.high,
+      actions: [
+        AndroidNotificationAction(
+          'done',
+          l10n.done,
+          showsUserInterface: false,
+          cancelNotification: true,
+        ),
+        AndroidNotificationAction(
+          'snooze',
+          l10n.snooze,
+          showsUserInterface: false,
+          cancelNotification: true,
+        ),
+      ],
     );
 
     final details = NotificationDetails(android: androidDetails);
@@ -73,6 +94,7 @@ class NotificationService {
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         matchDateTimeComponents:
             null, // Không còn dùng uiLocalNotificationDateInterpretation
+        payload: payload,
       );
     } catch (e) {
       debugPrint('Error scheduling notification: $e');
@@ -181,6 +203,7 @@ class NotificationService {
     required String body,
     required int minutes,
     required AppLocalizations l10n,
+    required String payload,
   }) async {
     await _fln.cancel(id);
 
@@ -194,6 +217,20 @@ class NotificationService {
       channelDescription: l10n.snoozeDesc,
       importance: Importance.max,
       priority: Priority.high,
+      actions: [
+        AndroidNotificationAction(
+          'done',
+          l10n.done,
+          showsUserInterface: false,
+          cancelNotification: true,
+        ),
+        AndroidNotificationAction(
+          'snooze',
+          l10n.snooze,
+          showsUserInterface: false,
+          cancelNotification: true,
+        ),
+      ],
     );
 
     final details = NotificationDetails(android: androidDetails);
@@ -206,6 +243,7 @@ class NotificationService {
       details,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       matchDateTimeComponents: null,
+      payload: payload,
     );
   }
 

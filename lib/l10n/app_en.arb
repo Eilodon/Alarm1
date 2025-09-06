@@ -45,6 +45,11 @@
   "delete": "Delete",
   "timeLabel": "Time",
 
+  "pin": "Pin",
+  "share": "Share",
+  "markDone": "Mark done",
+  "setReminder": "Set reminder",
+
   "noteDeleted": "Note deleted",
   "undo": "Undo",
 
@@ -72,7 +77,13 @@
   "addTag": "Add tag",
   "requireAuth": "Require authentication",
   "lockNote": "Lock note",
+  "pinNote": "Pin note",
+  "colorLabel": "Color",
   "authReason": "Please authenticate to continue",
+  "themeMode": "Theme mode",
+  "light": "Light",
+  "dark": "Dark",
+  "system": "System",
   "voiceToNote": "Voice To Note",
   "stop": "Stop",
   "speak": "Speak",
@@ -87,6 +98,7 @@
   "recurring": "Recurring",
   "daily": "Daily",
   "snooze": "Snooze",
+  "done": "Done",
   "scheduledDesc": "Scheduled notifications",
   "recurringDesc": "Recurring notifications",
   "dailyDesc": "Daily notifications",
@@ -98,5 +110,9 @@
   "authFailedMessage": "Anonymous sign-in failed. Limited functionality.",
   "notificationFailedMessage": "Notification setup failed.",
   "saveNoteFailed": "Failed to save note"
-
+,
+  "backupNow": "Backup now",
+  "syncStatusIdle": "Synced",
+  "syncStatusSyncing": "Syncing...",
+  "syncStatusError": "Sync error"
 }

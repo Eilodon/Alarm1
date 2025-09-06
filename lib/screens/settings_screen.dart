@@ -11,11 +11,13 @@ import '../providers/note_provider.dart';
 class SettingsScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
   final Function(double) onFontScaleChanged;
+  final Function(ThemeMode) onThemeModeChanged;
 
   const SettingsScreen({
     super.key,
     required this.onThemeChanged,
     required this.onFontScaleChanged,
+    required this.onThemeModeChanged,
   });
 
   @override
@@ -26,7 +28,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final SettingsService _settings = SettingsService();
   final NoteRepository _noteRepository = NoteRepository();
   bool _requireAuth = false;
+
   BackupFormat _backupFormat = BackupFormat.json;
+
 
   @override
   void initState() {
@@ -36,9 +40,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         setState(() => _requireAuth = v);
       }
     });
+
     _settings.loadBackupFormat().then((v) {
       if (mounted) {
         setState(() => _backupFormat = v);
+
       }
     });
   }
@@ -147,6 +153,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _settings.saveRequireAuth(v);
   }
 
+  void _cycleThemeMode() {
+    setState(() {
+      _themeMode = ThemeMode.values[(_themeMode.index + 1) % ThemeMode.values.length];
+    });
+    widget.onThemeModeChanged(_themeMode);
+    _settings.saveThemeMode(_themeMode);
+  }
+
+  String _themeModeLabel(AppLocalizations l10n) {
+    switch (_themeMode) {
+      case ThemeMode.light:
+        return l10n.light;
+      case ThemeMode.dark:
+        return l10n.dark;
+      default:
+        return l10n.system;
+    }
+  }
+
   Future<void> _exportNotes() async {
     final l10n = AppLocalizations.of(context)!;
     final success =
@@ -240,6 +265,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ListTile(
             title: Text(AppLocalizations.of(context)!.fontSize),
             onTap: _changeFontScale,
+          ),
+          SwitchListTile(
+            title: Text(AppLocalizations.of(context)!.themeMode),
+            subtitle: Text(_themeModeLabel(AppLocalizations.of(context)!)),
+            value: _themeMode == ThemeMode.dark,
+            onChanged: (_) => _cycleThemeMode(),
           ),
           ListTile(
             title: Text(AppLocalizations.of(context)!.exportNotes),
