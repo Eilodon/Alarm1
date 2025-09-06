@@ -76,6 +76,7 @@ class NoteProvider extends ChangeNotifier {
     try {
       final user = _auth.currentUser ?? await _auth.signInAnonymously();
       final ids = List<String>.from(_unsyncedNoteIds);
+      WriteBatch batch = _firestore.batch();
       for (final id in ids) {
         Note? note;
         try {
@@ -83,15 +84,17 @@ class NoteProvider extends ChangeNotifier {
         } catch (_) {
           note = null;
         }
+        final docRef = _firestore.collection('notes').doc(id);
         if (note != null) {
           final data = await _repository.encryptNote(note);
           data['userId'] = user.uid;
-          await _firestore.collection('notes').doc(id).set(data);
+          batch.set(docRef, data);
         } else {
-          await _firestore.collection('notes').doc(id).delete();
+          batch.delete(docRef);
         }
         _unsyncedNoteIds.remove(id);
       }
+      await batch.commit();
       await _saveUnsyncedNoteIds();
     } catch (e, st) {
       debugPrint('syncUnsyncedNotes error: $e\n$st');
