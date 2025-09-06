@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:cryptography/cryptography.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -39,7 +40,9 @@ class DbService {
     return secretKey.extractBytes();
   }
 
-  Future<List<Note>> getNotes() async {
+  Future<List<Note>> getNotes({
+    void Function(String noteId)? onDecryptFailure,
+  }) async {
     final sp = await SharedPreferences.getInstance();
     var raw = sp.getString(_kNotes);
     raw ??= sp.getString(_kLegacyNotes);
@@ -47,19 +50,24 @@ class DbService {
     final keyBytes = await _getKey();
     final algorithm = AesGcm.with256bits();
     final secretKey = SecretKey(keyBytes);
-    final legacyEncrypter =
-        encrypt.Encrypter(encrypt.AES(encrypt.Key(keyBytes)));
+    final legacyEncrypter = encrypt.Encrypter(
+      encrypt.AES(encrypt.Key(keyBytes)),
+    );
     final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
     final notes = <Note>[];
+    final failedIds = <String>[];
     for (final m in list) {
+      final id = m['id'] as String?;
       final ivString = m['iv'];
       final tagString = m['tag'];
       final content = m['content'] as String;
       try {
         if (tagString != null) {
-          final box = SecretBox(base64Decode(content),
-              nonce: base64Decode(ivString),
-              mac: Mac(base64Decode(tagString)));
+          final box = SecretBox(
+            base64Decode(content),
+            nonce: base64Decode(ivString),
+            mac: Mac(base64Decode(tagString)),
+          );
           final decrypted = await algorithm.decrypt(box, secretKey: secretKey);
           m['content'] = utf8.decode(decrypted);
         } else {
@@ -71,8 +79,15 @@ class DbService {
         }
         notes.add(Note.fromJson(m));
       } catch (_) {
-        // Skip notes with invalid MAC or decryption errors
+        if (id != null) {
+          failedIds.add(id);
+          onDecryptFailure?.call(id);
+          debugPrint('Failed to decrypt note $id');
+        }
       }
+    }
+    if (failedIds.isNotEmpty) {
+      debugPrint('Failed to decrypt notes: ${failedIds.join(', ')}');
     }
     return notes;
   }
@@ -96,37 +111,49 @@ class DbService {
     }
   }
 
-  Future<Map<String, dynamic>> encryptNote(Note note,
-      {String? password}) async {
-    final keyBytes =
-        password != null ? await _deriveKeyFromPassword(password) : await _getKey();
+  Future<Map<String, dynamic>> encryptNote(
+    Note note, {
+    String? password,
+  }) async {
+    final keyBytes = password != null
+        ? await _deriveKeyFromPassword(password)
+        : await _getKey();
     final algorithm = AesGcm.with256bits();
     final secretKey = SecretKey(keyBytes);
     final m = note.toJson();
     final iv = List<int>.generate(12, (_) => Random.secure().nextInt(256));
-    final box = await algorithm.encrypt(utf8.encode(m['content']),
-        secretKey: secretKey, nonce: iv);
+    final box = await algorithm.encrypt(
+      utf8.encode(m['content']),
+      secretKey: secretKey,
+      nonce: iv,
+    );
     m['content'] = base64Encode(box.cipherText);
     m['iv'] = base64Encode(iv);
     m['tag'] = base64Encode(box.mac.bytes);
     return m;
   }
 
-  Future<Note> decryptNote(Map<String, dynamic> data,
-      {String? password}) async {
-    final keyBytes =
-        password != null ? await _deriveKeyFromPassword(password) : await _getKey();
+  Future<Note> decryptNote(
+    Map<String, dynamic> data, {
+    String? password,
+  }) async {
+    final keyBytes = password != null
+        ? await _deriveKeyFromPassword(password)
+        : await _getKey();
     final algorithm = AesGcm.with256bits();
     final secretKey = SecretKey(keyBytes);
-    final legacyEncrypter =
-        encrypt.Encrypter(encrypt.AES(encrypt.Key(keyBytes)));
+    final legacyEncrypter = encrypt.Encrypter(
+      encrypt.AES(encrypt.Key(keyBytes)),
+    );
     final ivString = data['iv'];
     final tagString = data['tag'];
     final content = data['content'] as String;
     if (tagString != null) {
-      final box = SecretBox(base64Decode(content),
-          nonce: base64Decode(ivString),
-          mac: Mac(base64Decode(tagString)));
+      final box = SecretBox(
+        base64Decode(content),
+        nonce: base64Decode(ivString),
+        mac: Mac(base64Decode(tagString)),
+      );
       final decrypted = await algorithm.decrypt(box, secretKey: secretKey);
       data['content'] = utf8.decode(decrypted);
     } else {
@@ -138,6 +165,4 @@ class DbService {
     }
     return Note.fromJson(data);
   }
-
-
 }

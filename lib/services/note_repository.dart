@@ -9,11 +9,13 @@ class NoteRepository {
   final BackupService _backupService;
 
   NoteRepository({DbService? dbService, BackupService? backupService})
-      : _dbService = dbService ?? DbService(),
-        _backupService = backupService ?? BackupService();
+    : _dbService = dbService ?? DbService(),
+      _backupService = backupService ?? BackupService();
 
-  Future<List<Note>> getNotes() {
-    return _dbService.getNotes();
+  Future<List<Note>> getNotes({
+    void Function(String noteId)? onDecryptFailure,
+  }) {
+    return _dbService.getNotes(onDecryptFailure: onDecryptFailure);
   }
 
   Future<void> saveNotes(List<Note> notes) {
@@ -37,12 +39,14 @@ class NoteRepository {
     return _backupService.exportNotes(notes, l10n, password: password);
   }
 
-  Future<List<Note>> importNotes(AppLocalizations l10n, {String? password}) async {
+  Future<List<Note>> importNotes(
+    AppLocalizations l10n, {
+    String? password,
+  }) async {
     final notes = await _backupService.importNotes(l10n, password: password);
     if (notes.isNotEmpty) {
       await _dbService.saveNotes(notes);
     }
     return notes;
   }
-
 }
