@@ -17,11 +17,13 @@ import 'voice_to_note_screen.dart';
 class HomeScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
   final Function(double) onFontScaleChanged;
+  final Function(ThemeMode) onThemeModeChanged;
 
   const HomeScreen({
     super.key,
     required this.onThemeChanged,
     required this.onFontScaleChanged,
+    required this.onThemeModeChanged,
   });
 
   @override
@@ -109,6 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   builder: (_) => SettingsScreen(
                     onThemeChanged: widget.onThemeChanged,
                     onFontScaleChanged: widget.onFontScaleChanged,
+                    onThemeModeChanged: widget.onThemeModeChanged,
                   ),
                 ),
               );

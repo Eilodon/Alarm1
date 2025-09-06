@@ -9,6 +9,7 @@ class SettingsService {
   static const _kMascotPath = 'mascot_path';
   static const _kFontScale = 'font_scale';
   static const _kRequireAuth = 'require_auth';
+  static const _kThemeMode = 'theme_mode';
 
   SharedPreferences? _preferences;
 
@@ -56,5 +57,22 @@ class SettingsService {
   Future<bool> loadRequireAuth() async {
     final sp = await _sp;
     return sp.getBool(_kRequireAuth) ?? false;
+  }
+
+  Future<void> saveThemeMode(ThemeMode mode) async {
+    final sp = await _sp;
+    await sp.setString(_kThemeMode, mode.name);
+  }
+
+  Future<ThemeMode> loadThemeMode() async {
+    final sp = await _sp;
+    final value = sp.getString(_kThemeMode);
+    if (value != null) {
+      return ThemeMode.values.firstWhere(
+        (m) => m.name == value,
+        orElse: () => ThemeMode.system,
+      );
+    }
+    return ThemeMode.system;
   }
 }
