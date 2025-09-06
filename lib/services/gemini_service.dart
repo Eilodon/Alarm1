@@ -70,7 +70,7 @@ class GeminiService {
     );
 
     final prompt =
-        'Summarize the following note and return a JSON object with keys "summary" (string), "actionItems" (array of strings), "suggestedTags" (array of strings), and "dates" (array of ISO8601 date strings).\n$content';
+        'Summarize the following note and return a JSON object with keys "summary" (string), "actionItems" (array of strings), "suggestedTags" (array of strings), "suggestedTitle" (string), and "dates" (array of ISO8601 date strings).\n$content';
 
     final body = {
       "contents": [
@@ -115,13 +115,14 @@ class GeminiService {
           .map((e) => DateTime.tryParse(e as String))
           .whereType<DateTime>()
           .toList();
-      return NoteAnalysis(
-        summary: map['summary'] as String? ?? '',
-        actionItems: (map['actionItems'] as List<dynamic>? ?? []).cast<String>(),
-        suggestedTags:
-            (map['suggestedTags'] as List<dynamic>? ?? []).cast<String>(),
-        dates: dates,
-      );
+        return NoteAnalysis(
+          summary: map['summary'] as String? ?? '',
+          actionItems: (map['actionItems'] as List<dynamic>? ?? []).cast<String>(),
+          suggestedTags:
+              (map['suggestedTags'] as List<dynamic>? ?? []).cast<String>(),
+          suggestedTitle: map['suggestedTitle'] as String?,
+          dates: dates,
+        );
     } catch (e, st) {
       debugPrint('analyzeNote parse error: $e\n$st');
       return null;
@@ -133,6 +134,7 @@ class NoteAnalysis {
   final String summary;
   final List<String> actionItems;
   final List<String> suggestedTags;
+  final String? suggestedTitle;
   final List<DateTime> dates;
 
   NoteAnalysis({
@@ -140,5 +142,6 @@ class NoteAnalysis {
     required this.actionItems,
     required this.suggestedTags,
     required this.dates,
+    this.suggestedTitle,
   });
 }

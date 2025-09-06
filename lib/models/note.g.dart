@@ -7,6 +7,7 @@ part of 'note.dart';
 // **************************************************************************
 
 Note _$NoteFromJson(Map<String, dynamic> json) => Note(
+
   id: json['id'] as String,
   title: json['title'] as String,
   content: json['content'] as String,
@@ -69,6 +70,7 @@ Map<String, dynamic> _$NoteToJson(Note instance) => <String, dynamic>{
   'notificationId': instance.notificationId,
   'eventId': instance.eventId,
 };
+
 
 const _$RepeatIntervalEnumMap = {
   RepeatInterval.everyMinute: 'everyMinute',
