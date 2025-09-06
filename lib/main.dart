@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'screens/home_screen.dart';
 import 'screens/onboarding_screen.dart';
@@ -15,12 +16,37 @@ import 'services/settings_service.dart';
 import 'services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'providers/note_provider.dart';
+import 'models/note.dart';
 import 'firebase_options.dart';
 
 final messengerKey = GlobalKey<ScaffoldMessengerState>();
+late final NoteProvider noteProvider;
+
+Future<void> _onNotificationResponse(NotificationResponse response) async {
+  final id = response.payload;
+  if (id == null) return;
+  Note? note;
+  try {
+    note = noteProvider.notes.firstWhere((n) => n.id == id);
+  } catch (_) {
+    note = null;
+  }
+  if (note == null) return;
+  final locale = WidgetsBinding.instance.platformDispatcher.locale;
+  final l10n = await AppLocalizations.delegate.load(locale);
+  if (response.actionId == 'done') {
+    await noteProvider.updateNote(
+      note.copyWith(alarmTime: null, notificationId: null, active: false),
+      l10n,
+    );
+  } else if (response.actionId == 'snooze') {
+    await noteProvider.snoozeNote(note, l10n);
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  noteProvider = NoteProvider();
   bool authFailed = false;
   bool notificationFailed = false;
 
@@ -34,7 +60,9 @@ void main() async {
   }
 
   try {
-    await NotificationService().init();
+    await NotificationService().init(
+      onDidReceiveNotificationResponse: _onNotificationResponse,
+    );
   } catch (e) {
     notificationFailed = true;
   }
@@ -55,8 +83,8 @@ void main() async {
   final hasSeenOnboarding = await settings.loadHasSeenOnboarding();
 
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => NoteProvider(),
+    ChangeNotifierProvider.value(
+      value: noteProvider,
       child: MyApp(
         themeColor: themeColor,
         fontScale: fontScale,

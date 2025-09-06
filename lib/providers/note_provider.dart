@@ -305,6 +305,7 @@ class NoteProvider extends ChangeNotifier {
             body: content,
             scheduledDate: alarmTime,
             l10n: l10n,
+            payload: id,
           );
         }
         eventId = await _calendarService.createEvent(
@@ -431,6 +432,7 @@ class NoteProvider extends ChangeNotifier {
             body: note.content,
             scheduledDate: note.alarmTime!,
             l10n: l10n,
+            payload: note.id,
           );
         }
         updated = updated.copyWith(notificationId: nid, active: true);
@@ -475,6 +477,7 @@ class NoteProvider extends ChangeNotifier {
       body: note.content,
       minutes: note.snoozeMinutes,
       l10n: l10n,
+      payload: note.id,
     );
   }
 

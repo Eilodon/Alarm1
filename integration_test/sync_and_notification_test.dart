@@ -142,6 +142,7 @@ void main() {
       body: 'b',
       scheduledDate: date,
       l10n: l10n,
+      payload: 'p',
     );
 
     await service.snoozeNotification(
@@ -150,6 +151,7 @@ void main() {
       body: 'b',
       minutes: 5,
       l10n: l10n,
+      payload: 'p',
     );
 
     expect(calls.any((c) => c.method == 'zonedSchedule'), isTrue);
