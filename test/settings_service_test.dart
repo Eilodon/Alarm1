@@ -38,15 +38,24 @@ void main() {
     expect(value, true);
   });
 
+  test('save and load theme mode', () async {
+    final service = SettingsService();
+    await service.saveThemeMode(ThemeMode.dark);
+    final mode = await service.loadThemeMode();
+    expect(mode, ThemeMode.dark);
+  });
+
   test('default values returned when not set', () async {
     final service = SettingsService();
     final color = await service.loadThemeColor();
     final path = await service.loadMascotPath();
     final scale = await service.loadFontScale();
     final auth = await service.loadRequireAuth();
+    final mode = await service.loadThemeMode();
     expect(color, Colors.blue);
     expect(path, 'assets/lottie/mascot.json');
     expect(scale, 1.0);
     expect(auth, false);
+    expect(mode, ThemeMode.system);
   });
 }
