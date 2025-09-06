@@ -41,10 +41,15 @@ sed -i \
   's#distributionUrl=.*#distributionUrl=https\://services.gradle.org/distributions/gradle-'$REQUIRED_GRADLE'-all.zip#' \
   android/gradle/wrapper/gradle-wrapper.properties
 
-# Clean, get packages, build và cài APK
+# Clean, check dependencies, build và cài APK
 flutter clean
 flutter pub get
-flutter build apk --release --android-skip-build-dependency-validation
+
+# Kiểm tra nhanh môi trường và phụ thuộc
+flutter doctor
+(cd android && ./gradlew app:dependencies)
+
+flutter build apk --release
 adb install -r build/app/outputs/flutter-apk/app-release.apk
 
 echo "✅ Done"
