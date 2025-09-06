@@ -105,10 +105,51 @@ class _NotesListState extends State<NotesList> {
         }
         final note = notes[index];
         return Card(
-          child: Slidable(
-            key: ValueKey(note.id),
-            startActionPane: ActionPane(
-              motion: const DrawerMotion(),
+
+          child: ListTile(
+            leading: note.locked ? const Icon(Icons.lock) : null,
+            title: Hero(
+              tag: note.id,
+              child: Material(
+                color: Colors.transparent,
+                child: Text(note.title),
+              ),
+            ),
+            subtitle: Text(
+              note.alarmTime != null
+                  ? '${note.content}\n⏰ ${DateFormat.yMd(Localizations.localeOf(context).toString()).add_Hm().format(note.alarmTime!)}'
+                  : note.content,
+            ),
+            onTap: () async {
+              if (note.locked) {
+                final ok = await AuthService().authenticate(
+                  AppLocalizations.of(context)!,
+                );
+                if (!ok) return;
+              }
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (_, __, ___) => NoteDetailScreen(note: note),
+                  transitionsBuilder: (_, animation, __, child) {
+                    final offsetAnimation = Tween<Offset>(
+                      begin: const Offset(1, 0),
+                      end: Offset.zero,
+                    ).animate(animation);
+                    return FadeTransition(
+                      opacity: animation,
+                      child: SlideTransition(
+                        position: offsetAnimation,
+                        child: child,
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+
               children: [
                 SlidableAction(
                   onPressed: (_) async {

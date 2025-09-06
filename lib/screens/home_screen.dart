@@ -155,6 +155,60 @@ class _NotesTabState extends State<_NotesTab> {
             ),
           ),
 
+          IconButton(
+            icon: const Icon(Icons.mic),
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (_, __, ___) => const VoiceToNoteScreen(),
+                  transitionsBuilder: (_, animation, __, child) {
+                    final offsetAnimation = Tween<Offset>(
+                      begin: const Offset(1, 0),
+                      end: Offset.zero,
+                    ).animate(animation);
+                    return FadeTransition(
+                      opacity: animation,
+                      child: SlideTransition(
+                        position: offsetAnimation,
+                        child: child,
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: AppLocalizations.of(context)!.settingsTooltip,
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (_, __, ___) => SettingsScreen(
+                    onThemeChanged: widget.onThemeChanged,
+                    onFontScaleChanged: widget.onFontScaleChanged,
+                  ),
+                  transitionsBuilder: (_, animation, __, child) {
+                    final offsetAnimation = Tween<Offset>(
+                      begin: const Offset(1, 0),
+                      end: Offset.zero,
+                    ).animate(animation);
+                    return FadeTransition(
+                      opacity: animation,
+                      child: SlideTransition(
+                        position: offsetAnimation,
+                        child: child,
+                      ),
+                    );
+                  },
+                ),
+              );
+              _loadMascot();
+            },
+          ),
+
         ],
       ),
       body: Column(
@@ -174,8 +228,22 @@ class _NotesTabState extends State<_NotesTab> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (_) => NoteListForDayScreen(date: d),
+                      PageRouteBuilder(
+                        pageBuilder: (_, __, ___) =>
+                            NoteListForDayScreen(date: d),
+                        transitionsBuilder: (_, animation, __, child) {
+                          final offsetAnimation = Tween<Offset>(
+                            begin: const Offset(1, 0),
+                            end: Offset.zero,
+                          ).animate(animation);
+                          return FadeTransition(
+                            opacity: animation,
+                            child: SlideTransition(
+                              position: offsetAnimation,
+                              child: child,
+                            ),
+                          );
+                        },
                       ),
                     );
                   },
