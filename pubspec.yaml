@@ -15,14 +15,13 @@ dependencies:
   timezone: ^0.10.1
   flutter_native_timezone: ^2.0.0
   lottie: ^3.3.1
-  http: ^0.13.5
+  http: ^1.2.1
   shared_preferences: ^2.3.2
   audioplayers: ^6.5.0
   intl: ^0.20.2
   provider: ^6.1.2
   flutter_tts: ^4.2.3
   speech_to_text: ^7.3.0
-  vosk_flutter: ^0.3.48
   share_plus: ^10.0.2
   connectivity_plus: ^6.1.5
 
@@ -50,9 +49,6 @@ dev_dependencies:
     sdk: flutter
   uuid: ^4.5.1
 
-dependency_overrides:
-  archive: ^4.0.0
-
 flutter:
   generate: true
   uses-material-design: true
@@ -60,6 +56,3 @@ flutter:
     - assets/lottie/mascot.json
     - assets/lottie/mascot2.json
     - assets/lottie/mascot3.json
-    - assets/models/
-    - assets/models/vosk-model-small-en/
-    - assets/models/vosk-model-small-vi/
