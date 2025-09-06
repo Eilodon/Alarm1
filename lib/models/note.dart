@@ -65,10 +65,6 @@ class Note {
   @JsonKey(defaultValue: 0)
   final int snoozeMinutes;
 
-  /// Whether this note is pinned to the top of the list.
-  @JsonKey(defaultValue: false)
-  final bool pinned;
-
   /// Whether this note has been marked as completed.
   @JsonKey(defaultValue: false)
   final bool done;
@@ -100,7 +96,6 @@ class Note {
     this.pinned = false,
     this.locked = false,
     this.snoozeMinutes = 0,
-    this.pinned = false,
     this.done = false,
     this.updatedAt,
     this.notificationId,
@@ -125,7 +120,6 @@ class Note {
     List<DateTime>? dates,
     bool? locked,
     int? snoozeMinutes,
-    bool? pinned,
     bool? done,
     DateTime? updatedAt,
     Object? notificationId = _notificationIdSentinel,
@@ -150,7 +144,6 @@ class Note {
       pinned: pinned ?? this.pinned,
       locked: locked ?? this.locked,
       snoozeMinutes: snoozeMinutes ?? this.snoozeMinutes,
-      pinned: pinned ?? this.pinned,
       done: done ?? this.done,
       updatedAt: updatedAt ?? this.updatedAt,
       notificationId: notificationId == _notificationIdSentinel
