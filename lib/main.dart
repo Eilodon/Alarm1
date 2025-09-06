@@ -83,6 +83,7 @@ void main() async {
   }
   final themeColor = await settings.loadThemeColor();
   final fontScale = await settings.loadFontScale();
+  final themeMode = await settings.loadThemeMode();
 
   final hasSeenOnboarding = await settings.loadHasSeenOnboarding();
 
@@ -92,7 +93,9 @@ void main() async {
       child: MyApp(
         themeColor: themeColor,
         fontScale: fontScale,
+
         themeMode: await settings.loadThemeMode(),
+
 
         hasSeenOnboarding: hasSeenOnboarding,
 
