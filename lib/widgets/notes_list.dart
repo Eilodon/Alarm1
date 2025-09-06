@@ -6,7 +6,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../pandora_ui/result_card.dart';
-import '../pandora_ui/toolbar_button.dart';
+import 'toolbar_button.dart';
 
 import '../models/note.dart';
 import '../providers/note_provider.dart';

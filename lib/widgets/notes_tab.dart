@@ -9,7 +9,7 @@ import '../services/settings_service.dart';
 import '../screens/note_search_delegate.dart';
 import '../screens/voice_to_note_screen.dart';
 import '../screens/settings_screen.dart';
-import '../pandora_ui/toolbar_button.dart';
+import 'toolbar_button.dart';
 import 'add_note_dialog.dart';
 import 'tag_filtered_notes_list.dart';
 

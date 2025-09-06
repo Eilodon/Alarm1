@@ -40,6 +40,9 @@ class PandoraTokens {
   static const double iconM = 24.0;
   static const double iconL = 32.0;
 
+  // Minimum touch target size
+  static const double touchTarget = 48.0;
+
   // Icons
   static const IconData hintIcon = Icons.lightbulb_outline;
 

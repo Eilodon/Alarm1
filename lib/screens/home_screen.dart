@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 import '../pandora_ui/bottom_sheet.dart';
 import '../pandora_ui/palette_list_item.dart';
@@ -7,6 +9,7 @@ import '../pandora_ui/pandora_snackbar.dart';
 import '../pandora_ui/teach_ai_modal.dart';
 import '../pandora_ui/tokens.dart';
 import '../pandora_ui/toolbar_button.dart';
+
 import '../widgets/notes_tab.dart';
 import 'chat_screen.dart';
 import 'note_list_for_day_screen.dart';
@@ -29,9 +32,14 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+class _OpenPaletteIntent extends Intent {
+  const _OpenPaletteIntent();
+}
+
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   late final List<Widget> _screens;
+  late final List<Command> _commands;
 
   OverlayEntry? _snackEntry;
 
@@ -53,6 +61,24 @@ class _HomeScreenState extends State<HomeScreen> {
         onThemeModeChanged: widget.onThemeModeChanged,
       ),
     ];
+    _commands = [
+      Command(
+        title: 'Show Notes',
+        action: () => setState(() => _currentIndex = 0),
+      ),
+      Command(
+        title: 'Show Voice to Note',
+        action: () => setState(() => _currentIndex = 2),
+      ),
+      Command(
+        title: 'Open Settings',
+        action: () => setState(() => _currentIndex = 4),
+      ),
+    ];
+  }
+
+  void _openPalette() {
+    showPaletteBottomSheet(context, commands: _commands);
   }
 
   void _showSnackbar(String text, SnackbarKind kind) {
@@ -112,6 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -165,9 +192,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
+
             ),
           ),
-        ],
+        ),
       ),
     );
   }
