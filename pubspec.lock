@@ -488,29 +488,29 @@ packages:
     source: hosted
     version: "5.9.0"
   google_sign_in_platform_interface:
-    dependency: "direct dev"
+    dependency: transitive
     description:
       name: google_sign_in_platform_interface
-      sha256: "5f6f79cf139c197261adb6ac024577518ae48fdff8e53205c5373b5f6430a8aa"
+      sha256: "8736443134d2cccadd4f228d600177cb3947e36683466a6ab96877ce6932885a"
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.0"
+    version: "3.0.0"
   google_sign_in_web:
     dependency: transitive
     description:
       name: google_sign_in_web
-      sha256: "460547beb4962b7623ac0fb8122d6b8268c951cf0b646dd150d60498430e4ded"
+      sha256: "09ac306b2787b48f19c857b9f93375b654f774643c75bd6a1a078c85f4f7b468"
       url: "https://pub.dev"
     source: hosted
-    version: "0.12.4+4"
+    version: "1.0.0"
   http:
     dependency: "direct main"
     description:
       name: http
-      sha256: "b9c29a161230ee03d3ccf545097fccd9b87a5264228c5d348202e0f0c28f9010"
+      sha256: "bb2ce4590bc2667c96f318d68cac1b5a7987ec819351d32b1c987239a815e007"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.2"
+    version: "1.5.0"
   http_parser:
     dependency: transitive
     description:
