@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'tokens.dart';
+import '../theme/tokens.dart';
 
 /// Simple modal dialog allowing the user to provide feedback to improve the AI.
 class TeachAiModal extends StatefulWidget {
@@ -31,8 +31,9 @@ class _TeachAiModalState extends State<TeachAiModal> {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = Theme.of(context).extension<Tokens>()!;
     return AlertDialog(
-      contentPadding: const EdgeInsets.all(PandoraTokens.spacingM),
+      contentPadding: EdgeInsets.all(tokens.spacing.m),
       title: const Text('Teach AI'),
       content: TextField(
         controller: _controller,
@@ -41,9 +42,9 @@ class _TeachAiModalState extends State<TeachAiModal> {
           hintText: 'Share feedback or corrections',
         ),
       ),
-      actionsPadding: const EdgeInsets.symmetric(
-        horizontal: PandoraTokens.spacingM,
-        vertical: PandoraTokens.spacingS,
+      actionsPadding: EdgeInsets.symmetric(
+        horizontal: tokens.spacing.m,
+        vertical: tokens.spacing.s,
       ),
       actions: [
         TextButton(

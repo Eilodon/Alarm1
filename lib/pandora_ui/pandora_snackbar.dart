@@ -1,14 +1,17 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../theme/tokens.dart';
 
-  static const success =
-      SnackbarKind._(Icons.check_circle, PandoraTokens.secondary);
-  static const warn = SnackbarKind._(Icons.warning, PandoraTokens.warning);
-  static const error = SnackbarKind._(Icons.error, PandoraTokens.error);
+const _animationDuration = Duration(milliseconds: 150);
+
+class SnackbarKind {
+  final IconData icon;
+  const SnackbarKind._(this.icon);
+
+  static const success = SnackbarKind._(Icons.check_circle);
+  static const warn = SnackbarKind._(Icons.warning);
+  static const error = SnackbarKind._(Icons.error);
 }
 
 class PandoraSnackbar extends StatefulWidget {
@@ -41,7 +44,7 @@ class _PandoraSnackbarState extends State<PandoraSnackbar>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: PandoraTokens.durationShort,
+      duration: _animationDuration,
     );
     final animation = CurvedAnimation(parent: _controller, curve: _curve);
     _fade = animation;
@@ -62,31 +65,48 @@ class _PandoraSnackbarState extends State<PandoraSnackbar>
 
   @override
   Widget build(BuildContext context) {
+    final tokens = Theme.of(context).extension<Tokens>()!;
+    Color iconColor;
+    if (widget.kind == SnackbarKind.success) {
+      iconColor = tokens.colors.secondary;
+    } else if (widget.kind == SnackbarKind.warn) {
+      iconColor = tokens.colors.warning;
+    } else {
+      iconColor = tokens.colors.error;
+    }
 
-    return AnimatedOpacity(
-      duration: Duration(milliseconds: 300),
-      opacity: 1,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.7),
-          borderRadius: BorderRadius.circular(10),
-          backdropFilter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        ),
-        padding: EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Icon(getIcon(kind)),
-            SizedBox(width: 8),
-            Expanded(child: Text(text)),
-            TextButton(
-              onPressed: onUndo,
-              child: Text(AppLocalizations.of(context)!.undo),
-            ),
-            IconButton(
-              icon: Icon(Icons.close),
-              onPressed: onClose,
-
-            ),
+    return FadeTransition(
+      opacity: _fade,
+      child: SlideTransition(
+        position: _slide,
+        child: Container(
+          decoration: BoxDecoration(
+            color: tokens.colors.surface,
+            borderRadius: BorderRadius.circular(tokens.radii.m),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 4,
+              ),
+            ],
+          ),
+          padding: EdgeInsets.all(tokens.spacing.m),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(widget.kind.icon, color: iconColor),
+              SizedBox(width: tokens.spacing.s),
+              Expanded(child: Text(widget.text)),
+              if (widget.onUndo != null)
+                TextButton(
+                  onPressed: widget.onUndo,
+                  child: Text(AppLocalizations.of(context)!.undo),
+                ),
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: widget.onClose ?? hide,
+              ),
+            ],
           ),
         ),
       ),

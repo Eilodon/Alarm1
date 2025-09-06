@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'tokens.dart';
+import '../theme/tokens.dart';
 
 class ResultCard extends StatelessWidget {
   final Widget child;
@@ -9,11 +9,12 @@ class ResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = Theme.of(context).extension<Tokens>()!;
     return Card(
       color: Theme.of(context).colorScheme.surface,
-      elevation: PandoraTokens.elevationLow,
+      elevation: tokens.elevation.low,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
+        borderRadius: BorderRadius.circular(tokens.radii.m),
       ),
       child: child,
 

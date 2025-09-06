@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'tokens.dart';
+import '../theme/tokens.dart';
 
 class ToolbarButton extends StatelessWidget {
   final Widget icon;
@@ -18,22 +18,22 @@ class ToolbarButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    final tokens = Theme.of(context).extension<Tokens>()!;
+
     return ElevatedButton.icon(
       onPressed: disabled ? null : onPressed,
       icon: icon,
       label: Text(label),
       style: ElevatedButton.styleFrom(
         backgroundColor:
-            disabled ? PandoraTokens.neutral300 : PandoraTokens.primary,
+            disabled ? tokens.colors.neutral300 : tokens.colors.primary,
         foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(
-            vertical: PandoraTokens.spacingS,
-            horizontal: PandoraTokens.spacingM),
+        padding: EdgeInsets.symmetric(
+            vertical: tokens.spacing.s, horizontal: tokens.spacing.m),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
+          borderRadius: BorderRadius.circular(tokens.radii.m),
         ),
-        elevation: PandoraTokens.elevationLow,
-
+        elevation: tokens.elevation.low,
       ),
     );
   }

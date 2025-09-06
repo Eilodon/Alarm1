@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../pandora_ui/tokens.dart';
+import '../theme/tokens.dart';
 
 class _ToolbarButtonStyle {
   final Color background;
@@ -15,23 +15,7 @@ class _ToolbarButtonStyle {
   });
 }
 
-const Map<String, _ToolbarButtonStyle> _toolbarStyles = {
-  'default': _ToolbarButtonStyle(
-    background: PandoraTokens.primary,
-    foreground: PandoraTokens.neutral100,
-    enabled: true,
-  ),
-  'active': _ToolbarButtonStyle(
-    background: PandoraTokens.secondary,
-    foreground: PandoraTokens.neutral100,
-    enabled: true,
-  ),
-  'disabled': _ToolbarButtonStyle(
-    background: PandoraTokens.neutral300,
-    foreground: PandoraTokens.neutral100,
-    enabled: false,
-  ),
-};
+const _touchTarget = 48.0;
 
 /// Toolbar button with icon and label.
 class ToolbarButton extends StatelessWidget {
@@ -50,12 +34,31 @@ class ToolbarButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = _toolbarStyles[state] ?? _toolbarStyles['default']!;
+    final tokens = Theme.of(context).extension<Tokens>()!;
+    final toolbarStyles = {
+      'default': _ToolbarButtonStyle(
+        background: tokens.colors.primary,
+        foreground: tokens.colors.neutral100,
+        enabled: true,
+      ),
+      'active': _ToolbarButtonStyle(
+        background: tokens.colors.secondary,
+        foreground: tokens.colors.neutral100,
+        enabled: true,
+      ),
+      'disabled': _ToolbarButtonStyle(
+        background: tokens.colors.neutral300,
+        foreground: tokens.colors.neutral100,
+        enabled: false,
+      ),
+    };
+
+    final style = toolbarStyles[state] ?? toolbarStyles['default']!;
 
     return ConstrainedBox(
       constraints: const BoxConstraints(
-        minHeight: PandoraTokens.touchTarget,
-        minWidth: PandoraTokens.touchTarget,
+        minHeight: _touchTarget,
+        minWidth: _touchTarget,
       ),
       child: ElevatedButton.icon(
         onPressed: style.enabled
@@ -69,17 +72,17 @@ class ToolbarButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: style.background,
           foregroundColor: style.foreground,
-          padding: const EdgeInsets.symmetric(
-            vertical: PandoraTokens.spacingS,
-            horizontal: PandoraTokens.spacingM,
+          padding: EdgeInsets.symmetric(
+            vertical: tokens.spacing.s,
+            horizontal: tokens.spacing.m,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
+            borderRadius: BorderRadius.circular(tokens.radii.m),
           ),
-          elevation: PandoraTokens.elevationLow,
+          elevation: tokens.elevation.low,
           minimumSize: const Size(
-            PandoraTokens.touchTarget,
-            PandoraTokens.touchTarget,
+            _touchTarget,
+            _touchTarget,
           ),
         ),
       ),
