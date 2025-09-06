@@ -154,6 +154,30 @@ void main() {
         )).called(1);
   });
 
+  test('fetchNotesPage paginates using stored order', () async {
+    final repo = MockRepo();
+    when(() => repo.getNotes()).thenAnswer((_) async => [
+          Note(id: '1', title: 'a', content: 'c', updatedAt: DateTime(2023, 1, 1)),
+          Note(id: '2', title: 'b', content: 'c', updatedAt: DateTime(2024, 1, 1)),
+          Note(id: '3', title: 'c', content: 'c', updatedAt: DateTime(2022, 1, 1)),
+        ]);
+    when(() => repo.saveNotes(any())).thenAnswer((_) async {});
+
+    final provider = NoteProvider(
+      repository: repo,
+      calendarService: MockCalendar(),
+      notificationService: MockNotification(),
+    );
+
+    final firstPage = await provider.fetchNotesPage(null, 2);
+    expect(firstPage.map((n) => n.id), ['2', '1']);
+
+    final secondPage =
+        await provider.fetchNotesPage(firstPage.last.updatedAt, 2);
+    expect(secondPage.map((n) => n.id), ['3']);
+    verify(() => repo.getNotes()).called(1);
+  });
+
   test('snoozeNote calls notification snooze', () async {
     final repo = MockRepo();
     final calendar = MockCalendar();
