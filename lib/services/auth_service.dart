@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -11,8 +13,12 @@ class AuthService {
         localizedReason: l10n.authReason,
         options: const AuthenticationOptions(stickyAuth: true),
       );
-    } catch (_) {
+    } on PlatformException catch (e, st) {
+      debugPrint(l10n.errorWithMessage('${e.message ?? e.toString()}\n$st'));
       return false;
+    } catch (e, st) {
+      debugPrint(l10n.errorWithMessage('${e.toString()}\n$st'));
+      rethrow;
     }
   }
 }
