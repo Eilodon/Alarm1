@@ -14,6 +14,10 @@
   "chooseMascot": "Chọn mascot",
   "changeMascot": "Thay mascot",
   "fontSize": "Cỡ chữ",
+  "backupFormat": "Định dạng sao lưu",
+  "formatJson": "JSON",
+  "formatPdf": "PDF",
+  "formatMarkdown": "Markdown",
   "chatAI": "Chat AI",
   "enterMessage": "Nhập tin nhắn...",
   "send": "Gửi",
@@ -40,6 +44,11 @@
   "settingsTooltip": "Mở cài đặt",
   "delete": "Xóa",
   "timeLabel": "Thời gian",
+
+  "pin": "Ghim",
+  "share": "Chia sẻ",
+  "markDone": "Đánh dấu xong",
+  "setReminder": "Đặt nhắc nhở",
 
   "noteDeleted": "Đã xóa ghi chú",
   "undo": "Hoàn tác",
@@ -68,7 +77,13 @@
   "addTag": "Thêm tag",
   "requireAuth": "Yêu cầu xác thực",
   "lockNote": "Khóa ghi chú",
+  "pinNote": "Ghim ghi chú",
+  "colorLabel": "Màu",
   "authReason": "Vui lòng xác thực để tiếp tục",
+  "themeMode": "Chế độ giao diện",
+  "light": "Sáng",
+  "dark": "Tối",
+  "system": "Hệ thống",
   "voiceToNote": "Giọng nói thành ghi chú",
   "stop": "Dừng",
   "speak": "Nói",
@@ -83,6 +98,7 @@
   "recurring": "Định kỳ",
   "daily": "Hàng ngày",
   "snooze": "Báo lại",
+  "done": "Xong",
   "scheduledDesc": "Thông báo đã lên lịch",
   "recurringDesc": "Thông báo định kỳ",
   "dailyDesc": "Thông báo hàng ngày",
@@ -94,5 +110,9 @@
   "authFailedMessage": "Đăng nhập ẩn danh thất bại. Chức năng bị hạn chế.",
   "notificationFailedMessage": "Thiết lập thông báo thất bại.",
   "saveNoteFailed": "Lưu ghi chú thất bại"
-
+,
+  "backupNow": "Sao lưu ngay",
+  "syncStatusIdle": "Đã đồng bộ",
+  "syncStatusSyncing": "Đang đồng bộ...",
+  "syncStatusError": "Lỗi đồng bộ"
 }

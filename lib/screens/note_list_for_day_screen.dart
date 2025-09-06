@@ -53,7 +53,13 @@ class NoteListForDayScreen extends StatelessWidget {
               : null;
           return Card(
             child: ListTile(
-              title: Text(note.title),
+              title: Hero(
+                tag: note.id,
+                child: Material(
+                  color: Colors.transparent,
+                  child: Text(note.title),
+                ),
+              ),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -83,8 +89,21 @@ class NoteListForDayScreen extends StatelessWidget {
                 }
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => NoteDetailScreen(note: note),
+                  PageRouteBuilder(
+                    pageBuilder: (_, __, ___) => NoteDetailScreen(note: note),
+                    transitionsBuilder: (_, animation, __, child) {
+                      final offsetAnimation = Tween<Offset>(
+                        begin: const Offset(1, 0),
+                        end: Offset.zero,
+                      ).animate(animation);
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
+                        ),
+                      );
+                    },
                   ),
                 );
               },

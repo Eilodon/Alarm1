@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'backup_service.dart';
 
 class SettingsService {
   SettingsService({SharedPreferences? sharedPreferences})
@@ -9,6 +10,10 @@ class SettingsService {
   static const _kMascotPath = 'mascot_path';
   static const _kFontScale = 'font_scale';
   static const _kRequireAuth = 'require_auth';
+  static const _kBackupFormat = 'backup_format';
+
+  static const _kHasSeenOnboarding = 'has_seen_onboarding';
+
 
   SharedPreferences? _preferences;
 
@@ -56,5 +61,21 @@ class SettingsService {
   Future<bool> loadRequireAuth() async {
     final sp = await _sp;
     return sp.getBool(_kRequireAuth) ?? false;
+  }
+
+
+  Future<void> saveBackupFormat(BackupFormat format) async {
+    final sp = await _sp;
+    await sp.setString(_kBackupFormat, format.name);
+  }
+
+  Future<BackupFormat> loadBackupFormat() async {
+    final sp = await _sp;
+    final value = sp.getString(_kBackupFormat);
+    return BackupFormat.values.firstWhere(
+      (f) => f.name == value,
+      orElse: () => BackupFormat.json,
+    );
+
   }
 }

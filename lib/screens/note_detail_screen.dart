@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +10,7 @@ import '../models/note.dart';
 import '../providers/note_provider.dart';
 import '../services/tts_service.dart';
 import '../widgets/tag_selector.dart';
+import '../l10n/localization_extensions.dart';
 import '../services/gemini_service.dart';
 import '../widgets/attachment_section.dart';
 import '../widgets/reminder_controls.dart';
@@ -35,7 +38,13 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   RepeatInterval? _repeat;
   int _snoozeMinutes = 5;
   late List<String> _tags;
+  int _color = 0xFFFFFFFF;
+  bool _pinned = false;
   late final TTSService _ttsService;
+  String? _titleSuggestion;
+  List<String> _tagSuggestions = [];
+  NoteAnalysis? _analysis;
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -43,16 +52,21 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     _ttsService = widget.ttsService;
     _titleCtrl = TextEditingController(text: widget.note.title);
     _contentCtrl = TextEditingController(text: widget.note.content);
+    _contentCtrl.addListener(_onContentChanged);
     _alarmTime = widget.note.alarmTime;
     _repeat = widget.note.repeatInterval ??
         (widget.note.daily ? RepeatInterval.daily : null);
     _snoozeMinutes = widget.note.snoozeMinutes;
     _attachments = List.from(widget.note.attachments);
     _tags = List.from(widget.note.tags);
+    _color = widget.note.color;
+    _pinned = widget.note.pinned;
   }
 
   @override
   void dispose() {
+    _debounce?.cancel();
+    _contentCtrl.removeListener(_onContentChanged);
     _titleCtrl.dispose();
     _contentCtrl.dispose();
     super.dispose();
@@ -65,13 +79,43 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     );
   }
 
+  void _onContentChanged() {
+    _debounce?.cancel();
+    if (_contentCtrl.text.trim().isEmpty) {
+      setState(() {
+        _analysis = null;
+        _titleSuggestion = null;
+        _tagSuggestions = [];
+      });
+      return;
+    }
+    _debounce = Timer(const Duration(seconds: 1), () async {
+      final analysis = await GeminiService().analyzeNote(_contentCtrl.text);
+      if (!mounted) return;
+      setState(() {
+        _analysis = analysis;
+        _titleSuggestion = analysis?.suggestedTitle;
+        _tagSuggestions = analysis?.suggestedTags
+                .where((t) => !_tags.contains(t))
+                .toList() ??
+            [];
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<NoteProvider>();
     final availableTags = provider.notes.expand((n) => n.tags).toSet().toList();
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.note.title),
+        title: Hero(
+          tag: widget.note.id,
+          child: Material(
+            color: Colors.transparent,
+            child: Text(widget.note.title),
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: _readNote,
@@ -105,6 +149,41 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               maxLines: null,
             ),
             const SizedBox(height: 12),
+            if (_titleSuggestion != null || _tagSuggestions.isNotEmpty)
+              Wrap(
+                spacing: 8,
+                children: [
+                  if (_titleSuggestion != null)
+                    InputChip(
+                      label: Text(_titleSuggestion!),
+                      onPressed: () {
+                        setState(() {
+                          _titleCtrl.text = _titleSuggestion!;
+                          _titleSuggestion = null;
+                        });
+                      },
+                      onDeleted: () =>
+                          setState(() => _titleSuggestion = null),
+                    ),
+                  ..._tagSuggestions.map(
+                    (tag) => InputChip(
+                      label: Text(tag),
+                      onPressed: () {
+                        setState(() {
+                          if (!_tags.contains(tag)) {
+                            _tags.add(tag);
+                          }
+                          _tagSuggestions.remove(tag);
+                        });
+                      },
+                      onDeleted: () =>
+                          setState(() => _tagSuggestions.remove(tag)),
+                    ),
+                  ),
+                ],
+              ),
+            if (_titleSuggestion != null || _tagSuggestions.isNotEmpty)
+              const SizedBox(height: 12),
             ReminderControls(
               alarmTime: _alarmTime,
               repeat: _repeat,
@@ -120,6 +199,14 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               allowCreate: true,
               onChanged: (v) => setState(() => _tags = v),
               label: AppLocalizations.of(context)!.tagsLabel,
+              selectedColor: _color,
+              onColorChanged: (c) => setState(() => _color = c),
+              colorLabel: AppLocalizations.of(context)!.colorLabel,
+            ),
+            SwitchListTile(
+              title: Text(AppLocalizations.of(context)!.pinNote),
+              value: _pinned,
+              onChanged: (v) => setState(() => _pinned = v),
             ),
             const SizedBox(height: 12),
             AttachmentSection(
@@ -131,9 +218,22 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) =>
+                  PageRouteBuilder(
+                    pageBuilder: (_, __, ___) =>
                         ChatScreen(initialMessage: _contentCtrl.text),
+                    transitionsBuilder: (_, animation, __, child) {
+                      final offsetAnimation = Tween<Offset>(
+                        begin: const Offset(1, 0),
+                        end: Offset.zero,
+                      ).animate(animation);
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
+                        ),
+                      );
+                    },
                   ),
                 );
               },
@@ -149,7 +249,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   Future<void> _save() async {
     final l10n = AppLocalizations.of(context)!;
 
-    final analysis = await GeminiService().analyzeNote(_contentCtrl.text);
+    final analysis =
+        _analysis ?? await GeminiService().analyzeNote(_contentCtrl.text);
     String summary = widget.note.summary;
     List<String> actionItems = List.from(widget.note.actionItems);
     List<DateTime> dates = List.from(widget.note.dates);
@@ -164,9 +265,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       if (result != null) {
         summary = result.summary;
         actionItems = result.actionItems;
-        tags = result.tags;
-        dates = result.dates;
-      }
+      tags = result.tags;
+      dates = result.dates;
+    }
     }
 
     final updated = widget.note.copyWith(
@@ -183,6 +284,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       summary: summary,
       actionItems: actionItems,
       dates: dates,
+      color: _color,
+      pinned: _pinned,
     );
 
     final ok = await context.read<NoteProvider>().saveNote(updated, l10n);

@@ -49,6 +49,7 @@ void main() {
       body: 'b',
       scheduledDate: DateTime.now().add(const Duration(minutes: 1)),
       l10n: l10n,
+      payload: 'p',
     );
     final call = log.singleWhere((c) => c.method == 'zonedSchedule');
     final args = call.arguments as Map<dynamic, dynamic>;
@@ -65,6 +66,7 @@ void main() {
         body: 'b',
         scheduledDate: DateTime.now().subtract(const Duration(minutes: 1)),
         l10n: l10n,
+        payload: 'p',
       ),
       throwsArgumentError,
     );
@@ -87,6 +89,7 @@ void main() {
       body: 'b',
       scheduledDate: DateTime.now().add(const Duration(minutes: 1)),
       l10n: l10n,
+      payload: 'p',
     );
     final call = log.singleWhere((c) => c.method == 'zonedSchedule');
     final args = call.arguments as Map<dynamic, dynamic>;
@@ -204,6 +207,7 @@ void main() {
       body: 'b',
       minutes: 5,
       l10n: l10n,
+      payload: 'p',
     );
     expect(log.first.method, 'cancel');
     final scheduleCall =
@@ -231,6 +235,7 @@ void main() {
         body: 'b',
         minutes: 5,
         l10n: l10n,
+        payload: 'p',
       ),
       throwsA(isA<PlatformException>()),
     );

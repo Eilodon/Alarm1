@@ -7,6 +7,9 @@ class TagSelector extends StatefulWidget {
   final ValueChanged<List<String>> onChanged;
   final bool allowCreate;
   final String? label;
+  final int selectedColor;
+  final ValueChanged<int> onColorChanged;
+  final String? colorLabel;
 
   const TagSelector({
     super.key,
@@ -15,6 +18,9 @@ class TagSelector extends StatefulWidget {
     required this.onChanged,
     this.allowCreate = false,
     this.label,
+    required this.selectedColor,
+    required this.onColorChanged,
+    this.colorLabel,
   });
 
   @override
@@ -57,6 +63,30 @@ class _TagSelectorState extends State<TagSelector> {
       );
     }).toList();
 
+    final colorOptions = <Color>[
+      Colors.white,
+      Colors.red,
+      Colors.orange,
+      Colors.yellow,
+      Colors.green,
+      Colors.blue,
+      Colors.purple,
+      Colors.brown,
+    ];
+    final colorChips = colorOptions.map((c) {
+      final selected = widget.selectedColor == c.value;
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: ChoiceChip(
+          label: const SizedBox(width: 24, height: 24),
+          selectedColor: c,
+          backgroundColor: c,
+          selected: selected,
+          onSelected: (_) => widget.onColorChanged(c.value),
+        ),
+      );
+    }).toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -70,6 +100,11 @@ class _TagSelectorState extends State<TagSelector> {
             ),
             onSubmitted: _addTag,
           ),
+        if (widget.colorLabel != null) ...[
+          const SizedBox(height: 8),
+          Text(widget.colorLabel!),
+        ],
+        Wrap(children: colorChips),
       ],
     );
   }

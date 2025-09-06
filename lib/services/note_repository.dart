@@ -34,19 +34,38 @@ class NoteRepository {
     return _dbService.decryptNote(data, password: password);
   }
 
-  Future<bool> exportNotes(AppLocalizations l10n, {String? password}) async {
+  Future<bool> exportNotes(
+    AppLocalizations l10n, {
+    String? password,
+    BackupFormat format = BackupFormat.json,
+  }) async {
     final notes = await _dbService.getNotes();
-    return _backupService.exportNotes(notes, l10n, password: password);
+    return _backupService.exportNotes(
+      notes,
+      l10n,
+      password: password,
+      format: format,
+    );
   }
 
   Future<List<Note>> importNotes(
     AppLocalizations l10n, {
     String? password,
+    BackupFormat format = BackupFormat.json,
   }) async {
-    final notes = await _backupService.importNotes(l10n, password: password);
+    final notes = await _backupService.importNotes(
+      l10n,
+      password: password,
+      format: format,
+    );
     if (notes.isNotEmpty) {
       await _dbService.saveNotes(notes);
     }
     return notes;
+  }
+
+  Future<bool> autoBackup() async {
+    final notes = await _dbService.getNotes();
+    return _backupService.autoBackup(notes);
   }
 }
