@@ -33,9 +33,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   BackupFormat _backupFormat = BackupFormat.json;
 
-  ThemeMode _themeMode = ThemeMode.system;
-
-
   @override
   void initState() {
     super.initState();
@@ -48,7 +45,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _settings.loadBackupFormat().then((v) {
       if (mounted) {
         setState(() => _backupFormat = v);
-
       }
     });
 
@@ -183,34 +179,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _exportNotes() async {
     final l10n = AppLocalizations.of(context)!;
-    final success =
-        await _noteRepository.exportNotes(l10n, format: _backupFormat);
+    final success = await _noteRepository.exportNotes(
+      l10n,
+      format: _backupFormat,
+    );
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(success
-            ? l10n.notesExported
-            : l10n.errorWithMessage('Failed to export notes')),
+        content: Text(
+          success
+              ? l10n.notesExported
+              : l10n.errorWithMessage('Failed to export notes'),
+        ),
       ),
     );
   }
 
   Future<void> _importNotes() async {
     final l10n = AppLocalizations.of(context)!;
-    final notes =
-        await _noteRepository.importNotes(l10n, format: _backupFormat);
+    final notes = await _noteRepository.importNotes(
+      l10n,
+      format: _backupFormat,
+    );
     if (!mounted) return;
     if (notes.isNotEmpty) {
       await context.read<NoteProvider>().loadNotes();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.notesImported)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.notesImported)));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            l10n.errorWithMessage('Failed to import notes'),
-          ),
+          content: Text(l10n.errorWithMessage('Failed to import notes')),
         ),
       );
     }
@@ -252,9 +252,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.settings),
-      ),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.settings)),
       body: ListView(
         children: [
           ListTile(
@@ -267,8 +265,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ListTile(
             title: Text(AppLocalizations.of(context)!.backupFormat),
-            subtitle: Text(_formatLabel(
-                _backupFormat, AppLocalizations.of(context)!)),
+            subtitle: Text(
+              _formatLabel(_backupFormat, AppLocalizations.of(context)!),
+            ),
             onTap: _pickFormat,
           ),
           ListTile(
@@ -277,7 +276,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ListTile(
             title: Text(AppLocalizations.of(context)!.themeMode),
-            subtitle: Text(_themeModeLabel(_themeMode, AppLocalizations.of(context)!)),
+            subtitle: Text(
+              _themeModeLabel(_themeMode, AppLocalizations.of(context)!),
+            ),
             trailing: DropdownButton<ThemeMode>(
               value: _themeMode,
               onChanged: (mode) {

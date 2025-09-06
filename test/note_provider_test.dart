@@ -5,12 +5,14 @@ import 'package:notes_reminder_app/providers/note_provider.dart';
 import 'package:notes_reminder_app/services/note_repository.dart';
 import 'package:notes_reminder_app/services/calendar_service.dart';
 import 'package:notes_reminder_app/services/notification_service.dart';
+import 'package:notes_reminder_app/services/note_sync_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class MockRepo extends Mock implements NoteRepository {}
 class MockCalendar extends Mock implements CalendarService {}
 class MockNotification extends Mock implements NotificationService {}
+class MockSyncService extends Mock implements NoteSyncService {}
 class FakeL10n extends Fake implements AppLocalizations {}
 
 void main() {
@@ -19,12 +21,23 @@ void main() {
   setUpAll(() {
     registerFallbackValue<List<Note>>([]);
     registerFallbackValue(DateTime(0));
+    registerFallbackValue(<Note>{});
+    registerFallbackValue(const Note(
+      id: '0',
+      title: '',
+      content: '',
+      summary: '',
+      actionItems: [],
+      dates: [],
+    ));
+    registerFallbackValue<Note? Function(String)>((_) => null);
   });
 
   test('removeNoteAt cancels notification and deletes event', () async {
     final repo = MockRepo();
     final calendar = MockCalendar();
     final notification = MockNotification();
+    final sync = MockSyncService();
     when(() => repo.getNotes()).thenAnswer((_) async => [
           const Note(
             id: '1',
@@ -40,11 +53,16 @@ void main() {
     when(() => repo.saveNotes(any())).thenAnswer((_) async {});
     when(() => calendar.deleteEvent(any())).thenAnswer((_) async {});
     when(() => notification.cancel(any())).thenAnswer((_) async {});
+    when(() => sync.init(any())).thenAnswer((_) async {});
+    when(() => sync.syncStatus).thenReturn(ValueNotifier(SyncStatus.idle));
+    when(() => sync.loadFromRemote(any())).thenAnswer((_) async => true);
+    when(() => sync.deleteNote(any())).thenAnswer((_) async {});
 
     final provider = NoteProvider(
       repository: repo,
       calendarService: calendar,
       notificationService: notification,
+      syncService: sync,
     );
 
     await provider.loadNotes();
@@ -59,6 +77,7 @@ void main() {
     final repo = MockRepo();
     final calendar = MockCalendar();
     final notification = MockNotification();
+    final sync = MockSyncService();
     final l10n = FakeL10n();
     when(() => repo.saveNotes(any())).thenAnswer((_) async {});
     when(
@@ -78,11 +97,16 @@ void main() {
         start: any(named: 'start'),
       ),
     ).thenAnswer((_) async => 'e1');
+    when(() => sync.init(any())).thenAnswer((_) async {});
+    when(() => sync.syncStatus).thenReturn(ValueNotifier(SyncStatus.idle));
+    when(() => sync.loadFromRemote(any())).thenAnswer((_) async => true);
+    when(() => sync.syncNote(any())).thenAnswer((_) async {});
 
     final provider = NoteProvider(
       repository: repo,
       calendarService: calendar,
       notificationService: notification,
+      syncService: sync,
     );
 
     final ok = await provider.createNote(
@@ -116,6 +140,7 @@ void main() {
     final repo = MockRepo();
     final calendar = MockCalendar();
     final notification = MockNotification();
+    final sync = MockSyncService();
     final l10n = FakeL10n();
     when(() => repo.saveNotes(any())).thenAnswer((_) async {});
     when(
@@ -132,11 +157,16 @@ void main() {
           description: any(named: 'description'),
           start: any(named: 'start'),
         )).thenAnswer((_) async => 'e1');
+    when(() => sync.init(any())).thenAnswer((_) async {});
+    when(() => sync.syncStatus).thenReturn(ValueNotifier(SyncStatus.idle));
+    when(() => sync.loadFromRemote(any())).thenAnswer((_) async => true);
+    when(() => sync.syncNote(any())).thenAnswer((_) async {});
 
     final provider = NoteProvider(
       repository: repo,
       calendarService: calendar,
       notificationService: notification,
+      syncService: sync,
     );
 
     await provider.createNote(
@@ -158,17 +188,22 @@ void main() {
 
   test('fetchNotesPage paginates using stored order', () async {
     final repo = MockRepo();
+    final sync = MockSyncService();
     when(() => repo.getNotes()).thenAnswer((_) async => [
           Note(id: '1', title: 'a', content: 'c', updatedAt: DateTime(2023, 1, 1)),
           Note(id: '2', title: 'b', content: 'c', updatedAt: DateTime(2024, 1, 1)),
           Note(id: '3', title: 'c', content: 'c', updatedAt: DateTime(2022, 1, 1)),
         ]);
     when(() => repo.saveNotes(any())).thenAnswer((_) async {});
+    when(() => sync.init(any())).thenAnswer((_) async {});
+    when(() => sync.syncStatus).thenReturn(ValueNotifier(SyncStatus.idle));
+    when(() => sync.loadFromRemote(any())).thenAnswer((_) async => true);
 
     final provider = NoteProvider(
       repository: repo,
       calendarService: MockCalendar(),
       notificationService: MockNotification(),
+      syncService: sync,
     );
 
     final firstPage = await provider.fetchNotesPage(null, 2);
@@ -184,6 +219,7 @@ void main() {
     final repo = MockRepo();
     final calendar = MockCalendar();
     final notification = MockNotification();
+    final sync = MockSyncService();
     final l10n = FakeL10n();
     when(() => repo.getNotes()).thenAnswer((_) async => [
           const Note(
@@ -206,11 +242,15 @@ void main() {
           l10n: l10n,
           payload: any(named: 'payload'),
         )).thenAnswer((_) async {});
+    when(() => sync.init(any())).thenAnswer((_) async {});
+    when(() => sync.syncStatus).thenReturn(ValueNotifier(SyncStatus.idle));
+    when(() => sync.loadFromRemote(any())).thenAnswer((_) async => true);
 
     final provider = NoteProvider(
       repository: repo,
       calendarService: calendar,
       notificationService: notification,
+      syncService: sync,
     );
 
     await provider.loadNotes();

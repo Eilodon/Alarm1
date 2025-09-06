@@ -1,87 +1,37 @@
 import 'dart:async';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
-import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'screens/home_screen.dart';
 import 'screens/onboarding_screen.dart';
-import 'services/notification_service.dart';
 import 'services/settings_service.dart';
-import 'services/auth_service.dart';
 
-import 'package:provider/provider.dart';
+final messengerKey = GlobalKey<ScaffoldMessengerState>();
 
-import 'models/note.dart';
+class MyApp extends StatefulWidget {
+  final Color themeColor;
+  final double fontScale;
+  final ThemeMode themeMode;
+  final bool authFailed;
+  final bool notificationFailed;
+  final bool hasSeenOnboarding;
+  const MyApp({
+    super.key,
+    required this.themeColor,
+    required this.fontScale,
+    required this.themeMode,
+    required this.hasSeenOnboarding,
+    this.authFailed = false,
+    this.notificationFailed = false,
+  });
 
-import 'firebase_options.dart';
-import 'pandora_ui/tokens.dart';
-
-
-late final NoteProvider noteProvider;
-
-Future<void> _onNotificationResponse(NotificationResponse response) async {
-  final id = response.payload;
-  if (id == null) return;
-  Note? note;
-  try {
-    note = noteProvider.notes.firstWhere((n) => n.id == id);
-  } catch (_) {
-    note = null;
-  }
-  if (note == null) return;
-  final locale = WidgetsBinding.instance.platformDispatcher.locale;
-  final l10n = await AppLocalizations.delegate.load(locale);
-  if (response.actionId == 'done') {
-    await noteProvider.updateNote(
-      note.copyWith(alarmTime: null, notificationId: null, active: false),
-      l10n,
-    );
-  } else if (response.actionId == 'snooze') {
-    await noteProvider.snoozeNote(note, l10n);
-  }
+  @override
+  State<MyApp> createState() => _MyAppState();
 }
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  noteProvider = NoteProvider();
-
-  final startupResult = await StartupService().initialize(
-    onDidReceiveNotificationResponse: _onNotificationResponse,
-  );
-
-  final settings = SettingsService();
-  final requireAuth = await settings.loadRequireAuth();
-  if (requireAuth) {
-    final locale = WidgetsBinding.instance.platformDispatcher.locale;
-    final l10n = await AppLocalizations.delegate.load(locale);
-    final ok = await AuthService().authenticate(l10n);
-    if (!ok) {
-      return;
-    }
-  }
-  final themeColor = await settings.loadThemeColor();
-  final fontScale = await settings.loadFontScale();
-  final themeMode = await settings.loadThemeMode();
-  final hasSeenOnboarding = await settings.loadHasSeenOnboarding();
-
-  runApp(
-    ChangeNotifierProvider.value(
-      value: noteProvider,
-      child: MyApp(
-        themeColor: themeColor,
-        fontScale: fontScale,
-        themeMode: themeMode,
-        hasSeenOnboarding: hasSeenOnboarding,
-        authFailed: startupResult.authFailed,
-        notificationFailed: startupResult.notificationFailed,
-      ),
-    ),
-  );
-}
-
 
 class _MyAppState extends State<MyApp> {
   Color _themeColor = Colors.blue;
@@ -95,7 +45,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _themeColor = widget.themeColor;
     _fontScale = widget.fontScale;
-
+    _themeMode = widget.themeMode;
     _hasSeenOnboarding = widget.hasSeenOnboarding;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -141,10 +91,13 @@ class _MyAppState extends State<MyApp> {
     await SettingsService().saveFontScale(newScale);
   }
 
+  void updateThemeMode(ThemeMode newMode) async {
+    setState(() => _themeMode = newMode);
+    await SettingsService().saveThemeMode(newMode);
+  }
 
   void _completeOnboarding() {
     setState(() => _hasSeenOnboarding = true);
-
   }
 
   @override
@@ -166,24 +119,12 @@ class _MyAppState extends State<MyApp> {
       ],
       supportedLocales: const [Locale('en'), Locale('vi')],
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: PandoraTokens.primary,
-          background: PandoraTokens.lightBg,
-          surface: PandoraTokens.neutral100,
-        ),
-        textTheme: GoogleFonts.interTextTheme(),
+        colorSchemeSeed: _themeColor,
         useMaterial3: true,
       ),
       darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: PandoraTokens.primary,
-          background: PandoraTokens.darkBg,
-          surface: PandoraTokens.neutral900,
-          brightness: Brightness.dark,
-        ),
-        textTheme: GoogleFonts.interTextTheme(
-          ThemeData.dark().textTheme,
-        ),
+        colorSchemeSeed: _themeColor,
+        brightness: Brightness.dark,
         useMaterial3: true,
       ),
       themeMode: _themeMode,
@@ -191,15 +132,13 @@ class _MyAppState extends State<MyApp> {
         data: MediaQuery.of(context).copyWith(textScaleFactor: _fontScale),
         child: child!,
       ),
-
       home: _hasSeenOnboarding
           ? HomeScreen(
               onThemeChanged: updateTheme,
               onFontScaleChanged: updateFontScale,
+              onThemeModeChanged: updateThemeMode,
             )
           : OnboardingScreen(onFinished: _completeOnboarding),
-
-
     );
   }
 }

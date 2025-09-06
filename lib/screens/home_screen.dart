@@ -34,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
       NotesTab(
         onThemeChanged: widget.onThemeChanged,
         onFontScaleChanged: widget.onFontScaleChanged,
+        onThemeModeChanged: widget.onThemeModeChanged,
       ),
       NoteListForDayScreen(date: DateTime.now()),
       const VoiceToNoteScreen(),
@@ -41,6 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
       SettingsScreen(
         onThemeChanged: widget.onThemeChanged,
         onFontScaleChanged: widget.onFontScaleChanged,
+        onThemeModeChanged: widget.onThemeModeChanged,
       ),
     ];
   }

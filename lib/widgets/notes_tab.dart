@@ -16,11 +16,13 @@ import 'tag_filtered_notes_list.dart';
 class NotesTab extends StatefulWidget {
   final Function(Color) onThemeChanged;
   final Function(double) onFontScaleChanged;
+  final Function(ThemeMode) onThemeModeChanged;
 
   const NotesTab({
     super.key,
     required this.onThemeChanged,
     required this.onFontScaleChanged,
+    required this.onThemeModeChanged,
   });
 
   @override
@@ -128,6 +130,7 @@ class _NotesTabState extends State<NotesTab> {
                   pageBuilder: (_, __, ___) => SettingsScreen(
                     onThemeChanged: widget.onThemeChanged,
                     onFontScaleChanged: widget.onFontScaleChanged,
+                    onThemeModeChanged: widget.onThemeModeChanged,
                   ),
                   transitionsBuilder: (_, animation, __, child) {
                     final offsetAnimation = Tween<Offset>(
