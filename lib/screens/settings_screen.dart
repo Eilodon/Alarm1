@@ -29,6 +29,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final NoteRepository _noteRepository = NoteRepository();
   bool _requireAuth = false;
 
+  ThemeMode _themeMode = ThemeMode.system;
+
   BackupFormat _backupFormat = BackupFormat.json;
 
 
@@ -45,6 +47,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (mounted) {
         setState(() => _backupFormat = v);
 
+      }
+    });
+
+    _settings.loadThemeMode().then((v) {
+      if (mounted) {
+        setState(() => _themeMode = v);
+        widget.onThemeModeChanged(_themeMode);
       }
     });
   }

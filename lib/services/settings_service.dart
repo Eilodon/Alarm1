@@ -11,6 +11,7 @@ class SettingsService {
   static const _kFontScale = 'font_scale';
   static const _kRequireAuth = 'require_auth';
   static const _kBackupFormat = 'backup_format';
+  static const _kThemeMode = 'theme_mode';
 
   static const _kHasSeenOnboarding = 'has_seen_onboarding';
 
@@ -77,5 +78,19 @@ class SettingsService {
       orElse: () => BackupFormat.json,
     );
 
+  }
+
+  Future<void> saveThemeMode(ThemeMode mode) async {
+    final sp = await _sp;
+    await sp.setString(_kThemeMode, mode.name);
+  }
+
+  Future<ThemeMode> loadThemeMode() async {
+    final sp = await _sp;
+    final value = sp.getString(_kThemeMode);
+    return ThemeMode.values.firstWhere(
+      (m) => m.name == value,
+      orElse: () => ThemeMode.system,
+    );
   }
 }
