@@ -17,8 +17,10 @@ class AuthService {
       debugPrint(l10n.errorWithMessage('${e.message ?? e.toString()}\n$st'));
       return false;
     } catch (e, st) {
+      // Catch any other unexpected errors and fail gracefully instead of
+      // bubbling the exception up to the caller which could crash the app.
       debugPrint(l10n.errorWithMessage('${e.toString()}\n$st'));
-      rethrow;
+      return false;
     }
   }
 }
