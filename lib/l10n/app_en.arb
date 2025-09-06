@@ -41,6 +41,11 @@
   "delete": "Delete",
   "timeLabel": "Time",
 
+  "pin": "Pin",
+  "share": "Share",
+  "markDone": "Mark done",
+  "setReminder": "Set reminder",
+
   "noteDeleted": "Note deleted",
   "undo": "Undo",
 
@@ -69,6 +74,10 @@
   "requireAuth": "Require authentication",
   "lockNote": "Lock note",
   "authReason": "Please authenticate to continue",
+  "themeMode": "Theme mode",
+  "light": "Light",
+  "dark": "Dark",
+  "system": "System",
   "voiceToNote": "Voice To Note",
   "stop": "Stop",
   "speak": "Speak",

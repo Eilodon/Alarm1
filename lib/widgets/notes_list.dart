@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../models/note.dart';
 import '../providers/note_provider.dart';
@@ -103,6 +105,7 @@ class _NotesListState extends State<NotesList> {
         }
         final note = notes[index];
         return Card(
+
           child: ListTile(
             leading: note.locked ? const Icon(Icons.lock) : null,
             title: Hero(
@@ -146,24 +149,41 @@ class _NotesListState extends State<NotesList> {
             },
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
+
               children: [
-                if (!provider.isSynced(note.id))
-                  const Icon(Icons.sync_problem, color: Colors.orange),
-                IconButton(
-                  icon: const Icon(Icons.delete),
-                  tooltip: AppLocalizations.of(context)!.delete,
-                  onPressed: () {
-                    final provider = context.read<NoteProvider>();
-                    final idx = provider.notes.indexWhere(
-                      (n) => n.id == note.id,
+                SlidableAction(
+                  onPressed: (_) async {
+                    final l10n = AppLocalizations.of(context)!;
+                    await provider.updateNote(
+                      note.copyWith(pinned: !note.pinned),
+                      l10n,
                     );
+                  },
+                  icon: Icons.push_pin,
+                  label: AppLocalizations.of(context)!.pin,
+                ),
+              ],
+            ),
+            endActionPane: ActionPane(
+              motion: const DrawerMotion(),
+              children: [
+                SlidableAction(
+                  onPressed: (_) {
+                    Share.share('${note.title}\n${note.content}');
+                  },
+                  icon: Icons.share,
+                  label: AppLocalizations.of(context)!.share,
+                ),
+                SlidableAction(
+                  backgroundColor: Colors.red,
+                  onPressed: (_) {
+                    final idx = provider.notes.indexWhere((n) => n.id == note.id);
                     if (idx != -1) {
                       provider.removeNoteAt(idx);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(
-                            AppLocalizations.of(context)!.noteDeleted,
-                          ),
+                          content:
+                              Text(AppLocalizations.of(context)!.noteDeleted),
                           action: SnackBarAction(
                             label: AppLocalizations.of(context)!.undo,
                             onPressed: () => provider.addNote(note),
@@ -172,8 +192,97 @@ class _NotesListState extends State<NotesList> {
                       );
                     }
                   },
+                  icon: Icons.delete,
+                  label: AppLocalizations.of(context)!.delete,
                 ),
               ],
+            ),
+            child: ListTile(
+              leading: note.locked ? const Icon(Icons.lock) : null,
+              title: Text(note.title),
+              subtitle: Text(
+                note.alarmTime != null
+                    ? '${note.content}\n⏰ ${DateFormat.yMd(Localizations.localeOf(context).toString()).add_Hm().format(note.alarmTime!)}'
+                    : note.content,
+              ),
+              onTap: () async {
+                if (note.locked) {
+                  final ok = await AuthService().authenticate(
+                    AppLocalizations.of(context)!,
+                  );
+                  if (!ok) return;
+                }
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => NoteDetailScreen(note: note)),
+                );
+              },
+              onLongPress: () {
+                final l10n = AppLocalizations.of(context)!;
+                showModalBottomSheet(
+                  context: context,
+                  builder: (ctx) => SafeArea(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          leading: const Icon(Icons.check),
+                          title: Text(l10n.markDone),
+                          onTap: () async {
+                            Navigator.pop(ctx);
+                            await provider.updateNote(
+                              note.copyWith(done: true, active: false),
+                              l10n,
+                            );
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.alarm),
+                          title: Text(l10n.setReminder),
+                          onTap: () async {
+                            Navigator.pop(ctx);
+                            final date = await showDatePicker(
+                              context: context,
+                              firstDate: DateTime.now(),
+                              lastDate:
+                                  DateTime.now().add(const Duration(days: 365)),
+                              initialDate: DateTime.now(),
+                            );
+                            if (date == null) return;
+                            final time = await showTimePicker(
+                              context: context,
+                              initialTime: TimeOfDay.now(),
+                            );
+                            if (time == null) return;
+                            final alarmTime = DateTime(
+                              date.year,
+                              date.month,
+                              date.day,
+                              time.hour,
+                              time.minute,
+                            );
+                            await provider.updateNote(
+                              note.copyWith(alarmTime: alarmTime),
+                              l10n,
+                            );
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.share),
+                          title: Text(l10n.share),
+                          onTap: () {
+                            Navigator.pop(ctx);
+                            Share.share('${note.title}\n${note.content}');
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+              trailing: provider.isSynced(note.id)
+                  ? null
+                  : const Icon(Icons.sync_problem, color: Colors.orange),
             ),
           ),
         );
