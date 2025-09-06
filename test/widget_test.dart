@@ -14,7 +14,12 @@ void main() {
         supportedLocales: AppLocalizations.supportedLocales,
         home: ChangeNotifierProvider(
           create: (_) => NoteProvider(),
-          child: MyApp(themeColor: Colors.blue, fontScale: 1.0),
+          child: MyApp(
+            themeColor: Colors.blue,
+            fontScale: 1.0,
+            themeMode: ThemeMode.system,
+            hasSeenOnboarding: true,
+          ),
         ),
       ),
     );
