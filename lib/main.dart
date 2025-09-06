@@ -93,7 +93,9 @@ void main() async {
       child: MyApp(
         themeColor: themeColor,
         fontScale: fontScale,
-        themeMode: themeMode,
+
+        themeMode: await settings.loadThemeMode(),
+
 
         hasSeenOnboarding: hasSeenOnboarding,
 
