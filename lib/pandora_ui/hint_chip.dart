@@ -1,5 +1,37 @@
 import 'package:flutter/material.dart';
 
+import 'tokens.dart';
+
+class _ChipStyle {
+  final Color background;
+  final Color text;
+  final double opacity;
+
+  const _ChipStyle({
+    required this.background,
+    required this.text,
+    required this.opacity,
+  });
+}
+
+const Map<String, _ChipStyle> _chipStyles = {
+  'default': _ChipStyle(
+    background: PandoraTokens.neutral200,
+    text: PandoraTokens.neutral900,
+    opacity: PandoraTokens.opacityDisabled,
+  ),
+  'armed': _ChipStyle(
+    background: PandoraTokens.error,
+    text: PandoraTokens.neutral100,
+    opacity: PandoraTokens.opacityFocus,
+  ),
+  'active': _ChipStyle(
+    background: PandoraTokens.secondary,
+    text: PandoraTokens.neutral100,
+    opacity: PandoraTokens.opacityEnabled,
+  ),
+};
+
 class HintChip extends StatelessWidget {
   final String label;
   final String state;
@@ -16,39 +48,34 @@ class HintChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color backgroundColor;
-    Color textColor;
+    final _ChipStyle styleData = _chipStyles[state] ?? _chipStyles['default']!;
 
-    switch (state) {
-      case 'armed':
-        backgroundColor = Colors.red;
-        textColor = Colors.white;
-        break;
-      case 'active':
-        backgroundColor = Colors.green;
-        textColor = Colors.white;
-        break;
-      default:
-        backgroundColor = Colors.grey[300]!;
-        textColor = Colors.black;
-    }
-
-    return GestureDetector(
+    return InkWell(
       onTap: onPressed,
-      child: Container(
+      borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
+      child: Ink(
         decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(12),
+          color: styleData.background.withOpacity(styleData.opacity),
+          borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.all(PandoraTokens.spacingM),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.lightbulb, color: Colors.yellow),
-            const SizedBox(width: 8),
+            Icon(
+              PandoraTokens.hintIcon,
+              size: PandoraTokens.iconS,
+              color: PandoraTokens.warning,
+            ),
+            const SizedBox(width: PandoraTokens.spacingM),
             Text(
               label,
-              style: style ?? TextStyle(color: textColor),
+              style: (style ??
+                      const TextStyle(
+                        fontSize: PandoraTokens.fontSizeS,
+                        fontFamily: PandoraTokens.fontFamily,
+                      ))
+                  .copyWith(color: styleData.text),
             ),
           ],
         ),

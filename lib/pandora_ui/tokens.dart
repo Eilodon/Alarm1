@@ -40,6 +40,9 @@ class PandoraTokens {
   static const double iconM = 24.0;
   static const double iconL = 32.0;
 
+  // Icons
+  static const IconData hintIcon = Icons.lightbulb_outline;
+
   // Opacity
   static const double opacityDisabled = 0.5;
   static const double opacityFocus = 0.85;
