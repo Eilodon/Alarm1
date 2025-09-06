@@ -18,11 +18,13 @@ import 'voice_to_note_screen.dart';
 class HomeScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
   final Function(double) onFontScaleChanged;
+  final Function(ThemeMode) onThemeModeChanged;
 
   const HomeScreen({
     super.key,
     required this.onThemeChanged,
     required this.onFontScaleChanged,
+    required this.onThemeModeChanged,
   });
 
   @override
@@ -152,6 +154,7 @@ class _NotesTabState extends State<_NotesTab> {
               delegate: NoteSearchDelegate(context.read<NoteProvider>().notes),
             ),
           ),
+
         ],
       ),
       body: Column(
