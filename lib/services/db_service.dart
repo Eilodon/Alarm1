@@ -26,6 +26,19 @@ class DbService {
     return base64Url.decode(key);
   }
 
+  Future<List<int>> _deriveKeyFromPassword(String password) async {
+    final pbkdf2 = Pbkdf2(
+      macAlgorithm: Hmac.sha256(),
+      iterations: 100000,
+      bits: 256,
+    );
+    final secretKey = await pbkdf2.deriveKey(
+      secretKey: SecretKey(utf8.encode(password)),
+      nonce: utf8.encode('notes_backup_salt'),
+    );
+    return secretKey.extractBytes();
+  }
+
   Future<List<Note>> getNotes() async {
     final sp = await SharedPreferences.getInstance();
     var raw = sp.getString(_kNotes);
@@ -83,8 +96,10 @@ class DbService {
     }
   }
 
-  Future<Map<String, dynamic>> encryptNote(Note note) async {
-    final keyBytes = await _getKey();
+  Future<Map<String, dynamic>> encryptNote(Note note,
+      {String? password}) async {
+    final keyBytes =
+        password != null ? await _deriveKeyFromPassword(password) : await _getKey();
     final algorithm = AesGcm.with256bits();
     final secretKey = SecretKey(keyBytes);
     final m = note.toJson();
@@ -95,6 +110,33 @@ class DbService {
     m['iv'] = base64Encode(iv);
     m['tag'] = base64Encode(box.mac.bytes);
     return m;
+  }
+
+  Future<Note> decryptNote(Map<String, dynamic> data,
+      {String? password}) async {
+    final keyBytes =
+        password != null ? await _deriveKeyFromPassword(password) : await _getKey();
+    final algorithm = AesGcm.with256bits();
+    final secretKey = SecretKey(keyBytes);
+    final legacyEncrypter =
+        encrypt.Encrypter(encrypt.AES(encrypt.Key(keyBytes)));
+    final ivString = data['iv'];
+    final tagString = data['tag'];
+    final content = data['content'] as String;
+    if (tagString != null) {
+      final box = SecretBox(base64Decode(content),
+          nonce: base64Decode(ivString),
+          mac: Mac(base64Decode(tagString)));
+      final decrypted = await algorithm.decrypt(box, secretKey: secretKey);
+      data['content'] = utf8.decode(decrypted);
+    } else {
+      final iv = ivString != null
+          ? encrypt.IV.fromBase64(ivString)
+          : encrypt.IV.fromLength(16);
+      final decrypted = legacyEncrypter.decrypt64(content, iv: iv);
+      data['content'] = decrypted;
+    }
+    return Note.fromJson(data);
   }
 
 
