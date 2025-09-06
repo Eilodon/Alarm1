@@ -43,7 +43,15 @@
 	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
+        <key>UIApplicationSupportsIndirectInputEvents</key>
+        <true/>
+        <key>NSMicrophoneUsageDescription</key>
+        <string>This app needs microphone access to record audio notes.</string>
+        <key>NSSpeechRecognitionUsageDescription</key>
+        <string>This app uses speech recognition to transcribe voice into text.</string>
+        <key>NSPhotoLibraryUsageDescription</key>
+        <string>This app requires photo library access to attach images to notes.</string>
+        <key>NSUserTrackingUsageDescription</key>
+        <string>This identifier will be used to deliver personalized content.</string>
 </dict>
 </plist>
