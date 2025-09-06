@@ -1,14 +1,20 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import 'tokens.dart';
 
-  static const success =
-      SnackbarKind._(Icons.check_circle, PandoraTokens.secondary);
-  static const warn = SnackbarKind._(Icons.warning, PandoraTokens.warning);
-  static const error = SnackbarKind._(Icons.error, PandoraTokens.error);
+
+class SnackbarKind {
+  final IconData icon;
+  final Color color;
+
+  const SnackbarKind._(this.icon, this.color);
+
+
+  /// Returns the color associated with this kind for the given [ColorScheme].
+  Color color(ColorScheme scheme) => _resolveColor(scheme);
 }
 
 class PandoraSnackbar extends StatefulWidget {
@@ -62,6 +68,10 @@ class _PandoraSnackbarState extends State<PandoraSnackbar>
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final background = scheme.surface.withOpacity(0.9);
+    final iconColor = widget.kind.color(scheme);
+
 
     return AnimatedOpacity(
       duration: Duration(milliseconds: 300),
@@ -84,7 +94,9 @@ class _PandoraSnackbarState extends State<PandoraSnackbar>
             ),
             IconButton(
               icon: Icon(Icons.close),
+              tooltip: AppLocalizations.of(context)!.cancel,
               onPressed: onClose,
+
 
             ),
           ),
@@ -93,3 +105,4 @@ class _PandoraSnackbarState extends State<PandoraSnackbar>
     );
   }
 }
+
