@@ -9,6 +9,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'screens/home_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'services/settings_service.dart';
+import 'theme/tokens.dart';
 
 final messengerKey = GlobalKey<ScaffoldMessengerState>();
 
@@ -119,13 +120,25 @@ class _MyAppState extends State<MyApp> {
       ],
       supportedLocales: const [Locale('en'), Locale('vi')],
       theme: ThemeData(
-        colorSchemeSeed: _themeColor,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: _themeColor,
+          background: Tokens.light.colors.background,
+          surface: Tokens.light.colors.surface,
+        ),
+        fontFamily: Tokens.light.typography.fontFamily,
         useMaterial3: true,
+        extensions: const [Tokens.light],
       ),
       darkTheme: ThemeData(
-        colorSchemeSeed: _themeColor,
-        brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: _themeColor,
+          background: Tokens.dark.colors.background,
+          surface: Tokens.dark.colors.surface,
+          brightness: Brightness.dark,
+        ),
+        fontFamily: Tokens.dark.typography.fontFamily,
         useMaterial3: true,
+        extensions: const [Tokens.dark],
       ),
       themeMode: _themeMode,
       builder: (context, child) => MediaQuery(
