@@ -74,6 +74,28 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.appTitle),
         actions: [
+          ValueListenableBuilder<SyncStatus>(
+            valueListenable: provider.syncStatus,
+            builder: (context, status, _) {
+              final l10n = AppLocalizations.of(context)!;
+              String text;
+              switch (status) {
+                case SyncStatus.syncing:
+                  text = l10n.syncStatusSyncing;
+                  break;
+                case SyncStatus.error:
+                  text = l10n.syncStatusError;
+                  break;
+                case SyncStatus.idle:
+                default:
+                  text = l10n.syncStatusIdle;
+              }
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Center(child: Text(text)),
+              );
+            },
+          ),
           TagFilterMenu(
             tags: tags,
             selectedTag: _selectedTag,
@@ -114,6 +136,26 @@ class _HomeScreenState extends State<HomeScreen> {
               );
               _loadMascot();
             },
+          ),
+          PopupMenuButton<String>(
+            onSelected: (value) async {
+              if (value == 'backup') {
+                final ok = await context.read<NoteProvider>().backupNow();
+                if (!mounted) return;
+                final l10n = AppLocalizations.of(context)!;
+                if (ok) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(l10n.notesExported)),
+                  );
+                }
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'backup',
+                child: Text(AppLocalizations.of(context)!.backupNow),
+              ),
+            ],
           ),
         ],
       ),

@@ -16,6 +16,8 @@ import '../services/note_repository.dart';
 import '../services/calendar_service.dart';
 import '../services/notification_service.dart';
 
+enum SyncStatus { idle, syncing, error }
+
 int _noteComparator(Note a, Note b) => (b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0)).compareTo(a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0));
 
 class NoteProvider extends ChangeNotifier {
@@ -35,6 +37,8 @@ class NoteProvider extends ChangeNotifier {
   final SplayTreeSet<Note> _notes = SplayTreeSet<Note>(_noteComparator);
   String _draft = '';
   final Set<String> _unsyncedNoteIds = {};
+  final ValueNotifier<SyncStatus> syncStatus =
+      ValueNotifier<SyncStatus>(SyncStatus.idle);
 
   Set<String> get unsyncedNoteIds => Set.unmodifiable(_unsyncedNoteIds);
   bool isSynced(String id) => !_unsyncedNoteIds.contains(id);
@@ -79,6 +83,7 @@ class NoteProvider extends ChangeNotifier {
 
   Future<void> _syncUnsyncedNotes() async {
     if (_unsyncedNoteIds.isEmpty || Firebase.apps.isEmpty) return;
+    syncStatus.value = SyncStatus.syncing;
     try {
       final user = _auth.currentUser ?? await _auth.signInAnonymously();
       final ids = List<String>.from(_unsyncedNoteIds);
@@ -103,19 +108,23 @@ class NoteProvider extends ChangeNotifier {
       await batch.commit();
       await _saveUnsyncedNoteIds();
       notifyListeners();
+      syncStatus.value = SyncStatus.idle;
     } catch (e, st) {
       debugPrint('syncUnsyncedNotes error: $e\n$st');
+      syncStatus.value = SyncStatus.error;
     }
   }
 
   @override
   void dispose() {
     _connectivitySubscription?.cancel();
+    unawaited(_repository.autoBackup());
     super.dispose();
   }
 
 
   Future<bool> loadNotes() async {
+    syncStatus.value = SyncStatus.syncing;
     _notes..clear();
     _notes.addAll(await _repository.getNotes());
     await _loadUnsyncedNoteIds();
@@ -175,7 +184,12 @@ class NoteProvider extends ChangeNotifier {
     }
     await _saveUnsyncedNoteIds();
     notifyListeners();
+    syncStatus.value = success ? SyncStatus.idle : SyncStatus.error;
     return success;
+  }
+
+  Future<bool> backupNow() {
+    return _repository.autoBackup();
   }
 
   Future<List<Note>> fetchNotesPage(DateTime? startAfter, int limit) async {

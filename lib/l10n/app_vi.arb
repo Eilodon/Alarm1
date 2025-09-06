@@ -94,5 +94,9 @@
   "authFailedMessage": "Đăng nhập ẩn danh thất bại. Chức năng bị hạn chế.",
   "notificationFailedMessage": "Thiết lập thông báo thất bại.",
   "saveNoteFailed": "Lưu ghi chú thất bại"
-
+,
+  "backupNow": "Sao lưu ngay",
+  "syncStatusIdle": "Đã đồng bộ",
+  "syncStatusSyncing": "Đang đồng bộ...",
+  "syncStatusError": "Lỗi đồng bộ"
 }
