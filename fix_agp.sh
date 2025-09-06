@@ -2,7 +2,7 @@
 set -e
 
 REQUIRED_AGP="8.1.1"
-REQUIRED_GRADLE="8.7"
+REQUIRED_GRADLE="8.1"
 REQUIRED_KOTLIN="1.9.23"
 
 # Đọc phiên bản AGP đang dùng
@@ -38,7 +38,7 @@ fi
 # Nâng Gradle Wrapper lên
 echo "Setting Gradle wrapper to $REQUIRED_GRADLE"
 sed -i \
-  's#distributionUrl=.*#distributionUrl=https\://services.gradle.org/distributions/gradle-'$REQUIRED_GRADLE'-all.zip#' \
+  's#distributionUrl=.*#distributionUrl=https\://services.gradle.org/distributions/gradle-'$REQUIRED_GRADLE'-bin.zip#' \
   android/gradle/wrapper/gradle-wrapper.properties
 
 # Clean, check dependencies, build và cài APK
