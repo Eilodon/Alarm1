@@ -24,23 +24,21 @@ class NoteRepository {
     return _dbService.updateNote(note);
   }
 
-  Future<Map<String, dynamic>> encryptNote(Note note) {
-    return _dbService.encryptNote(note);
+  Future<Map<String, dynamic>> encryptNote(Note note, {String? password}) {
+    return _dbService.encryptNote(note, password: password);
   }
 
-
-
-  Future<Note> decryptNote(Map<String, dynamic> data) {
-    return _dbService.decryptNote(data);
+  Future<Note> decryptNote(Map<String, dynamic> data, {String? password}) {
+    return _dbService.decryptNote(data, password: password);
   }
 
-  Future<bool> exportNotes(AppLocalizations l10n) async {
+  Future<bool> exportNotes(AppLocalizations l10n, {String? password}) async {
     final notes = await _dbService.getNotes();
-    return _backupService.exportNotes(notes, l10n);
+    return _backupService.exportNotes(notes, l10n, password: password);
   }
 
-  Future<List<Note>> importNotes(AppLocalizations l10n) async {
-    final notes = await _backupService.importNotes(l10n);
+  Future<List<Note>> importNotes(AppLocalizations l10n, {String? password}) async {
+    final notes = await _backupService.importNotes(l10n, password: password);
     if (notes.isNotEmpty) {
       await _dbService.saveNotes(notes);
     }

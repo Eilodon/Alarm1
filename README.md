@@ -9,6 +9,7 @@ A Flutter application to manage notes, schedule reminders, transcribe speech, pl
 * Voice dictation to turn speech into notes.
 * Text‑to‑speech playback for notes.
 * Chat with Gemini for analysis or conversational replies.
+* Backup and restore encrypted notes with an optional password.
 
 ## Firebase Configuration
 
@@ -72,6 +73,17 @@ Run the tests with:
 ```bash
 flutter test
 ```
+
+## Backup & Restore
+
+Use the backup feature to export your notes to an encrypted JSON file. Each
+note is encrypted with AES‑GCM. When exporting, you may supply a password to
+derive the encryption key. If you leave the password blank, the key stored in
+secure storage on the device is used instead.
+
+To restore notes, choose the backup file and enter the same password you used
+when exporting (or leave it blank to use the device key). The imported notes
+will replace the existing ones on the device.
 
 
 ## Troubleshooting

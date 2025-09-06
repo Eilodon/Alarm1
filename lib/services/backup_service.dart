@@ -6,9 +6,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../models/note.dart';
+import 'db_service.dart';
 
 class BackupService {
-  Future<bool> exportNotes(List<Note> notes, AppLocalizations l10n) async {
+  final DbService _dbService;
+
+  BackupService({DbService? dbService})
+      : _dbService = dbService ?? DbService();
+
+  Future<bool> exportNotes(List<Note> notes, AppLocalizations l10n,
+      {String? password}) async {
     String? path;
     try {
       path = await FilePicker.platform.saveFile(
@@ -23,7 +30,11 @@ class BackupService {
     }
     if (path == null) return false;
     final file = File(path);
-    final data = jsonEncode(notes.map((n) => n.toJson()).toList());
+    final list = <Map<String, dynamic>>[];
+    for (final n in notes) {
+      list.add(await _dbService.encryptNote(n, password: password));
+    }
+    final data = jsonEncode(list);
     try {
       await file.writeAsString(data);
       return true;
@@ -33,7 +44,8 @@ class BackupService {
     }
   }
 
-  Future<List<Note>> importNotes(AppLocalizations l10n) async {
+  Future<List<Note>> importNotes(AppLocalizations l10n,
+      {String? password}) async {
     FilePickerResult? result;
     try {
       result = await FilePicker.platform.pickFiles(
@@ -56,9 +68,17 @@ class BackupService {
     }
     try {
       final list = jsonDecode(content) as List<dynamic>;
-      return list
-          .map((e) => Note.fromJson(e as Map<String, dynamic>))
-          .toList();
+      final notes = <Note>[];
+      for (final m in list) {
+        try {
+          notes.add(await _dbService.decryptNote(
+              m as Map<String, dynamic>,
+              password: password));
+        } catch (_) {
+          // skip invalid note
+        }
+      }
+      return notes;
     } catch (e) {
       debugPrint(l10n.errorWithMessage(e.toString()));
       return [];
