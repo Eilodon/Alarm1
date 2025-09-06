@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:local_auth/local_auth.dart';
@@ -30,13 +31,22 @@ void main() {
     expect(ok, isTrue);
   });
 
-  test('authenticate returns false on failure', () async {
+  test('authenticate returns false on PlatformException', () async {
+    when(() => mock.authenticate(
+          localizedReason: any(named: 'localizedReason'),
+          options: any(named: 'options'),
+        )).thenThrow(const PlatformException(code: 'fail'));
+
+    final ok = await service.authenticate(l10n);
+    expect(ok, isFalse);
+  });
+
+  test('authenticate rethrows on generic exception', () async {
     when(() => mock.authenticate(
           localizedReason: any(named: 'localizedReason'),
           options: any(named: 'options'),
         )).thenThrow(Exception('fail'));
 
-    final ok = await service.authenticate(l10n);
-    expect(ok, isFalse);
+    expect(() => service.authenticate(l10n), throwsException);
   });
 }
