@@ -178,6 +178,7 @@ class _MyAppState extends State<MyApp> {
         data: MediaQuery.of(context).copyWith(textScaleFactor: _fontScale),
         child: child!,
       ),
+      // Home screen with bottom navigation bar
       home: HomeScreen(
         onThemeChanged: updateTheme,
         onFontScaleChanged: updateFontScale,
