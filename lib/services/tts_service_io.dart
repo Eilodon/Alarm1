@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:http/http.dart' as http;
 
@@ -50,16 +51,32 @@ class TTSService {
           )
           .timeout(const Duration(seconds: 10));
 
-      if (response.statusCode != 200) {
-        throw Exception('TTS API error: ${response.statusCode}');
+      if (response.statusCode == 200) {
+        await _player.play(BytesSource(response.bodyBytes));
+        return;
       }
 
-      await _player.play(BytesSource(response.bodyBytes));
-    } on TimeoutException {
-      // Fallback to local TTS when the request times out.
+      if (response.statusCode == 401 || response.statusCode == 403) {
+        debugPrint('TTS API invalid key: ${response.statusCode} ${response.body}');
+        await speak(text);
+        throw Exception('Invalid API key');
+      }
+
+      debugPrint('TTS API HTTP ${response.statusCode}: ${response.body}');
       await speak(text);
-    } catch (e) {
-      throw Exception('TTS API request failed: $e');
+      throw Exception('TTS API error: ${response.statusCode}');
+    } on SocketException catch (e, st) {
+      debugPrint('TTS API network error: $e\n$st');
+      await speak(text);
+      throw Exception('No internet connection');
+    } on TimeoutException catch (e, st) {
+      debugPrint('TTS API timeout: $e\n$st');
+      await speak(text);
+      throw Exception('Request timed out');
+    } catch (e, st) {
+      debugPrint('TTS API request failed: $e\n$st');
+      await speak(text);
+      throw Exception('TTS API request failed');
     }
   }
 }
