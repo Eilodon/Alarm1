@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -36,6 +38,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   int _snoozeMinutes = 5;
   late List<String> _tags;
   late final TTSService _ttsService;
+  String? _titleSuggestion;
+  List<String> _tagSuggestions = [];
+  NoteAnalysis? _analysis;
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -43,6 +49,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     _ttsService = widget.ttsService;
     _titleCtrl = TextEditingController(text: widget.note.title);
     _contentCtrl = TextEditingController(text: widget.note.content);
+    _contentCtrl.addListener(_onContentChanged);
     _alarmTime = widget.note.alarmTime;
     _repeat = widget.note.repeatInterval ??
         (widget.note.daily ? RepeatInterval.daily : null);
@@ -53,6 +60,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
+    _contentCtrl.removeListener(_onContentChanged);
     _titleCtrl.dispose();
     _contentCtrl.dispose();
     super.dispose();
@@ -63,6 +72,30 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       _contentCtrl.text,
       locale: Localizations.localeOf(context),
     );
+  }
+
+  void _onContentChanged() {
+    _debounce?.cancel();
+    if (_contentCtrl.text.trim().isEmpty) {
+      setState(() {
+        _analysis = null;
+        _titleSuggestion = null;
+        _tagSuggestions = [];
+      });
+      return;
+    }
+    _debounce = Timer(const Duration(seconds: 1), () async {
+      final analysis = await GeminiService().analyzeNote(_contentCtrl.text);
+      if (!mounted) return;
+      setState(() {
+        _analysis = analysis;
+        _titleSuggestion = analysis?.suggestedTitle;
+        _tagSuggestions = analysis?.suggestedTags
+                .where((t) => !_tags.contains(t))
+                .toList() ??
+            [];
+      });
+    });
   }
 
   @override
@@ -111,6 +144,41 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               maxLines: null,
             ),
             const SizedBox(height: 12),
+            if (_titleSuggestion != null || _tagSuggestions.isNotEmpty)
+              Wrap(
+                spacing: 8,
+                children: [
+                  if (_titleSuggestion != null)
+                    InputChip(
+                      label: Text(_titleSuggestion!),
+                      onPressed: () {
+                        setState(() {
+                          _titleCtrl.text = _titleSuggestion!;
+                          _titleSuggestion = null;
+                        });
+                      },
+                      onDeleted: () =>
+                          setState(() => _titleSuggestion = null),
+                    ),
+                  ..._tagSuggestions.map(
+                    (tag) => InputChip(
+                      label: Text(tag),
+                      onPressed: () {
+                        setState(() {
+                          if (!_tags.contains(tag)) {
+                            _tags.add(tag);
+                          }
+                          _tagSuggestions.remove(tag);
+                        });
+                      },
+                      onDeleted: () =>
+                          setState(() => _tagSuggestions.remove(tag)),
+                    ),
+                  ),
+                ],
+              ),
+            if (_titleSuggestion != null || _tagSuggestions.isNotEmpty)
+              const SizedBox(height: 12),
             ReminderControls(
               alarmTime: _alarmTime,
               repeat: _repeat,
@@ -168,7 +236,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   Future<void> _save() async {
     final l10n = AppLocalizations.of(context)!;
 
-    final analysis = await GeminiService().analyzeNote(_contentCtrl.text);
+    final analysis =
+        _analysis ?? await GeminiService().analyzeNote(_contentCtrl.text);
     String summary = widget.note.summary;
     List<String> actionItems = List.from(widget.note.actionItems);
     List<DateTime> dates = List.from(widget.note.dates);
