@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -32,11 +35,24 @@ class GeminiService {
         final data = jsonDecode(res.body);
         final text = (data['candidates']?[0]?['content']?['parts']?[0]?['text'] ?? '').toString();
         return text.isEmpty ? l10n.noResponse : text;
-      } else {
-        return l10n.geminiError('${res.statusCode} ${res.body}');
       }
-    } catch (_) {
-      return l10n.errorWithMessage(l10n.networkError);
+
+      if (res.statusCode == 401 || res.statusCode == 403) {
+        debugPrint('Gemini chat invalid API key: ${res.statusCode} ${res.body}');
+        return l10n.geminiError('Invalid API key');
+      }
+
+      debugPrint('Gemini chat HTTP ${res.statusCode}: ${res.body}');
+      return l10n.geminiError('${res.statusCode} ${res.reasonPhrase ?? ''}');
+    } on SocketException catch (e, st) {
+      debugPrint('Gemini chat network error: $e\n$st');
+      return l10n.noInternetConnection;
+    } on TimeoutException catch (e, st) {
+      debugPrint('Gemini chat timeout: $e\n$st');
+      return l10n.networkError;
+    } catch (e, st) {
+      debugPrint('Gemini chat unknown error: $e\n$st');
+      return l10n.networkError;
     }
   }
 
@@ -65,11 +81,25 @@ class GeminiService {
             body: jsonEncode(body),
           )
           .timeout(const Duration(seconds: 10));
-    } catch (_) {
+    } on SocketException catch (e, st) {
+      debugPrint('analyzeNote network error: $e\n$st');
+      return null;
+    } on TimeoutException catch (e, st) {
+      debugPrint('analyzeNote timeout: $e\n$st');
+      return null;
+    } catch (e, st) {
+      debugPrint('analyzeNote request error: $e\n$st');
       return null;
     }
 
-    if (res.statusCode != 200) return null;
+    if (res.statusCode != 200) {
+      if (res.statusCode == 401 || res.statusCode == 403) {
+        debugPrint('analyzeNote invalid API key: ${res.statusCode} ${res.body}');
+      } else {
+        debugPrint('analyzeNote HTTP ${res.statusCode}: ${res.body}');
+      }
+      return null;
+    }
 
     try {
       final data = jsonDecode(res.body);
@@ -86,7 +116,8 @@ class GeminiService {
             (map['suggestedTags'] as List<dynamic>? ?? []).cast<String>(),
         dates: dates,
       );
-    } catch (_) {
+    } catch (e, st) {
+      debugPrint('analyzeNote parse error: $e\n$st');
       return null;
     }
   }
