@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'tokens.dart';
 
 class ResultCard extends StatelessWidget {
@@ -15,6 +16,7 @@ class ResultCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
       ),
       child: child,
+
     );
   }
 }

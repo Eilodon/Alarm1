@@ -17,6 +17,7 @@ class ToolbarButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return ElevatedButton.icon(
       onPressed: disabled ? null : onPressed,
       icon: icon,
@@ -32,6 +33,7 @@ class ToolbarButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
         ),
         elevation: PandoraTokens.elevationLow,
+
       ),
     );
   }
