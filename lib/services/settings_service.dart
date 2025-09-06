@@ -9,7 +9,9 @@ class SettingsService {
   static const _kMascotPath = 'mascot_path';
   static const _kFontScale = 'font_scale';
   static const _kRequireAuth = 'require_auth';
-  static const _kThemeMode = 'theme_mode';
+
+  static const _kHasSeenOnboarding = 'has_seen_onboarding';
+
 
   SharedPreferences? _preferences;
 
@@ -59,20 +61,15 @@ class SettingsService {
     return sp.getBool(_kRequireAuth) ?? false;
   }
 
-  Future<void> saveThemeMode(ThemeMode mode) async {
+
+  Future<void> saveHasSeenOnboarding(bool value) async {
     final sp = await _sp;
-    await sp.setString(_kThemeMode, mode.name);
+    await sp.setBool(_kHasSeenOnboarding, value);
   }
 
-  Future<ThemeMode> loadThemeMode() async {
+  Future<bool> loadHasSeenOnboarding() async {
     final sp = await _sp;
-    final value = sp.getString(_kThemeMode);
-    if (value != null) {
-      return ThemeMode.values.firstWhere(
-        (m) => m.name == value,
-        orElse: () => ThemeMode.system,
-      );
-    }
-    return ThemeMode.system;
+    return sp.getBool(_kHasSeenOnboarding) ?? false;
+
   }
 }

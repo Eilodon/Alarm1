@@ -38,11 +38,13 @@ void main() {
     expect(value, true);
   });
 
-  test('save and load theme mode', () async {
+
+  test('save and load has seen onboarding', () async {
     final service = SettingsService();
-    await service.saveThemeMode(ThemeMode.dark);
-    final mode = await service.loadThemeMode();
-    expect(mode, ThemeMode.dark);
+    await service.saveHasSeenOnboarding(true);
+    final value = await service.loadHasSeenOnboarding();
+    expect(value, true);
+
   });
 
   test('default values returned when not set', () async {
@@ -51,11 +53,15 @@ void main() {
     final path = await service.loadMascotPath();
     final scale = await service.loadFontScale();
     final auth = await service.loadRequireAuth();
-    final mode = await service.loadThemeMode();
+
+    final onboarding = await service.loadHasSeenOnboarding();
+
     expect(color, Colors.blue);
     expect(path, 'assets/lottie/mascot.json');
     expect(scale, 1.0);
     expect(auth, false);
-    expect(mode, ThemeMode.system);
+
+    expect(onboarding, false);
+
   });
 }
