@@ -1,9 +1,14 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'tokens.dart';
 
+class SnackbarKind {
+  final IconData icon;
+  final Color color;
+
+  const SnackbarKind._(this.icon, this.color);
 
   static const success =
       SnackbarKind._(Icons.check_circle, PandoraTokens.secondary);
@@ -62,30 +67,69 @@ class _PandoraSnackbarState extends State<PandoraSnackbar>
 
   @override
   Widget build(BuildContext context) {
-
-    return AnimatedOpacity(
-      duration: Duration(milliseconds: 300),
-      opacity: 1,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.7),
-          borderRadius: BorderRadius.circular(10),
-          backdropFilter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        ),
-        padding: EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Icon(getIcon(kind)),
-            SizedBox(width: 8),
-            Expanded(child: Text(text)),
-            TextButton(
-              onPressed: onUndo,
-              child: Text(AppLocalizations.of(context)!.undo),
-            ),
-            IconButton(
-              icon: Icon(Icons.close),
-              onPressed: onClose,
-
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    
+    return SlideTransition(
+      position: _slide,
+      child: FadeTransition(
+        opacity: _fade,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface.withOpacity(0.9),
+                borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
+                border: Border.all(
+                  color: widget.kind.color.withOpacity(0.3),
+                  width: 1,
+                ),
+              ),
+              padding: const EdgeInsets.all(PandoraTokens.spacingM),
+              child: Row(
+                children: [
+                  Icon(
+                    widget.kind.icon,
+                    color: widget.kind.color,
+                    size: PandoraTokens.iconS,
+                  ),
+                  const SizedBox(width: PandoraTokens.spacingS),
+                  Expanded(
+                    child: Text(
+                      widget.text,
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                  ),
+                  if (widget.onUndo != null) ...[
+                    const SizedBox(width: PandoraTokens.spacingS),
+                    TextButton(
+                      onPressed: widget.onUndo,
+                      style: TextButton.styleFrom(
+                        foregroundColor: widget.kind.color,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: PandoraTokens.spacingS,
+                        ),
+                      ),
+                      child: Text(l10n.undo),
+                    ),
+                  ],
+                  if (widget.onClose != null) ...[
+                    const SizedBox(width: PandoraTokens.spacingXS),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      iconSize: PandoraTokens.iconS,
+                      padding: const EdgeInsets.all(PandoraTokens.spacingXS),
+                      constraints: const BoxConstraints(
+                        minWidth: 32,
+                        minHeight: 32,
+                      ),
+                      onPressed: widget.onClose,
+                    ),
+                  ],
+                ],
+              ),
             ),
           ),
         ),
