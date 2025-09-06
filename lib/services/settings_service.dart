@@ -9,7 +9,9 @@ class SettingsService {
   static const _kMascotPath = 'mascot_path';
   static const _kFontScale = 'font_scale';
   static const _kRequireAuth = 'require_auth';
+
   static const _kHasSeenOnboarding = 'has_seen_onboarding';
+
 
   SharedPreferences? _preferences;
 
@@ -59,6 +61,7 @@ class SettingsService {
     return sp.getBool(_kRequireAuth) ?? false;
   }
 
+
   Future<void> saveHasSeenOnboarding(bool value) async {
     final sp = await _sp;
     await sp.setBool(_kHasSeenOnboarding, value);
@@ -67,5 +70,6 @@ class SettingsService {
   Future<bool> loadHasSeenOnboarding() async {
     final sp = await _sp;
     return sp.getBool(_kHasSeenOnboarding) ?? false;
+
   }
 }

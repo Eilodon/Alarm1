@@ -16,7 +16,7 @@ void main() {
           locale: const Locale('vi'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: HomeScreen(onThemeChanged: (_) {}, onFontScaleChanged: (_) {}),
+          home: HomeScreen(onThemeChanged: (_) {}, onFontScaleChanged: (_) {}, onThemeModeChanged: (_) {}),
         ),
       ),
     );
@@ -50,7 +50,7 @@ void main() {
           locale: const Locale('vi'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: HomeScreen(onThemeChanged: (_) {}, onFontScaleChanged: (_) {}),
+          home: HomeScreen(onThemeChanged: (_) {}, onFontScaleChanged: (_) {}, onThemeModeChanged: (_) {}),
         ),
       ),
     );
