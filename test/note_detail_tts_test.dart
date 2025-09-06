@@ -1,20 +1,27 @@
+import 'dart:typed_data';
+
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:notes_reminder_app/models/note.dart';
 import 'package:notes_reminder_app/providers/note_provider.dart';
 import 'package:notes_reminder_app/screens/note_detail_screen.dart';
 import 'package:notes_reminder_app/services/tts_service.dart';
 
 class MockTTS extends Mock implements TTSService {}
+class MockAudioPlayer extends Mock implements AudioPlayer {}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() {
     registerFallbackValue(const Locale('en'));
+    registerFallbackValue(BytesSource(Uint8List(0)));
   });
 
   testWidgets('read note triggers TTS', (tester) async {
@@ -45,5 +52,38 @@ void main() {
     await tester.pump();
 
     verify(() => tts.speak('content', locale: any(named: 'locale'))).called(1);
+  });
+
+  test('speakWithApi uses provided voiceId', () async {
+    final player = MockAudioPlayer();
+    when(() => player.play(any())).thenAnswer((_) async {});
+
+    Uri? requested;
+    final client = MockClient((request) async {
+      requested = request.url;
+      return http.Response.bytes(Uint8List(0), 200);
+    });
+
+    final service = TTSService(player: player, client: client);
+    await service.speakWithApi('hello', voiceId: 'test-voice');
+
+    expect(requested!.pathSegments.last, 'test-voice');
+    verify(() => player.play(any())).called(1);
+  });
+
+  test('speakWithApi maps locale to voice', () async {
+    final player = MockAudioPlayer();
+    when(() => player.play(any())).thenAnswer((_) async {});
+
+    Uri? requested;
+    final client = MockClient((request) async {
+      requested = request.url;
+      return http.Response.bytes(Uint8List(0), 200);
+    });
+
+    final service = TTSService(player: player, client: client);
+    await service.speakWithApi('xin chao', locale: const Locale('vi'));
+
+    expect(requested!.pathSegments.last, 'vi-VN');
   });
 }
