@@ -54,10 +54,12 @@
         <key>NSUserTrackingUsageDescription</key>
         <string>This identifier will be used to deliver personalized content.</string>
 
-        <key>FirebaseCrashlyticsCollectionEnabled</key>
-        <true/>
-        <key>FirebaseAnalyticsCollectionEnabled</key>
-        <true/>
+        <key>NSSiriUsageDescription</key>
+        <string>This app uses Siri to create voice notes.</string>
+        <key>IntentsSupported</key>
+        <array>
+                <string>CreateNoteIntent</string>
+        </array>
 
 </dict>
 </plist>

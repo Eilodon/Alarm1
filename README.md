@@ -53,6 +53,18 @@ Add to `ios/Runner/Info.plist`:
 * `NSMicrophoneUsageDescription` and `NSSpeechRecognitionUsageDescription` for voice input.
 * Notification permissions for alerts, badges, and sounds are requested at runtime.
 
+## Voice Commands
+
+### Android
+
+1. Open **Settings > Apps > Default apps > Assist app** and choose *Notes Reminder App*.
+2. Long-press the home button or use the assist gesture and speak to create a note.
+
+### iOS
+
+1. Open the Shortcuts app and add the **Create Note** shortcut from Notes Reminder App.
+2. Say “Hey Siri, create note” to launch the app and dictate your note.
+
 ## Build & Run
 
 ```bash
