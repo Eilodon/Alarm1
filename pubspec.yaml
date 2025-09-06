@@ -15,7 +15,9 @@ dependencies:
   timezone: ^0.10.1
   flutter_native_timezone: ^2.0.0
   lottie: ^3.3.1
-  http: ^1.2.1
+ codex/update-http-package-and-dependencies
+  http: ^1.1.0
+
   shared_preferences: ^2.3.2
   audioplayers: ^6.5.0
   intl: ^0.20.2
@@ -44,7 +46,6 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^2.0.0
   mocktail: ^1.0.4
-  google_sign_in_platform_interface: ^2.4.0
   integration_test:
     sdk: flutter
   uuid: ^4.5.1
