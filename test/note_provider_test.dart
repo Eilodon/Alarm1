@@ -68,6 +68,7 @@ void main() {
         body: any(named: 'body'),
         scheduledDate: any(named: 'scheduledDate'),
         l10n: l10n,
+        payload: any(named: 'payload'),
       ),
     ).thenAnswer((_) async {});
     when(
@@ -104,6 +105,7 @@ void main() {
         body: 'c',
         scheduledDate: any(named: 'scheduledDate'),
         l10n: l10n,
+        payload: captureAny(named: 'payload'),
       ),
     ).captured;
     expect(captured.first, isA<int>());
@@ -202,6 +204,7 @@ void main() {
           body: any(named: 'body'),
           minutes: any(named: 'minutes'),
           l10n: l10n,
+          payload: any(named: 'payload'),
         )).thenAnswer((_) async {});
 
     final provider = NoteProvider(
@@ -220,6 +223,7 @@ void main() {
           body: 'c',
           minutes: 5,
           l10n: l10n,
+          payload: note.id,
         )).called(1);
   });
 }

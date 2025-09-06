@@ -83,6 +83,7 @@
   "recurring": "Recurring",
   "daily": "Daily",
   "snooze": "Snooze",
+  "done": "Done",
   "scheduledDesc": "Scheduled notifications",
   "recurringDesc": "Recurring notifications",
   "dailyDesc": "Daily notifications",
