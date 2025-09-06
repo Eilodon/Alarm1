@@ -12,10 +12,12 @@ import 'tts_platform_stub.dart' if (dart.library.io) 'dart:io';
 class TTSService {
   final FlutterTts _tts;
   final AudioPlayer _player;
+  final http.Client _client;
 
-  TTSService({FlutterTts? tts, AudioPlayer? player})
+  TTSService({FlutterTts? tts, AudioPlayer? player, http.Client? client})
       : _tts = tts ?? FlutterTts(),
-        _player = player ?? AudioPlayer();
+        _player = player ?? AudioPlayer(),
+        _client = client ?? http.Client();
 
   String _ttsCodeForLocale(Locale locale) {
     const mapping = {
@@ -55,15 +57,27 @@ class TTSService {
     return 'TTS API request failed';
   }
 
-  Future<void> speakWithApi(String text) async {
+  String _voiceIdForLocale(Locale locale) {
+    const mapping = {
+      'en': 'en-US',
+      'vi': 'vi-VN',
+    };
+    return mapping[locale.languageCode] ?? 'en-US';
+  }
+
+  Future<void> speakWithApi(String text,
+      {Locale? locale, String? voiceId}) async {
     final apiKey = _getApiKey();
     if (apiKey.isEmpty) {
       throw Exception('Missing TTS_API_KEY');
     }
 
-    final url = Uri.parse('https://api.elevenlabs.io/v1/text-to-speech/en-US');
+    final loc = locale ?? PlatformDispatcher.instance.locale;
+    final voice = voiceId ?? _voiceIdForLocale(loc);
+    final url =
+        Uri.parse('https://api.elevenlabs.io/v1/text-to-speech/$voice');
     try {
-      final response = await http
+      final response = await _client
           .post(
             url,
             headers: {
