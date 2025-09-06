@@ -1,5 +1,6 @@
 
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -15,6 +16,8 @@ import '../services/note_repository.dart';
 import '../services/calendar_service.dart';
 import '../services/notification_service.dart';
 
+int _noteComparator(Note a, Note b) => (b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0)).compareTo(a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0));
+
 class NoteProvider extends ChangeNotifier {
   final NoteRepository _repository;
 
@@ -29,7 +32,7 @@ class NoteProvider extends ChangeNotifier {
 
   static const _unsyncedKey = 'unsyncedNoteIds';
 
-  List<Note> _notes = [];
+  final SplayTreeSet<Note> _notes = SplayTreeSet<Note>(_noteComparator);
   String _draft = '';
   final Set<String> _unsyncedNoteIds = {};
 
@@ -110,7 +113,8 @@ class NoteProvider extends ChangeNotifier {
 
 
   Future<bool> loadNotes() async {
-    _notes = await _repository.getNotes();
+    _notes..clear();
+    _notes.addAll(await _repository.getNotes());
     await _loadUnsyncedNoteIds();
     final existingUnsynced = Set<String>.from(_unsyncedNoteIds);
     _unsyncedNoteIds.clear();
@@ -148,8 +152,9 @@ class NoteProvider extends ChangeNotifier {
           }
         }
         _unsyncedNoteIds.addAll(existingUnsynced);
-        _notes = map.values.toList();
-        await _repository.saveNotes(_notes);
+        _notes..clear();
+        _notes.addAll(map.values);
+        await _repository.saveNotes(_notes.toList());
         if (remoteIds.isEmpty && _notes.isNotEmpty) {
           for (final n in _notes) {
             final data = await _repository.encryptNote(n);
@@ -160,7 +165,8 @@ class NoteProvider extends ChangeNotifier {
         }
       } catch (e, st) {
         debugPrint('loadNotes error: $e\n$st');
-        _notes = originalNotes;
+        _notes..clear();
+        _notes.addAll(originalNotes);
         success = false;
       }
     }
@@ -171,7 +177,7 @@ class NoteProvider extends ChangeNotifier {
 
   Future<List<Note>> fetchNotesPage(DateTime? startAfter, int limit) async {
     if (_notes.isEmpty && startAfter == null) {
-      _notes = await _repository.getNotes();
+      _notes.addAll(await _repository.getNotes());
     }
 
     if (Firebase.apps.isNotEmpty) {
@@ -204,12 +210,9 @@ class NoteProvider extends ChangeNotifier {
             }
           }
         }
-        _notes = map.values.toList()
-          ..sort((a, b) =>
-              (b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0))
-                  .compareTo(
-                      a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0)));
-        await _repository.saveNotes(_notes);
+        _notes..clear();
+        _notes.addAll(map.values);
+        await _repository.saveNotes(_notes.toList());
       } catch (e, st) {
         debugPrint('fetchNotesPage error: $e\n$st');
         if (_notes.isEmpty) {
@@ -218,10 +221,7 @@ class NoteProvider extends ChangeNotifier {
       }
     }
 
-    final sorted = _notes.toList()
-      ..sort((a, b) => (b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0))
-          .compareTo(a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0)));
-    final page = sorted
+    final page = _notes
         .where((n) => startAfter == null
             ? true
             : (n.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0))
@@ -309,9 +309,7 @@ class NoteProvider extends ChangeNotifier {
 
   Future<void> addNote(Note note) async {
     _notes.add(note);
-    _notes.sort((a, b) => (b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0))
-        .compareTo(a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0)));
-    await _repository.saveNotes(_notes);
+    await _repository.saveNotes(_notes.toList());
     notifyListeners();
     if (Firebase.apps.isNotEmpty) {
       try {
@@ -331,10 +329,13 @@ class NoteProvider extends ChangeNotifier {
 
   Future<bool> updateNote(Note note, AppLocalizations l10n) async {
     try {
-      final index = _notes.indexWhere((n) => n.id == note.id);
-      if (index == -1) return false;
+      Note old;
+      try {
+        old = _notes.firstWhere((n) => n.id == note.id);
+      } catch (_) {
+        return false;
+      }
       var updated = note;
-      final old = _notes[index];
 
       // Handle calendar events
       if (old.eventId != null && note.alarmTime == null) {
@@ -402,8 +403,9 @@ class NoteProvider extends ChangeNotifier {
         updated = updated.copyWith(notificationId: null, active: false);
       }
 
-      _notes[index] = updated;
-      await _repository.saveNotes(_notes);
+      _notes.remove(old);
+      _notes.add(updated);
+      await _repository.saveNotes(_notes.toList());
       notifyListeners();
       if (Firebase.apps.isNotEmpty) {
         try {
@@ -442,14 +444,15 @@ class NoteProvider extends ChangeNotifier {
   }
 
   Future<void> removeNoteAt(int index) async {
-    final note = _notes.removeAt(index);
+    final note = _notes.elementAt(index);
+    _notes.remove(note);
     if (note.notificationId != null) {
       await _notificationService.cancel(note.notificationId!);
     }
     if (note.eventId != null) {
       await _calendarService.deleteEvent(note.eventId!);
     }
-    await _repository.saveNotes(_notes);
+    await _repository.saveNotes(_notes.toList());
     notifyListeners();
     if (Firebase.apps.isNotEmpty) {
       try {
