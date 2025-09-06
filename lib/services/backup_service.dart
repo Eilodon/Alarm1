@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:pdf/widgets.dart' as pw;
+import 'package:uuid/uuid.dart';
 
 
 import '../models/note.dart';
@@ -146,11 +147,12 @@ class BackupService {
         final lines = content.split('\n');
         String? title;
         final buffer = StringBuffer();
+        final uuid = Uuid();
         for (final line in lines) {
           if (line.startsWith('# ')) {
             if (title != null) {
               notes.add(
-                Note(id: '${notes.length}', title: title!, content: buffer.toString().trim()),
+                Note(id: uuid.v4(), title: title!, content: buffer.toString().trim()),
               );
               buffer.clear();
             }
@@ -161,7 +163,7 @@ class BackupService {
         }
         if (title != null) {
           notes.add(
-            Note(id: '${notes.length}', title: title!, content: buffer.toString().trim()),
+            Note(id: uuid.v4(), title: title!, content: buffer.toString().trim()),
           );
         }
         return notes;
