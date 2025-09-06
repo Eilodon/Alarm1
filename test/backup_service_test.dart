@@ -206,5 +206,69 @@ void main() {
       final notes = await BackupService().importNotes(l10n);
       expect(notes, isEmpty);
     });
+
+    test('exportNotes writes markdown file', () async {
+      final path = '${tempDir.path}/notes.md';
+      _channel.setMockMethodCallHandler(
+        (call) async => call.method == 'saveFile' ? path : null,
+      );
+      final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+      const note = Note(id: '1', title: 't', content: 'c');
+      final ok = await BackupService().exportNotes(
+        [note],
+        l10n,
+        format: BackupFormat.md,
+      );
+      expect(ok, true);
+      final data = await File(path).readAsString();
+      expect(data.contains('# t'), true);
+      expect(data.contains('c'), true);
+    });
+
+    test('importNotes reads markdown file', () async {
+      final path = '${tempDir.path}/notes.md';
+      await File(path).writeAsString('# t\nc');
+      _channel.setMockMethodCallHandler((call) async {
+        if (call.method == 'custom') {
+          final file = File(path);
+          return [
+            {
+              'name': 'notes.md',
+              'path': path,
+              'bytes': null,
+              'size': await file.length(),
+              'identifier': null,
+            },
+          ];
+        }
+        return null;
+      });
+      final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+      final notes = await BackupService().importNotes(
+        l10n,
+        format: BackupFormat.md,
+      );
+      expect(notes.length, 1);
+      expect(notes.first.title, 't');
+      expect(notes.first.content.trim(), 'c');
+    });
+
+    test('exportNotes writes pdf file', () async {
+      final path = '${tempDir.path}/notes.pdf';
+      _channel.setMockMethodCallHandler(
+        (call) async => call.method == 'saveFile' ? path : null,
+      );
+      final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+      const note = Note(id: '1', title: 't', content: 'c');
+      final ok = await BackupService().exportNotes(
+        [note],
+        l10n,
+        format: BackupFormat.pdf,
+      );
+      expect(ok, true);
+      final bytes = await File(path).readAsBytes();
+      expect(bytes.isNotEmpty, true);
+      expect(String.fromCharCodes(bytes.take(4)), '%PDF');
+    });
   });
 }

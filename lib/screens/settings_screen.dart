@@ -4,6 +4,7 @@ import 'package:lottie/lottie.dart';
 
 import '../services/settings_service.dart';
 import '../services/note_repository.dart';
+import '../services/backup_service.dart';
 import 'package:provider/provider.dart';
 import '../providers/note_provider.dart';
 
@@ -27,7 +28,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final SettingsService _settings = SettingsService();
   final NoteRepository _noteRepository = NoteRepository();
   bool _requireAuth = false;
-  ThemeMode _themeMode = ThemeMode.system;
+
+  BackupFormat _backupFormat = BackupFormat.json;
+
 
   @override
   void initState() {
@@ -37,9 +40,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         setState(() => _requireAuth = v);
       }
     });
-    _settings.loadThemeMode().then((m) {
+
+    _settings.loadBackupFormat().then((v) {
       if (mounted) {
-        setState(() => _themeMode = m);
+        setState(() => _backupFormat = v);
+
       }
     });
   }
@@ -169,7 +174,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _exportNotes() async {
     final l10n = AppLocalizations.of(context)!;
-    final success = await _noteRepository.exportNotes(l10n);
+    final success =
+        await _noteRepository.exportNotes(l10n, format: _backupFormat);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -182,7 +188,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _importNotes() async {
     final l10n = AppLocalizations.of(context)!;
-    final notes = await _noteRepository.importNotes(l10n);
+    final notes =
+        await _noteRepository.importNotes(l10n, format: _backupFormat);
     if (!mounted) return;
     if (notes.isNotEmpty) {
       await context.read<NoteProvider>().loadNotes();
@@ -197,6 +204,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
       );
+    }
+  }
+
+  String _formatLabel(BackupFormat f, AppLocalizations l10n) {
+    switch (f) {
+      case BackupFormat.json:
+        return l10n.formatJson;
+      case BackupFormat.pdf:
+        return l10n.formatPdf;
+      case BackupFormat.md:
+        return l10n.formatMarkdown;
+    }
+  }
+
+  Future<void> _pickFormat() async {
+    final l10n = AppLocalizations.of(context)!;
+    final selected = await showDialog<BackupFormat>(
+      context: context,
+      builder: (_) => SimpleDialog(
+        title: Text(l10n.backupFormat),
+        children: BackupFormat.values
+            .map(
+              (f) => SimpleDialogOption(
+                onPressed: () => Navigator.pop(context, f),
+                child: Text(_formatLabel(f, l10n)),
+              ),
+            )
+            .toList(),
+      ),
+    );
+    if (selected != null) {
+      setState(() => _backupFormat = selected);
+      _settings.saveBackupFormat(selected);
     }
   }
 
@@ -215,6 +255,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ListTile(
             title: Text(AppLocalizations.of(context)!.changeMascot),
             onTap: _pickMascot,
+          ),
+          ListTile(
+            title: Text(AppLocalizations.of(context)!.backupFormat),
+            subtitle: Text(_formatLabel(
+                _backupFormat, AppLocalizations.of(context)!)),
+            onTap: _pickFormat,
           ),
           ListTile(
             title: Text(AppLocalizations.of(context)!.fontSize),
