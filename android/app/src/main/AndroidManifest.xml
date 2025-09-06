@@ -35,9 +35,16 @@
             android:name="flutterEmbedding"
             android:value="2" />
 
-        <receiver
-            android:name=".WidgetProvider"
-            android:exported="true">
+
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="true" />
+        <meta-data
+            android:name="firebase_analytics_collection_enabled"
+            android:value="true" />
+
+        <receiver android:name=".WidgetProvider">
+
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

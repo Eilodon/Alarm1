@@ -53,9 +53,11 @@
         <string>This app requires photo library access to attach images to notes.</string>
         <key>NSUserTrackingUsageDescription</key>
         <string>This identifier will be used to deliver personalized content.</string>
-        <key>com.apple.security.application-groups</key>
-        <array>
-                <string>group.com.example.notes_reminder_app</string>
-        </array>
+
+        <key>FirebaseCrashlyticsCollectionEnabled</key>
+        <true/>
+        <key>FirebaseAnalyticsCollectionEnabled</key>
+        <true/>
+
 </dict>
 </plist>
