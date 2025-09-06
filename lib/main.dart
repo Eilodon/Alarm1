@@ -184,6 +184,11 @@ class _MyAppState extends State<MyApp> {
     await SettingsService().saveFontScale(newScale);
   }
 
+  void updateThemeMode(ThemeMode newMode) async {
+    setState(() => _themeMode = newMode);
+    await SettingsService().saveThemeMode(newMode);
+  }
+
 
   void _completeOnboarding() {
     setState(() => _hasSeenOnboarding = true);
@@ -227,6 +232,7 @@ class _MyAppState extends State<MyApp> {
           ? HomeScreen(
               onThemeChanged: updateTheme,
               onFontScaleChanged: updateFontScale,
+              onThemeModeChanged: updateThemeMode,
             )
           : OnboardingScreen(onFinished: _completeOnboarding),
 
