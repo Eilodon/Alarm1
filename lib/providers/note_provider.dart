@@ -16,9 +16,11 @@ import '../services/note_repository.dart';
 import '../services/calendar_service.dart';
 import '../services/notification_service.dart';
 
+
 enum SyncStatus { idle, syncing, error }
 
 int _noteComparator(Note a, Note b) => (b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0)).compareTo(a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0));
+
 
 class NoteProvider extends ChangeNotifier {
   final NoteRepository _repository;

@@ -9,6 +9,7 @@ import '../services/settings_service.dart';
 import '../widgets/add_note_dialog.dart';
 import '../widgets/notes_list.dart';
 import '../widgets/tag_filter_menu.dart';
+import 'chat_screen.dart';
 import 'note_list_for_day_screen.dart';
 import 'note_search_delegate.dart';
 import 'settings_screen.dart';
@@ -17,11 +18,13 @@ import 'voice_to_note_screen.dart';
 class HomeScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
   final Function(double) onFontScaleChanged;
+  final Function(ThemeMode) onThemeModeChanged;
 
   const HomeScreen({
     super.key,
     required this.onThemeChanged,
     required this.onFontScaleChanged,
+    required this.onThemeModeChanged,
   });
 
   @override
@@ -29,6 +32,67 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  int _currentIndex = 0;
+  late final List<Widget> _screens;
+
+  @override
+  void initState() {
+    super.initState();
+    _screens = [
+      const _NotesTab(),
+      NoteListForDayScreen(date: DateTime.now()),
+      const VoiceToNoteScreen(),
+      const ChatScreen(initialMessage: ''),
+      SettingsScreen(
+        onThemeChanged: widget.onThemeChanged,
+        onFontScaleChanged: widget.onFontScaleChanged,
+      ),
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Scaffold(
+      body: IndexedStack(index: _currentIndex, children: _screens),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (i) => setState(() => _currentIndex = i),
+        items: [
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.note),
+            label: 'Notes',
+          ),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.alarm),
+            label: 'Reminders',
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.mic),
+            label: l10n.voiceToNote,
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.smart_toy),
+            label: l10n.chatAI,
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.settings),
+            label: l10n.settings,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NotesTab extends StatefulWidget {
+  const _NotesTab();
+
+  @override
+  State<_NotesTab> createState() => _NotesTabState();
+}
+
+class _NotesTabState extends State<_NotesTab> {
   String _mascotPath = 'assets/lottie/mascot.json';
   final DateTime _today = DateTime.now();
   String? _selectedTag;
@@ -112,12 +176,28 @@ class _HomeScreenState extends State<HomeScreen> {
               delegate: NoteSearchDelegate(context.read<NoteProvider>().notes),
             ),
           ),
+
           IconButton(
             icon: const Icon(Icons.mic),
             onPressed: () async {
               await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const VoiceToNoteScreen()),
+                PageRouteBuilder(
+                  pageBuilder: (_, __, ___) => const VoiceToNoteScreen(),
+                  transitionsBuilder: (_, animation, __, child) {
+                    final offsetAnimation = Tween<Offset>(
+                      begin: const Offset(1, 0),
+                      end: Offset.zero,
+                    ).animate(animation);
+                    return FadeTransition(
+                      opacity: animation,
+                      child: SlideTransition(
+                        position: offsetAnimation,
+                        child: child,
+                      ),
+                    );
+                  },
+                ),
               );
             },
           ),
@@ -127,11 +207,24 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () async {
               await Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => SettingsScreen(
+                PageRouteBuilder(
+                  pageBuilder: (_, __, ___) => SettingsScreen(
                     onThemeChanged: widget.onThemeChanged,
                     onFontScaleChanged: widget.onFontScaleChanged,
                   ),
+                  transitionsBuilder: (_, animation, __, child) {
+                    final offsetAnimation = Tween<Offset>(
+                      begin: const Offset(1, 0),
+                      end: Offset.zero,
+                    ).animate(animation);
+                    return FadeTransition(
+                      opacity: animation,
+                      child: SlideTransition(
+                        position: offsetAnimation,
+                        child: child,
+                      ),
+                    );
+                  },
                 ),
               );
               _loadMascot();
@@ -157,6 +250,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
+
         ],
       ),
       body: Column(
@@ -176,8 +270,22 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (_) => NoteListForDayScreen(date: d),
+                      PageRouteBuilder(
+                        pageBuilder: (_, __, ___) =>
+                            NoteListForDayScreen(date: d),
+                        transitionsBuilder: (_, animation, __, child) {
+                          final offsetAnimation = Tween<Offset>(
+                            begin: const Offset(1, 0),
+                            end: Offset.zero,
+                          ).animate(animation);
+                          return FadeTransition(
+                            opacity: animation,
+                            child: SlideTransition(
+                              position: offsetAnimation,
+                              child: child,
+                            ),
+                          );
+                        },
                       ),
                     );
                   },

@@ -41,6 +41,11 @@
   "delete": "Xóa",
   "timeLabel": "Thời gian",
 
+  "pin": "Ghim",
+  "share": "Chia sẻ",
+  "markDone": "Đánh dấu xong",
+  "setReminder": "Đặt nhắc nhở",
+
   "noteDeleted": "Đã xóa ghi chú",
   "undo": "Hoàn tác",
 
@@ -69,6 +74,10 @@
   "requireAuth": "Yêu cầu xác thực",
   "lockNote": "Khóa ghi chú",
   "authReason": "Vui lòng xác thực để tiếp tục",
+  "themeMode": "Chế độ giao diện",
+  "light": "Sáng",
+  "dark": "Tối",
+  "system": "Hệ thống",
   "voiceToNote": "Giọng nói thành ghi chú",
   "stop": "Dừng",
   "speak": "Nói",

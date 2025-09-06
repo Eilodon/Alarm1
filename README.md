@@ -11,6 +11,7 @@ A Flutter application to manage notes, schedule reminders, transcribe speech, pl
 * Chat with Gemini for analysis or conversational replies.
 * Backup and restore encrypted notes with an optional password.
 * Notes waiting to sync display a warning icon (e.g., `sync_problem`) and upload automatically when connectivity returns.
+* Swipe notes to pin, share, or delete. Long‑press a note to mark it done, set a reminder, or share.
 
 ## Firebase Configuration
 
