@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/note_provider.dart';
 import 'tag_selector.dart';
+import '../l10n/localization_extensions.dart';
 
 class AddNoteDialog extends StatefulWidget {
   const AddNoteDialog({super.key});
@@ -20,6 +21,8 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
   DateTime? _alarmTime;
   bool _locked = false;
   List<String> _tags = [];
+  int _color = 0xFFFFFFFF;
+  bool _pinned = false;
   bool _isValid = false;
 
   @override
@@ -108,11 +111,19 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
                 allowCreate: true,
                 label: l10n.tagsLabel,
                 onChanged: (v) => setState(() => _tags = v),
+                selectedColor: _color,
+                onColorChanged: (c) => setState(() => _color = c),
+                colorLabel: l10n.colorLabel,
               ),
               SwitchListTile(
                 title: Text(l10n.lockNote),
                 value: _locked,
                 onChanged: (value) => setState(() => _locked = value),
+              ),
+              SwitchListTile(
+                title: Text(l10n.pinNote),
+                value: _pinned,
+                onChanged: (v) => setState(() => _pinned = v),
               ),
               const SizedBox(height: 12),
               ElevatedButton(
@@ -145,6 +156,8 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
                     content: _contentCtrl.text,
                     tags: _tags,
                     locked: _locked,
+                    color: _color,
+                    pinned: _pinned,
                     alarmTime: _alarmTime,
                     l10n: l10n,
                   );

@@ -104,7 +104,17 @@ class _NotesListState extends State<NotesList> {
         final note = notes[index];
         return Card(
           child: ListTile(
-            leading: note.locked ? const Icon(Icons.lock) : null,
+            leading: Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Color(note.color),
+              ),
+              child: note.locked
+                  ? const Icon(Icons.lock, size: 16, color: Colors.white)
+                  : null,
+            ),
             title: Text(note.title),
             subtitle: Text(
               note.alarmTime != null
@@ -126,6 +136,8 @@ class _NotesListState extends State<NotesList> {
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                if (note.pinned)
+                  const Icon(Icons.push_pin, size: 20),
                 if (!provider.isSynced(note.id))
                   const Icon(Icons.sync_problem, color: Colors.orange),
                 IconButton(

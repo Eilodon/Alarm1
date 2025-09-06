@@ -68,6 +68,8 @@
   "addTag": "Thêm tag",
   "requireAuth": "Yêu cầu xác thực",
   "lockNote": "Khóa ghi chú",
+  "pinNote": "Ghim ghi chú",
+  "colorLabel": "Màu",
   "authReason": "Vui lòng xác thực để tiếp tục",
   "voiceToNote": "Giọng nói thành ghi chú",
   "stop": "Dừng",

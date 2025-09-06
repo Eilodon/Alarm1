@@ -16,7 +16,13 @@ import '../services/note_repository.dart';
 import '../services/calendar_service.dart';
 import '../services/notification_service.dart';
 
-int _noteComparator(Note a, Note b) => (b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0)).compareTo(a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0));
+int _noteComparator(Note a, Note b) {
+  if (a.pinned != b.pinned) {
+    return a.pinned ? -1 : 1;
+  }
+  return (b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0))
+      .compareTo(a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0));
+}
 
 class NoteProvider extends ChangeNotifier {
   final NoteRepository _repository;
@@ -245,6 +251,8 @@ class NoteProvider extends ChangeNotifier {
     RepeatInterval? repeatInterval,
     bool daily = false,
     int snoozeMinutes = 0,
+    int color = 0xFFFFFFFF,
+    bool pinned = false,
     required AppLocalizations l10n,
   }) async {
     try {
@@ -292,6 +300,8 @@ class NoteProvider extends ChangeNotifier {
         content: content,
         tags: tags,
         locked: locked,
+        color: color,
+        pinned: pinned,
         alarmTime: alarmTime,
         repeatInterval: repeatInterval,
         daily: daily,

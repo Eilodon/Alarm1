@@ -68,6 +68,8 @@
   "addTag": "Add tag",
   "requireAuth": "Require authentication",
   "lockNote": "Lock note",
+  "pinNote": "Pin note",
+  "colorLabel": "Color",
   "authReason": "Please authenticate to continue",
   "voiceToNote": "Voice To Note",
   "stop": "Stop",
