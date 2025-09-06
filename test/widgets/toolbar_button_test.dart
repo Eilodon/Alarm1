@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:notes_reminder_app/pandora_ui/toolbar_button.dart';
+import 'package:notes_reminder_app/widgets/toolbar_button.dart';
 import 'package:notes_reminder_app/pandora_ui/tokens.dart';
 
 void main() {
@@ -38,7 +38,7 @@ void main() {
           onPressed: () {
             pressed = true;
           },
-          disabled: true,
+          state: 'disabled',
         ),
       ),
     );
@@ -52,8 +52,8 @@ void main() {
     expect(opacityWidget.opacity, PandoraTokens.opacityDisabled);
 
     final style = button.style!;
-    final shape = style.shape!.resolve({MaterialState.disabled}) as RoundedRectangleBorder;
-    expect(shape.side.color, PandoraTokens.neutral200);
+    final bg = style.backgroundColor!.resolve({MaterialState.disabled});
+    expect(bg, PandoraTokens.neutral300);
 
     await tester.tap(find.byType(ElevatedButton));
     expect(pressed, isFalse);
