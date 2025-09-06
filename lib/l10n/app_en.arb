@@ -41,6 +41,11 @@
   "delete": "Delete",
   "timeLabel": "Time",
 
+  "pin": "Pin",
+  "share": "Share",
+  "markDone": "Mark done",
+  "setReminder": "Set reminder",
+
   "noteDeleted": "Note deleted",
   "undo": "Undo",
 

@@ -35,6 +35,8 @@ Note _$NoteFromJson(Map<String, dynamic> json) => Note(
           [],
       locked: json['locked'] as bool? ?? false,
       snoozeMinutes: (json['snoozeMinutes'] as num?)?.toInt() ?? 0,
+      pinned: json['pinned'] as bool? ?? false,
+      done: json['done'] as bool? ?? false,
       updatedAt: json['updatedAt'] == null
           ? null
           : DateTime.parse(json['updatedAt'] as String),
@@ -57,6 +59,8 @@ Map<String, dynamic> _$NoteToJson(Note instance) => <String, dynamic>{
       'attachments': instance.attachments,
       'locked': instance.locked,
       'snoozeMinutes': instance.snoozeMinutes,
+      'pinned': instance.pinned,
+      'done': instance.done,
       'updatedAt': instance.updatedAt?.toIso8601String(),
       'notificationId': instance.notificationId,
       'eventId': instance.eventId,

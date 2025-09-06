@@ -41,6 +41,11 @@
   "delete": "Xóa",
   "timeLabel": "Thời gian",
 
+  "pin": "Ghim",
+  "share": "Chia sẻ",
+  "markDone": "Đánh dấu xong",
+  "setReminder": "Đặt nhắc nhở",
+
   "noteDeleted": "Đã xóa ghi chú",
   "undo": "Hoàn tác",
 
