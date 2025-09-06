@@ -1,19 +1,17 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:intl/intl.dart';
 
 import '../models/note.dart';
 import '../providers/note_provider.dart';
 import '../services/tts_service.dart';
 import '../widgets/tag_selector.dart';
 import '../services/gemini_service.dart';
+import '../widgets/attachment_section.dart';
+import '../widgets/reminder_controls.dart';
+import '../widgets/ai_suggestions_dialog.dart';
 import 'chat_screen.dart';
 
 class NoteDetailScreen extends StatefulWidget {
@@ -46,8 +44,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     _titleCtrl = TextEditingController(text: widget.note.title);
     _contentCtrl = TextEditingController(text: widget.note.content);
     _alarmTime = widget.note.alarmTime;
-    _repeat =
-        widget.note.repeatInterval ??
+    _repeat = widget.note.repeatInterval ??
         (widget.note.daily ? RepeatInterval.daily : null);
     _snoozeMinutes = widget.note.snoozeMinutes;
     _attachments = List.from(widget.note.attachments);
@@ -59,21 +56,6 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     _titleCtrl.dispose();
     _contentCtrl.dispose();
     super.dispose();
-  }
-
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final file = await picker.pickImage(source: ImageSource.gallery);
-    if (file != null) {
-      setState(() => _attachments.add(file.path));
-    }
-  }
-
-  Future<void> _pickAudio() async {
-    final res = await FilePicker.platform.pickFiles(type: FileType.audio);
-    if (res != null && res.files.single.path != null) {
-      setState(() => _attachments.add(res.files.single.path!));
-    }
   }
 
   Future<void> _readNote() async {
@@ -123,67 +105,13 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               maxLines: null,
             ),
             const SizedBox(height: 12),
-            Row(
-              children: [
-                ElevatedButton(
-                  onPressed: _pickAlarmTime,
-                  child: Text(AppLocalizations.of(context)!.selectReminderTime),
-                ),
-                if (_alarmTime != null)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8),
-                    child: Text(
-                      DateFormat.yMd(
-                        Localizations.localeOf(context).toString(),
-                      ).add_Hm().format(_alarmTime!),
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Text(AppLocalizations.of(context)!.repeatLabel),
-                const SizedBox(width: 8),
-                DropdownButton<RepeatInterval?>(
-                  value: _repeat,
-                  onChanged: (value) => setState(() => _repeat = value),
-                  items: [
-                    DropdownMenuItem<RepeatInterval?>(
-                      value: null,
-                      child: Text(AppLocalizations.of(context)!.repeatNone),
-                    ),
-                    DropdownMenuItem<RepeatInterval?>(
-                      value: RepeatInterval.everyMinute,
-                      child: Text(
-                        AppLocalizations.of(context)!.repeatEveryMinute,
-                      ),
-                    ),
-                    DropdownMenuItem<RepeatInterval?>(
-                      value: RepeatInterval.hourly,
-                      child: Text(AppLocalizations.of(context)!.repeatHourly),
-                    ),
-                    DropdownMenuItem<RepeatInterval?>(
-                      value: RepeatInterval.daily,
-                      child: Text(AppLocalizations.of(context)!.repeatDaily),
-                    ),
-                    DropdownMenuItem<RepeatInterval?>(
-                      value: RepeatInterval.weekly,
-                      child: Text(AppLocalizations.of(context)!.repeatWeekly),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(AppLocalizations.of(context)!.snoozeLabel(_snoozeMinutes)),
-            Slider(
-              value: _snoozeMinutes.toDouble(),
-              min: 1,
-              max: 60,
-              divisions: 59,
-              label: _snoozeMinutes.toString(),
-              onChanged: (v) => setState(() => _snoozeMinutes = v.round()),
+            ReminderControls(
+              alarmTime: _alarmTime,
+              repeat: _repeat,
+              snoozeMinutes: _snoozeMinutes,
+              onAlarmTimeChanged: (v) => setState(() => _alarmTime = v),
+              onRepeatChanged: (v) => setState(() => _repeat = v),
+              onSnoozeChanged: (v) => setState(() => _snoozeMinutes = v),
             ),
             const SizedBox(height: 12),
             TagSelector(
@@ -194,65 +122,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               label: AppLocalizations.of(context)!.tagsLabel,
             ),
             const SizedBox(height: 12),
-            Row(
-              children: [
-                ElevatedButton.icon(
-                  onPressed: _pickImage,
-                  icon: const Icon(Icons.image),
-                  label: Text(AppLocalizations.of(context)!.imageLabel),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton.icon(
-                  onPressed: _pickAudio,
-                  icon: const Icon(Icons.audiotrack),
-                  label: Text(AppLocalizations.of(context)!.audioLabel),
-                ),
-              ],
+            AttachmentSection(
+              attachments: _attachments,
+              onChanged: (v) => setState(() => _attachments = v),
             ),
-            const SizedBox(height: 12),
-
-            ..._attachments.asMap().entries.map(
-              (entry) {
-                final index = entry.key;
-                final a = entry.value;
-                final ext = a.split('.').last.toLowerCase();
-                if (['jpg', 'jpeg', 'png', 'gif', 'bmp'].contains(ext)) {
-                  return Stack(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: Image.file(File(a)),
-                      ),
-                      Positioned(
-                        top: 0,
-                        right: 0,
-                        child: IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () =>
-                              setState(() => _attachments.removeAt(index)),
-                        ),
-                      ),
-                    ],
-                  );
-                }
-                if (['mp3', 'wav'].contains(ext)) {
-                  return _AudioAttachment(
-                    path: a,
-                    onDelete: () =>
-                        setState(() => _attachments.removeAt(index)),
-                  );
-                }
-                return ListTile(
-                  title: Text(a.split('/').last),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () =>
-                        setState(() => _attachments.removeAt(index)),
-                  ),
-                );
-              },
-            ),
-
             const SizedBox(height: 12),
             ElevatedButton.icon(
               onPressed: () {
@@ -273,35 +146,6 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     );
   }
 
-  Future<void> _pickAlarmTime() async {
-    final now = DateTime.now();
-    final picked = await showDatePicker(
-      context: context,
-      firstDate: now,
-      lastDate: DateTime(now.year + 2),
-      initialDate: _alarmTime ?? now,
-    );
-    if (picked != null) {
-      final time = await showTimePicker(
-        context: context,
-        initialTime: _alarmTime != null
-            ? TimeOfDay.fromDateTime(_alarmTime!)
-            : TimeOfDay.now(),
-      );
-      if (time != null) {
-        setState(() {
-          _alarmTime = DateTime(
-            picked.year,
-            picked.month,
-            picked.day,
-            time.hour,
-            time.minute,
-          );
-        });
-      }
-    }
-  }
-
   Future<void> _save() async {
     final l10n = AppLocalizations.of(context)!;
 
@@ -312,77 +156,16 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     var tags = List<String>.from(_tags);
 
     if (analysis != null) {
-      final summaryCtrl = TextEditingController(text: analysis.summary);
-      final actionCtrl = TextEditingController(
-        text: analysis.actionItems.join('\n'),
-      );
-      final tagsCtrl = TextEditingController(
-        text: analysis.suggestedTags.join(', '),
-      );
-      final datesCtrl = TextEditingController(
-        text: analysis.dates
-            .map((d) => DateFormat('yyyy-MM-dd').format(d))
-            .join(', '),
-      );
-
-      final accepted = await showDialog<bool>(
+      final result = await showDialog<AISuggestionsResult>(
         context: context,
-        builder: (context) => AlertDialog(
-          title: Text(l10n.aiSuggestionsTitle),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: summaryCtrl,
-                  decoration: InputDecoration(labelText: l10n.summaryLabel),
-                ),
-                TextField(
-                  controller: actionCtrl,
-                  decoration: InputDecoration(labelText: l10n.actionItemsLabel),
-                  maxLines: null,
-                ),
-                TextField(
-                  controller: tagsCtrl,
-                  decoration: InputDecoration(labelText: l10n.tagsLabel),
-                ),
-                TextField(
-                  controller: datesCtrl,
-                  decoration: InputDecoration(labelText: l10n.datesLabel),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: Text(l10n.cancel),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: Text(l10n.save),
-            ),
-          ],
-        ),
+        builder: (context) =>
+            AISuggestionsDialog(analysis: analysis, l10n: l10n),
       );
-
-      if (accepted == true) {
-        summary = summaryCtrl.text;
-        actionItems = actionCtrl.text
-            .split('\n')
-            .map((e) => e.trim())
-            .where((e) => e.isNotEmpty)
-            .toList();
-        tags = tagsCtrl.text
-            .split(',')
-            .map((e) => e.trim())
-            .where((e) => e.isNotEmpty)
-            .toList();
-        dates = datesCtrl.text
-            .split(',')
-            .map((e) => DateTime.tryParse(e.trim()))
-            .whereType<DateTime>()
-            .toList();
+      if (result != null) {
+        summary = result.summary;
+        actionItems = result.actionItems;
+        tags = result.tags;
+        dates = result.dates;
       }
     }
 
@@ -412,66 +195,5 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         SnackBar(content: Text(l10n.saveNoteFailed)),
       );
     }
-  }
-}
-
-class _AudioAttachment extends StatefulWidget {
-  final String path;
-  final VoidCallback? onDelete;
-  const _AudioAttachment({required this.path, this.onDelete});
-
-  @override
-  State<_AudioAttachment> createState() => _AudioAttachmentState();
-}
-
-class _AudioAttachmentState extends State<_AudioAttachment> {
-  final AudioPlayer _player = AudioPlayer();
-  bool _playing = false;
-
-  @override
-  void dispose() {
-    _player.dispose();
-    super.dispose();
-  }
-
-  Future<void> _toggle() async {
-    try {
-      if (_playing) {
-        await _player.pause();
-      } else {
-        await _player.play(DeviceFileSource(widget.path));
-      }
-      if (!mounted) return;
-      setState(() => _playing = !_playing);
-    } catch (e) {
-      if (!mounted) return;
-      final l10n = AppLocalizations.of(context)!;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.errorWithMessage(e.toString())),
-        ),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(widget.path.split('/').last),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            icon: Icon(_playing ? Icons.pause : Icons.play_arrow),
-            onPressed: _toggle,
-          ),
-          if (widget.onDelete != null)
-            IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: widget.onDelete,
-            ),
-        ],
-      ),
-    );
   }
 }
