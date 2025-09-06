@@ -1,25 +1,72 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'note.g.dart';
+
+/// Represents a note with optional reminders and associated metadata.
+@JsonSerializable()
 class Note {
+  /// Unique identifier for the note.
   final String id;
+
+  /// Title of the note.
   final String title;
+
+  /// Full text content of the note.
   final String content;
+
+  /// Short summary or preview of the note.
+  @JsonKey(defaultValue: '')
   final String summary;
+
+  /// List of action items extracted from the note.
+  @JsonKey(defaultValue: [])
   final List<String> actionItems;
+
+  /// Important dates associated with the note.
+  @JsonKey(defaultValue: [])
   final List<DateTime> dates;
+
+  /// Optional time when a notification alarm should trigger.
   final DateTime? alarmTime;
+
+  /// How often the alarm should repeat.
   final RepeatInterval? repeatInterval;
+
+  /// Whether this note should repeat daily.
+  @JsonKey(defaultValue: false)
   final bool daily;
+
+  /// Whether this note's reminder is currently active.
+  @JsonKey(defaultValue: false)
   final bool active;
+
+  /// Tags used to categorize the note.
+  @JsonKey(defaultValue: [])
   final List<String> tags;
+
+  /// Paths or identifiers for file attachments.
+  @JsonKey(defaultValue: [])
   final List<String> attachments;
+
+  /// Indicates if the note is locked and requires authentication.
+  @JsonKey(defaultValue: false)
   final bool locked;
+
+  /// Number of minutes to snooze the reminder.
+  @JsonKey(defaultValue: 0)
   final int snoozeMinutes;
+
+  /// Timestamp of the last update.
   final DateTime? updatedAt;
+
+  /// Identifier of the scheduled notification.
   final int? notificationId;
+
+  /// Calendar event identifier associated with the note.
   final String? eventId;
 
-
+  /// Creates a new [Note].
   const Note({
     required this.id,
     required this.title,
@@ -37,11 +84,10 @@ class Note {
     this.snoozeMinutes = 0,
     this.updatedAt,
     this.notificationId,
-
     this.eventId,
-
   });
 
+  /// Returns a copy of this note with the given fields replaced.
   Note copyWith({
     String? id,
     String? title,
@@ -82,78 +128,20 @@ class Note {
       notificationId: notificationId == _notificationIdSentinel
           ? this.notificationId
           : notificationId as int?,
-
       eventId:
           eventId == _eventIdSentinel ? this.eventId : eventId as String?,
-
     );
   }
 
-  factory Note.fromJson(Map<String, dynamic> json) {
-    return Note(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      content: json['content'] as String,
-      summary: json['summary'] as String? ?? '',
-      actionItems:
-          (json['actionItems'] as List<dynamic>? ?? []).cast<String>(),
-      dates: (json['dates'] as List<dynamic>? ?? [])
-          .map((e) => DateTime.parse(e as String))
-          .toList(),
-      alarmTime: json['alarmTime'] != null
-          ? DateTime.parse(json['alarmTime'])
-          : json['remindAt'] != null
-          ? DateTime.parse(json['remindAt'])
-          : null,
-      repeatInterval: _repeatIntervalFromString(
-        json['repeatInterval'] as String?,
-      ),
-      daily: json['daily'] ?? false,
-      active: json['active'] ?? false,
-      tags: (json['tags'] as List<dynamic>? ?? []).cast<String>(),
-      attachments: (json['attachments'] as List<dynamic>? ?? []).cast<String>(),
-      locked: json['locked'] ?? false,
-      snoozeMinutes: json['snoozeMinutes'] ?? 0,
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'])
-          : null,
-      notificationId: json['notificationId'] as int?,
+  /// Creates a [Note] from a JSON map.
+  factory Note.fromJson(Map<String, dynamic> json) => _$NoteFromJson(json);
 
-      eventId: json['eventId'] as String?,
-
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'title': title,
-    'content': content,
-    'summary': summary,
-    'actionItems': actionItems,
-    'dates': dates.map((d) => d.toIso8601String()).toList(),
-    'alarmTime': alarmTime?.toIso8601String(),
-    'repeatInterval': repeatInterval?.toString().split('.').last,
-    'daily': daily,
-    'active': active,
-    'tags': tags,
-    'attachments': attachments,
-    'locked': locked,
-    'snoozeMinutes': snoozeMinutes,
-    'updatedAt': updatedAt?.toIso8601String(),
-    'notificationId': notificationId,
-
-    'eventId': eventId,
-
-  };
+  /// Converts this note to a JSON map.
+  Map<String, dynamic> toJson() => _$NoteToJson(this);
 }
-
+/// Sentinel value used to differentiate a missing notificationId in [Note.copyWith].
 const _notificationIdSentinel = Object();
+
+/// Sentinel value used to differentiate a missing eventId in [Note.copyWith].
 const _eventIdSentinel = Object();
 
-RepeatInterval? _repeatIntervalFromString(String? value) {
-  if (value == null) return null;
-  for (final r in RepeatInterval.values) {
-    if (r.toString().split('.').last == value) return r;
-  }
-  return null;
-}
