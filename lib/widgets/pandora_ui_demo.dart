@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../pandora_ui/bottom_sheet.dart';
 import '../pandora_ui/dismissible_wrapper.dart';
-import '../pandora_ui/palette_list_item.dart';
+import 'palette_list_item.dart';
 import '../pandora_ui/result_card.dart';
 import '../pandora_ui/security_cue.dart';
 import '../pandora_ui/teach_ai_modal.dart';
