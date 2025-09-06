@@ -17,7 +17,8 @@ class PaletteListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textColor = Theme.of(context).textTheme.bodyMedium?.color;
+    final baseStyle = Theme.of(context).textTheme.bodyMedium;
+    final textColor = baseStyle?.color;
     return ListTile(
       leading: Container(
         width: PandoraTokens.iconL,
@@ -27,7 +28,7 @@ class PaletteListItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(PandoraTokens.radiusS),
         ),
       ),
-      title: Text(label, style: TextStyle(color: textColor)),
+      title: Text(label, style: baseStyle?.copyWith(color: textColor)),
       onTap: onTap,
     );
   }

@@ -50,38 +50,34 @@ class ToolbarButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = _toolbarStyles[state] ?? _toolbarStyles['default']!;
 
-    return ConstrainedBox(
-      constraints: const BoxConstraints(
-        minHeight: PandoraTokens.touchTarget,
-        minWidth: PandoraTokens.touchTarget,
+    return ElevatedButton.icon(
+      onPressed: disabled ? null : onPressed,
+      icon: icon,
+      label: Text(
+        label,
+        style: Theme.of(
+          context,
+        ).textTheme.labelLarge?.copyWith(color: Colors.white),
       ),
-      child: ElevatedButton.icon(
-        onPressed: style.enabled
-            ? () {
-                HapticFeedback.selectionClick();
-                onPressed();
-              }
-            : null,
-        icon: icon,
-        label: Text(label),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: style.background,
-          foregroundColor: style.foreground,
-          padding: const EdgeInsets.symmetric(
-            vertical: PandoraTokens.spacingS,
-            horizontal: PandoraTokens.spacingM,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
-          ),
-          elevation: PandoraTokens.elevationLow,
-          minimumSize: const Size(
-            PandoraTokens.touchTarget,
-            PandoraTokens.touchTarget,
-          ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: disabled
+            ? PandoraTokens.neutral300
+            : PandoraTokens.primary,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(
+          vertical: PandoraTokens.spacingS,
+          horizontal: PandoraTokens.spacingM,
         ),
+        minimumSize: const Size(
+          PandoraTokens.touchTarget,
+          PandoraTokens.touchTarget,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
+        ),
+        elevation: PandoraTokens.elevationLow,
+
       ),
     );
   }

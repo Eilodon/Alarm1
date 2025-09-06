@@ -49,35 +49,35 @@ class HintChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _ChipStyle styleData = _chipStyles[state] ?? _chipStyles['default']!;
+    final baseStyle =
+        style ?? Theme.of(context).textTheme.bodySmall ?? const TextStyle();
 
-    return InkWell(
-      onTap: onPressed,
-      borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
-      child: Ink(
-        decoration: BoxDecoration(
-          color: styleData.background.withOpacity(styleData.opacity),
-          borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
-        ),
-        padding: const EdgeInsets.all(PandoraTokens.spacingM),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              PandoraTokens.hintIcon,
-              size: PandoraTokens.iconS,
-              color: PandoraTokens.warning,
-            ),
-            const SizedBox(width: PandoraTokens.spacingM),
-            Text(
-              label,
-              style: (style ??
-                      const TextStyle(
-                        fontSize: PandoraTokens.fontSizeS,
-                        fontFamily: PandoraTokens.fontFamily,
-                      ))
-                  .copyWith(color: styleData.text),
-            ),
-          ],
+    return ConstrainedBox(
+      constraints: const BoxConstraints(
+        minHeight: PandoraTokens.touchTarget,
+        minWidth: PandoraTokens.touchTarget,
+      ),
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
+        child: Ink(
+          decoration: BoxDecoration(
+            color: styleData.background.withOpacity(styleData.opacity),
+            borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
+          ),
+          padding: const EdgeInsets.all(PandoraTokens.spacingM),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                PandoraTokens.hintIcon,
+                size: PandoraTokens.iconS,
+                color: PandoraTokens.warning,
+              ),
+              const SizedBox(width: PandoraTokens.spacingM),
+              Text(label, style: baseStyle.copyWith(color: styleData.text)),
+            ],
+          ),
         ),
       ),
     );
