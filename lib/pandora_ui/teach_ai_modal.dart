@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'tokens.dart';
 
@@ -33,12 +34,12 @@ class _TeachAiModalState extends State<TeachAiModal> {
   Widget build(BuildContext context) {
     return AlertDialog(
       contentPadding: const EdgeInsets.all(PandoraTokens.spacingM),
-      title: const Text('Teach AI'),
+      title: Text(AppLocalizations.of(context)!.teachAi),
       content: TextField(
         controller: _controller,
         maxLines: 5,
-        decoration: const InputDecoration(
-          hintText: 'Share feedback or corrections',
+        decoration: InputDecoration(
+          hintText: AppLocalizations.of(context)!.teachAiHint,
         ),
       ),
       actionsPadding: const EdgeInsets.symmetric(
@@ -48,14 +49,14 @@ class _TeachAiModalState extends State<TeachAiModal> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(AppLocalizations.of(context)!.cancel),
         ),
         ElevatedButton(
           onPressed: () {
             widget.onSubmit?.call(_controller.text);
             Navigator.of(context).pop();
           },
-          child: const Text('Submit'),
+          child: Text(AppLocalizations.of(context)!.submit),
         ),
       ],
     );

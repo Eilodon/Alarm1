@@ -1,9 +1,15 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import 'tokens.dart';
+
+class SnackbarKind {
+  final IconData icon;
+  final Color color;
+
+  const SnackbarKind._(this.icon, this.color);
 
   static const success =
       SnackbarKind._(Icons.check_circle, PandoraTokens.secondary);
@@ -84,6 +90,7 @@ class _PandoraSnackbarState extends State<PandoraSnackbar>
             ),
             IconButton(
               icon: Icon(Icons.close),
+              tooltip: AppLocalizations.of(context)!.cancel,
               onPressed: onClose,
 
             ),
