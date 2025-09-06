@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'path/to/tokens.dart'; // Đường dẫn đến tokens.dart
+import 'tokens.dart';
 
 class ToolbarButton extends StatelessWidget {
   final Widget icon;
@@ -7,7 +7,8 @@ class ToolbarButton extends StatelessWidget {
   final VoidCallback onPressed;
   final bool disabled;
 
-  ToolbarButton({
+  const ToolbarButton({
+    super.key,
     required this.icon,
     required this.label,
     required this.onPressed,
@@ -16,22 +17,21 @@ class ToolbarButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
+    return ElevatedButton.icon(
       onPressed: disabled ? null : onPressed,
+      icon: icon,
+      label: Text(label),
       style: ElevatedButton.styleFrom(
-        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        backgroundColor:
+            disabled ? PandoraTokens.neutral300 : PandoraTokens.primary,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(
+            vertical: PandoraTokens.spacingS,
+            horizontal: PandoraTokens.spacingM),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: Colors.transparent), // Có thể thay đổi màu viền nếu cần
+          borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
         ),
-        backgroundColor: disabled ? Colors.grey : Color.fromARGB(255, /* lấy màu từ tokens.dart */),
-      ),
-      child: Row(
-        children: [
-          icon,
-          SizedBox(width: 8),
-          Text(label),
-        ],
+        elevation: PandoraTokens.elevationLow,
       ),
     );
   }

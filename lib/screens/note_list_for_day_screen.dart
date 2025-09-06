@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+
 import '../models/note.dart';
 import '../providers/note_provider.dart';
-import 'note_detail_screen.dart';
 import '../services/auth_service.dart';
+import 'note_detail_screen.dart';
+import '../pandora_ui/hint_chip.dart';
+import '../pandora_ui/result_card.dart';
 
 class NoteListForDayScreen extends StatelessWidget {
   final DateTime date;
@@ -51,7 +54,7 @@ class NoteListForDayScreen extends StatelessWidget {
               ? DateFormat.Hm(Localizations.localeOf(context).toString())
                   .format(note.alarmTime!)
               : null;
-          return Card(
+          return ResultCard(
             child: ListTile(
               title: Hero(
                 tag: note.id,
@@ -74,8 +77,14 @@ class NoteListForDayScreen extends StatelessWidget {
                     Wrap(
                       spacing: 4,
                       runSpacing: 4,
-                      children:
-                          note.tags.map((t) => Chip(label: Text(t))).toList(),
+                      children: note.tags
+                          .map(
+                            (t) => HintChip(
+                              label: t,
+                              onPressed: () {},
+                            ),
+                          )
+                          .toList(),
                     ),
                   ]
                 ],
