@@ -49,4 +49,9 @@ class NoteRepository {
     }
     return notes;
   }
+
+  Future<bool> autoBackup() async {
+    final notes = await _dbService.getNotes();
+    return _backupService.autoBackup(notes);
+  }
 }

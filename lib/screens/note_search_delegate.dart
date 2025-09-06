@@ -45,7 +45,13 @@ class NoteSearchDelegate extends SearchDelegate {
     return ListView(
       children: filtered
           .map((n) => ListTile(
-                title: Text(n.title),
+                title: Hero(
+                  tag: n.id,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: Text(n.title),
+                  ),
+                ),
                 subtitle: Text(n.content),
                 onTap: () async {
                   if (n.locked) {
@@ -55,8 +61,21 @@ class NoteSearchDelegate extends SearchDelegate {
                   }
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => NoteDetailScreen(note: n),
+                    PageRouteBuilder(
+                      pageBuilder: (_, __, ___) => NoteDetailScreen(note: n),
+                      transitionsBuilder: (_, animation, __, child) {
+                        final offsetAnimation = Tween<Offset>(
+                          begin: const Offset(1, 0),
+                          end: Offset.zero,
+                        ).animate(animation);
+                        return FadeTransition(
+                          opacity: animation,
+                          child: SlideTransition(
+                            position: offsetAnimation,
+                            child: child,
+                          ),
+                        );
+                      },
                     ),
                   );
                 },

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../models/note.dart';
 import 'db_service.dart';
@@ -82,6 +83,23 @@ class BackupService {
     } catch (e) {
       debugPrint(l10n.errorWithMessage(e.toString()));
       return [];
+    }
+  }
+
+  Future<bool> autoBackup(List<Note> notes,
+      {String fileName = 'notes_autobackup.json'}) async {
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+      final file = File('${dir.path}/$fileName');
+      final list = <Map<String, dynamic>>[];
+      for (final n in notes) {
+        list.add(await _dbService.encryptNote(n));
+      }
+      await file.writeAsString(jsonEncode(list));
+      return true;
+    } catch (e) {
+      debugPrint('autoBackup error: $e');
+      return false;
     }
   }
 }
