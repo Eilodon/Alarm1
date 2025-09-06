@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:cryptography/cryptography.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -14,7 +15,7 @@ class DbService {
 
   final _secure = const FlutterSecureStorage();
 
-  Future<encrypt.Key> _getKey() async {
+  Future<List<int>> _getKey() async {
     var key = await _secure.read(key: _kEncKey);
     if (key == null) {
       final rand = Random.secure();
@@ -22,7 +23,7 @@ class DbService {
       key = base64UrlEncode(values);
       await _secure.write(key: _kEncKey, value: key);
     }
-    return encrypt.Key.fromBase64(key);
+    return base64Url.decode(key);
   }
 
   Future<List<Note>> getNotes() async {
@@ -30,31 +31,45 @@ class DbService {
     var raw = sp.getString(_kNotes);
     raw ??= sp.getString(_kLegacyNotes);
     if (raw == null) return [];
-    final key = await _getKey();
-    final encrypter = encrypt.Encrypter(encrypt.AES(key));
+    final keyBytes = await _getKey();
+    final algorithm = AesGcm.with256bits();
+    final secretKey = SecretKey(keyBytes);
+    final legacyEncrypter =
+        encrypt.Encrypter(encrypt.AES(encrypt.Key(keyBytes)));
     final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
-    return list.map((m) {
+    final notes = <Note>[];
+    for (final m in list) {
       final ivString = m['iv'];
-      final iv = ivString != null
-          ? encrypt.IV.fromBase64(ivString)
-          : encrypt.IV.fromLength(16);
-      final decrypted = encrypter.decrypt64(m['content'], iv: iv);
-      m['content'] = decrypted;
-      return Note.fromJson(m);
-    }).toList();
+      final tagString = m['tag'];
+      final content = m['content'] as String;
+      try {
+        if (tagString != null) {
+          final box = SecretBox(base64Decode(content),
+              nonce: base64Decode(ivString),
+              mac: Mac(base64Decode(tagString)));
+          final decrypted = await algorithm.decrypt(box, secretKey: secretKey);
+          m['content'] = utf8.decode(decrypted);
+        } else {
+          final iv = ivString != null
+              ? encrypt.IV.fromBase64(ivString)
+              : encrypt.IV.fromLength(16);
+          final decrypted = legacyEncrypter.decrypt64(content, iv: iv);
+          m['content'] = decrypted;
+        }
+        notes.add(Note.fromJson(m));
+      } catch (_) {
+        // Skip notes with invalid MAC or decryption errors
+      }
+    }
+    return notes;
   }
 
   Future<void> saveNotes(List<Note> notes) async {
     final sp = await SharedPreferences.getInstance();
-    final key = await _getKey();
-    final encrypter = encrypt.Encrypter(encrypt.AES(key));
-    final list = notes.map((n) {
-      final m = n.toJson();
-      final iv = encrypt.IV.fromSecureRandom(16);
-      m['content'] = encrypter.encrypt(m['content'], iv: iv).base64;
-      m['iv'] = iv.base64;
-      return m;
-    }).toList();
+    final list = <Map<String, dynamic>>[];
+    for (final n in notes) {
+      list.add(await encryptNote(n));
+    }
     final raw = jsonEncode(list);
     await sp.setString(_kNotes, raw);
   }
@@ -69,12 +84,16 @@ class DbService {
   }
 
   Future<Map<String, dynamic>> encryptNote(Note note) async {
-    final key = await _getKey();
-    final encrypter = encrypt.Encrypter(encrypt.AES(key));
+    final keyBytes = await _getKey();
+    final algorithm = AesGcm.with256bits();
+    final secretKey = SecretKey(keyBytes);
     final m = note.toJson();
-    final iv = encrypt.IV.fromSecureRandom(16);
-    m['content'] = encrypter.encrypt(m['content'], iv: iv).base64;
-    m['iv'] = iv.base64;
+    final iv = List<int>.generate(12, (_) => Random.secure().nextInt(256));
+    final box = await algorithm.encrypt(utf8.encode(m['content']),
+        secretKey: secretKey, nonce: iv);
+    m['content'] = base64Encode(box.cipherText);
+    m['iv'] = base64Encode(iv);
+    m['tag'] = base64Encode(box.mac.bytes);
     return m;
   }
 
