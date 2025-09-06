@@ -15,8 +15,18 @@ import '../models/note.dart';
 import '../services/note_repository.dart';
 import '../services/calendar_service.dart';
 import '../services/notification_service.dart';
+import '../services/home_widget_service.dart';
 
-int _noteComparator(Note a, Note b) => (b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0)).compareTo(a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0));
+
+int _noteComparator(Note a, Note b) {
+  if (a.pinned != b.pinned) {
+    return a.pinned ? -1 : 1;
+  }
+  return (b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0))
+      .compareTo(a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0));
+}
+
+
 
 class NoteProvider extends ChangeNotifier {
   final NoteRepository _repository;
@@ -25,6 +35,7 @@ class NoteProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final CalendarService _calendarService;
   final NotificationService _notificationService;
+  final HomeWidgetService _homeWidgetService;
   final Connectivity _connectivity = Connectivity();
   StreamSubscription<ConnectivityResult>? _connectivitySubscription;
 
@@ -35,6 +46,8 @@ class NoteProvider extends ChangeNotifier {
   final SplayTreeSet<Note> _notes = SplayTreeSet<Note>(_noteComparator);
   String _draft = '';
   final Set<String> _unsyncedNoteIds = {};
+  final ValueNotifier<SyncStatus> syncStatus =
+      ValueNotifier<SyncStatus>(SyncStatus.idle);
 
   Set<String> get unsyncedNoteIds => Set.unmodifiable(_unsyncedNoteIds);
   bool isSynced(String id) => !_unsyncedNoteIds.contains(id);
@@ -43,9 +56,11 @@ class NoteProvider extends ChangeNotifier {
     NoteRepository? repository,
     CalendarService? calendarService,
     NotificationService? notificationService,
+    HomeWidgetService? homeWidgetService,
   })  : _repository = repository ?? NoteRepository(),
         _calendarService = calendarService ?? CalendarService.instance,
-        _notificationService = notificationService ?? NotificationService() {
+        _notificationService = notificationService ?? NotificationService(),
+        _homeWidgetService = homeWidgetService ?? const HomeWidgetService() {
     _init();
   }
 
@@ -79,6 +94,7 @@ class NoteProvider extends ChangeNotifier {
 
   Future<void> _syncUnsyncedNotes() async {
     if (_unsyncedNoteIds.isEmpty || Firebase.apps.isEmpty) return;
+    syncStatus.value = SyncStatus.syncing;
     try {
       final user = _auth.currentUser ?? await _auth.signInAnonymously();
       final ids = List<String>.from(_unsyncedNoteIds);
@@ -103,19 +119,23 @@ class NoteProvider extends ChangeNotifier {
       await batch.commit();
       await _saveUnsyncedNoteIds();
       notifyListeners();
+      syncStatus.value = SyncStatus.idle;
     } catch (e, st) {
       debugPrint('syncUnsyncedNotes error: $e\n$st');
+      syncStatus.value = SyncStatus.error;
     }
   }
 
   @override
   void dispose() {
     _connectivitySubscription?.cancel();
+    unawaited(_repository.autoBackup());
     super.dispose();
   }
 
 
   Future<bool> loadNotes() async {
+    syncStatus.value = SyncStatus.syncing;
     _notes..clear();
     _notes.addAll(await _repository.getNotes());
     await _loadUnsyncedNoteIds();
@@ -174,8 +194,14 @@ class NoteProvider extends ChangeNotifier {
       }
     }
     await _saveUnsyncedNoteIds();
+    await _homeWidgetService.update(_notes.toList());
     notifyListeners();
+    syncStatus.value = success ? SyncStatus.idle : SyncStatus.error;
     return success;
+  }
+
+  Future<bool> backupNow() {
+    return _repository.autoBackup();
   }
 
   Future<List<Note>> fetchNotesPage(DateTime? startAfter, int limit) async {
@@ -245,6 +271,8 @@ class NoteProvider extends ChangeNotifier {
     RepeatInterval? repeatInterval,
     bool daily = false,
     int snoozeMinutes = 0,
+    int color = 0xFFFFFFFF,
+    bool pinned = false,
     required AppLocalizations l10n,
   }) async {
     try {
@@ -277,6 +305,7 @@ class NoteProvider extends ChangeNotifier {
             body: content,
             scheduledDate: alarmTime,
             l10n: l10n,
+            payload: id,
           );
         }
         eventId = await _calendarService.createEvent(
@@ -292,6 +321,8 @@ class NoteProvider extends ChangeNotifier {
         content: content,
         tags: tags,
         locked: locked,
+        color: color,
+        pinned: pinned,
         alarmTime: alarmTime,
         repeatInterval: repeatInterval,
         daily: daily,
@@ -401,6 +432,7 @@ class NoteProvider extends ChangeNotifier {
             body: note.content,
             scheduledDate: note.alarmTime!,
             l10n: l10n,
+            payload: note.id,
           );
         }
         updated = updated.copyWith(notificationId: nid, active: true);
@@ -411,6 +443,7 @@ class NoteProvider extends ChangeNotifier {
       _notes.remove(old);
       _notes.add(updated);
       await _repository.saveNotes(_notes.toList());
+      await _homeWidgetService.update(_notes.toList());
       notifyListeners();
       if (Firebase.apps.isNotEmpty) {
         try {
@@ -444,6 +477,7 @@ class NoteProvider extends ChangeNotifier {
       body: note.content,
       minutes: note.snoozeMinutes,
       l10n: l10n,
+      payload: note.id,
     );
   }
 
@@ -461,6 +495,7 @@ class NoteProvider extends ChangeNotifier {
       await _calendarService.deleteEvent(note.eventId!);
     }
     await _repository.saveNotes(_notes.toList());
+    await _homeWidgetService.update(_notes.toList());
     notifyListeners();
     if (Firebase.apps.isNotEmpty) {
       try {

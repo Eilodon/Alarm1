@@ -26,12 +26,18 @@ dependencies:
   share_plus: ^10.0.2
   connectivity_plus: ^6.1.5
 
+  home_widget: ^0.5.0
+
+
   local_auth: ^2.1.7
 
   cryptography: ^2.7.0
   encrypt: ^5.0.1
   flutter_secure_storage: ^9.0.0
   file_picker: ^6.1.1
+  pdf: ^3.10.5
+
+  path_provider: ^2.1.5
 
   json_annotation: ^4.8.1
 

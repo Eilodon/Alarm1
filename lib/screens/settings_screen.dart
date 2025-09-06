@@ -4,17 +4,20 @@ import 'package:lottie/lottie.dart';
 
 import '../services/settings_service.dart';
 import '../services/note_repository.dart';
+import '../services/backup_service.dart';
 import 'package:provider/provider.dart';
 import '../providers/note_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
   final Function(double) onFontScaleChanged;
+  final Function(ThemeMode) onThemeModeChanged;
 
   const SettingsScreen({
     super.key,
     required this.onThemeChanged,
     required this.onFontScaleChanged,
+    required this.onThemeModeChanged,
   });
 
   @override
@@ -26,12 +29,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final NoteRepository _noteRepository = NoteRepository();
   bool _requireAuth = false;
 
+  BackupFormat _backupFormat = BackupFormat.json;
+
+
   @override
   void initState() {
     super.initState();
     _settings.loadRequireAuth().then((v) {
       if (mounted) {
         setState(() => _requireAuth = v);
+      }
+    });
+
+    _settings.loadBackupFormat().then((v) {
+      if (mounted) {
+        setState(() => _backupFormat = v);
+
       }
     });
   }
@@ -140,9 +153,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _settings.saveRequireAuth(v);
   }
 
+  void _cycleThemeMode() {
+    setState(() {
+      _themeMode = ThemeMode.values[(_themeMode.index + 1) % ThemeMode.values.length];
+    });
+    widget.onThemeModeChanged(_themeMode);
+    _settings.saveThemeMode(_themeMode);
+  }
+
+  String _themeModeLabel(AppLocalizations l10n) {
+    switch (_themeMode) {
+      case ThemeMode.light:
+        return l10n.light;
+      case ThemeMode.dark:
+        return l10n.dark;
+      default:
+        return l10n.system;
+    }
+  }
+
   Future<void> _exportNotes() async {
     final l10n = AppLocalizations.of(context)!;
-    final success = await _noteRepository.exportNotes(l10n);
+    final success =
+        await _noteRepository.exportNotes(l10n, format: _backupFormat);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -155,7 +188,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _importNotes() async {
     final l10n = AppLocalizations.of(context)!;
-    final notes = await _noteRepository.importNotes(l10n);
+    final notes =
+        await _noteRepository.importNotes(l10n, format: _backupFormat);
     if (!mounted) return;
     if (notes.isNotEmpty) {
       await context.read<NoteProvider>().loadNotes();
@@ -170,6 +204,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
       );
+    }
+  }
+
+  String _formatLabel(BackupFormat f, AppLocalizations l10n) {
+    switch (f) {
+      case BackupFormat.json:
+        return l10n.formatJson;
+      case BackupFormat.pdf:
+        return l10n.formatPdf;
+      case BackupFormat.md:
+        return l10n.formatMarkdown;
+    }
+  }
+
+  Future<void> _pickFormat() async {
+    final l10n = AppLocalizations.of(context)!;
+    final selected = await showDialog<BackupFormat>(
+      context: context,
+      builder: (_) => SimpleDialog(
+        title: Text(l10n.backupFormat),
+        children: BackupFormat.values
+            .map(
+              (f) => SimpleDialogOption(
+                onPressed: () => Navigator.pop(context, f),
+                child: Text(_formatLabel(f, l10n)),
+              ),
+            )
+            .toList(),
+      ),
+    );
+    if (selected != null) {
+      setState(() => _backupFormat = selected);
+      _settings.saveBackupFormat(selected);
     }
   }
 
@@ -190,8 +257,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: _pickMascot,
           ),
           ListTile(
+            title: Text(AppLocalizations.of(context)!.backupFormat),
+            subtitle: Text(_formatLabel(
+                _backupFormat, AppLocalizations.of(context)!)),
+            onTap: _pickFormat,
+          ),
+          ListTile(
             title: Text(AppLocalizations.of(context)!.fontSize),
             onTap: _changeFontScale,
+          ),
+          SwitchListTile(
+            title: Text(AppLocalizations.of(context)!.themeMode),
+            subtitle: Text(_themeModeLabel(AppLocalizations.of(context)!)),
+            value: _themeMode == ThemeMode.dark,
+            onChanged: (_) => _cycleThemeMode(),
           ),
           ListTile(
             title: Text(AppLocalizations.of(context)!.exportNotes),

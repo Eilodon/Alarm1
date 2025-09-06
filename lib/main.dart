@@ -9,19 +9,46 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'screens/home_screen.dart';
+import 'screens/onboarding_screen.dart';
 import 'services/notification_service.dart';
 import 'services/settings_service.dart';
 import 'services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'providers/note_provider.dart';
+import 'models/note.dart';
 import 'firebase_options.dart';
 
 final messengerKey = GlobalKey<ScaffoldMessengerState>();
+late final NoteProvider noteProvider;
+
+Future<void> _onNotificationResponse(NotificationResponse response) async {
+  final id = response.payload;
+  if (id == null) return;
+  Note? note;
+  try {
+    note = noteProvider.notes.firstWhere((n) => n.id == id);
+  } catch (_) {
+    note = null;
+  }
+  if (note == null) return;
+  final locale = WidgetsBinding.instance.platformDispatcher.locale;
+  final l10n = await AppLocalizations.delegate.load(locale);
+  if (response.actionId == 'done') {
+    await noteProvider.updateNote(
+      note.copyWith(alarmTime: null, notificationId: null, active: false),
+      l10n,
+    );
+  } else if (response.actionId == 'snooze') {
+    await noteProvider.snoozeNote(note, l10n);
+  }
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  noteProvider = NoteProvider();
   bool authFailed = false;
   bool notificationFailed = false;
 
@@ -37,7 +64,9 @@ void main() async {
   }
 
   try {
-    await NotificationService().init();
+    await NotificationService().init(
+      onDidReceiveNotificationResponse: _onNotificationResponse,
+    );
   } catch (e) {
     notificationFailed = true;
   }
@@ -54,12 +83,18 @@ void main() async {
   }
   final themeColor = await settings.loadThemeColor();
   final fontScale = await settings.loadFontScale();
+
+  final hasSeenOnboarding = await settings.loadHasSeenOnboarding();
+
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => NoteProvider(),
+    ChangeNotifierProvider.value(
+      value: noteProvider,
       child: MyApp(
         themeColor: themeColor,
         fontScale: fontScale,
+
+        hasSeenOnboarding: hasSeenOnboarding,
+
         authFailed: authFailed,
         notificationFailed: notificationFailed,
       ),
@@ -71,12 +106,17 @@ void main() async {
 class MyApp extends StatefulWidget {
   final Color themeColor;
   final double fontScale;
+  final ThemeMode themeMode;
   final bool authFailed;
   final bool notificationFailed;
+  final bool hasSeenOnboarding;
   const MyApp({
     super.key,
     required this.themeColor,
     required this.fontScale,
+
+    required this.hasSeenOnboarding,
+
     this.authFailed = false,
     this.notificationFailed = false,
   });
@@ -89,13 +129,18 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   Color _themeColor = Colors.blue;
   double _fontScale = 1.0;
+  ThemeMode _themeMode = ThemeMode.system;
   StreamSubscription<ConnectivityResult>? _connSub;
+  bool _hasSeenOnboarding = true;
 
   @override
   void initState() {
     super.initState();
     _themeColor = widget.themeColor;
     _fontScale = widget.fontScale;
+
+    _hasSeenOnboarding = widget.hasSeenOnboarding;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final l10n = AppLocalizations.of(context)!;
       if (widget.authFailed) {
@@ -139,6 +184,12 @@ class _MyAppState extends State<MyApp> {
     await SettingsService().saveFontScale(newScale);
   }
 
+
+  void _completeOnboarding() {
+    setState(() => _hasSeenOnboarding = true);
+
+  }
+
   @override
   void dispose() {
     _connSub?.cancel();
@@ -161,14 +212,24 @@ class _MyAppState extends State<MyApp> {
         colorSchemeSeed: _themeColor,
         useMaterial3: true,
       ),
+      darkTheme: ThemeData(
+        colorSchemeSeed: _themeColor,
+        brightness: Brightness.dark,
+        useMaterial3: true,
+      ),
+      themeMode: _themeMode,
       builder: (context, child) => MediaQuery(
         data: MediaQuery.of(context).copyWith(textScaleFactor: _fontScale),
         child: child!,
       ),
-      home: HomeScreen(
-        onThemeChanged: updateTheme,
-        onFontScaleChanged: updateFontScale,
-      ),
+
+      home: _hasSeenOnboarding
+          ? HomeScreen(
+              onThemeChanged: updateTheme,
+              onFontScaleChanged: updateFontScale,
+            )
+          : OnboardingScreen(onFinished: _completeOnboarding),
+
 
     );
   }
