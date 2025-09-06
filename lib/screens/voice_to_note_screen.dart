@@ -8,10 +8,12 @@ import '../services/gemini_service.dart';
 
 class VoiceToNoteScreen extends StatefulWidget {
   final stt.SpeechToText speech;
+  final bool autoStart;
 
   const VoiceToNoteScreen({
     super.key,
     stt.SpeechToText? speech,
+    this.autoStart = false,
   }) : speech = speech ?? stt.SpeechToText();
 
   @override
@@ -22,6 +24,16 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
   String _recognized = '';
   bool _isListening = false;
   bool _isProcessing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.autoStart) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _toggleListening();
+      });
+    }
+  }
 
   Future<void> _toggleListening() async {
     if (!_isListening) {

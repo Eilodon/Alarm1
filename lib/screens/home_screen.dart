@@ -3,6 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 import '../models/note.dart';
 import '../providers/note_provider.dart';
 import '../services/settings_service.dart';
@@ -32,11 +33,21 @@ class _HomeScreenState extends State<HomeScreen> {
   String _mascotPath = 'assets/lottie/mascot.json';
   final DateTime _today = DateTime.now();
   String? _selectedTag;
+  static const _platform = MethodChannel('notes_reminder_app/actions');
 
   @override
   void initState() {
     super.initState();
     _loadMascot();
+    _platform.setMethodCallHandler((call) async {
+      if (call.method == 'voiceToNote') {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (_) => const VoiceToNoteScreen(autoStart: true)),
+        );
+      }
+    });
   }
 
   Future<void> _loadMascot() async {

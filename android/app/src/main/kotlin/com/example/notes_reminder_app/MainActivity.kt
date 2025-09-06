@@ -46,9 +46,16 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun handleIntent(intent: Intent?) {
-        val action = intent?.getStringExtra("action")
-        if (action != null) {
-            methodChannel?.invokeMethod(action, null)
+        when {
+            intent?.action == Intent.ACTION_ASSIST -> {
+                methodChannel?.invokeMethod("voiceToNote", null)
+            }
+            else -> {
+                val action = intent?.getStringExtra("action")
+                if (action != null) {
+                    methodChannel?.invokeMethod(action, null)
+                }
+            }
         }
     }
 }
