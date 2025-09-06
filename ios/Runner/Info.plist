@@ -53,5 +53,9 @@
         <string>This app requires photo library access to attach images to notes.</string>
         <key>NSUserTrackingUsageDescription</key>
         <string>This identifier will be used to deliver personalized content.</string>
+        <key>FirebaseCrashlyticsCollectionEnabled</key>
+        <true/>
+        <key>FirebaseAnalyticsCollectionEnabled</key>
+        <true/>
 </dict>
 </plist>
