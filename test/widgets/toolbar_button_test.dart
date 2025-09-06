@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:notes_reminder_app/widgets/toolbar_button.dart';
+import 'package:notes_reminder_app/pandora_ui/toolbar_button.dart';
 import 'package:notes_reminder_app/pandora_ui/tokens.dart';
 
 void main() {
-  testWidgets('ToolbarButton enabled state', (WidgetTester tester) async {
+  testWidgets('ToolbarButton enabled state respects touch target',
+      (WidgetTester tester) async {
     var pressed = false;
     await tester.pumpWidget(
       MaterialApp(
@@ -18,11 +19,12 @@ void main() {
       ),
     );
 
-    final opacityWidget = tester.widget<Opacity>(
-      find.ancestor(of: find.byType(ElevatedButton), matching: find.byType(Opacity)),
-    );
+    final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
+    expect(button.onPressed, isNotNull);
 
-    expect(opacityWidget.opacity, PandoraTokens.opacityEnabled);
+    final size = tester.getSize(find.byType(ElevatedButton));
+    expect(size.height >= PandoraTokens.touchTarget, isTrue);
+    expect(size.width >= PandoraTokens.touchTarget, isTrue);
 
     await tester.tap(find.byType(ElevatedButton));
     expect(pressed, isTrue);
@@ -45,11 +47,6 @@ void main() {
 
     final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
     expect(button.onPressed, isNull);
-
-    final opacityWidget = tester.widget<Opacity>(
-      find.ancestor(of: find.byType(ElevatedButton), matching: find.byType(Opacity)),
-    );
-    expect(opacityWidget.opacity, PandoraTokens.opacityDisabled);
 
     final style = button.style!;
     final bg = style.backgroundColor!.resolve({MaterialState.disabled});
