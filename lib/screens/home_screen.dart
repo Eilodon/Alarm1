@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../models/command.dart';
-import '../widgets/palette_bottom_sheet.dart';
+
+import '../pandora_ui/bottom_sheet.dart';
+import '../pandora_ui/palette_list_item.dart';
+import '../pandora_ui/pandora_snackbar.dart';
+import '../pandora_ui/teach_ai_modal.dart';
+import '../pandora_ui/tokens.dart';
+import '../pandora_ui/toolbar_button.dart';
 
 import '../widgets/notes_tab.dart';
 import 'chat_screen.dart';
@@ -35,6 +40,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   late final List<Widget> _screens;
   late final List<Command> _commands;
+
+  OverlayEntry? _snackEntry;
 
   @override
   void initState() {
@@ -74,52 +81,118 @@ class _HomeScreenState extends State<HomeScreen> {
     showPaletteBottomSheet(context, commands: _commands);
   }
 
+  void _showSnackbar(String text, SnackbarKind kind) {
+    _snackEntry?.remove();
+    _snackEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        left: PandoraTokens.spacingM,
+        right: PandoraTokens.spacingM,
+        bottom: PandoraTokens.spacingL,
+        child: PandoraSnackbar(
+          text: text,
+          kind: kind,
+          onClose: () => _snackEntry?.remove(),
+        ),
+      ),
+    );
+    Overlay.of(context).insert(_snackEntry!);
+    Future.delayed(PandoraTokens.durationLong, () => _snackEntry?.remove());
+  }
+
+  void _showPalette() {
+    PandoraBottomSheet.show(
+      context,
+      Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          PaletteListItem(
+            color: PandoraTokens.primary,
+            label: 'Primary',
+            onTap: () {
+              widget.onThemeChanged(PandoraTokens.primary);
+              Navigator.pop(context);
+              _showSnackbar('Theme updated', SnackbarKind.success);
+            },
+          ),
+          PaletteListItem(
+            color: PandoraTokens.secondary,
+            label: 'Secondary',
+            onTap: () {
+              widget.onThemeChanged(PandoraTokens.secondary);
+              Navigator.pop(context);
+              _showSnackbar('Theme updated', SnackbarKind.success);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _openTeachAi() {
+    TeachAiModal.show(
+      context,
+      onSubmit: (_) => _showSnackbar('Thanks for teaching!', SnackbarKind.success),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Shortcuts(
-      shortcuts: const {
-        LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyK):
-            _OpenPaletteIntent(),
-        LogicalKeySet(LogicalKeyboardKey.meta, LogicalKeyboardKey.keyK):
-            _OpenPaletteIntent(),
-      },
-      child: Actions(
-        actions: {
-          _OpenPaletteIntent: CallbackAction<_OpenPaletteIntent>(
-            onInvoke: (intent) {
-              _openPalette();
-              return null;
-            },
-          ),
-        },
-        child: Focus(
-          autofocus: true,
-          child: Scaffold(
-            body: IndexedStack(index: _currentIndex, children: _screens),
-            bottomNavigationBar: BottomNavigationBar(
-              currentIndex: _currentIndex,
-              onTap: (i) => setState(() => _currentIndex = i),
-              items: [
-                const BottomNavigationBarItem(
-                    icon: Icon(Icons.note), label: 'Notes'),
-                const BottomNavigationBarItem(
-                  icon: Icon(Icons.alarm),
-                  label: 'Reminders',
+
+    return Scaffold(
+      body: Stack(
+        children: [
+          IndexedStack(index: _currentIndex, children: _screens),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(PandoraTokens.spacingS),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ToolbarButton(
+                        icon: const Icon(Icons.note),
+                        label: 'Notes',
+                        onPressed: () => setState(() => _currentIndex = 0),
+                      ),
+                      ToolbarButton(
+                        icon: const Icon(Icons.alarm),
+                        label: 'Reminders',
+                        onPressed: () => setState(() => _currentIndex = 1),
+                      ),
+                      ToolbarButton(
+                        icon: const Icon(Icons.mic),
+                        label: l10n.voiceToNote,
+                        onPressed: () => setState(() => _currentIndex = 2),
+                      ),
+                      ToolbarButton(
+                        icon: const Icon(Icons.smart_toy),
+                        label: l10n.chatAI,
+                        onPressed: () => setState(() => _currentIndex = 3),
+                      ),
+                      ToolbarButton(
+                        icon: const Icon(Icons.settings),
+                        label: l10n.settings,
+                        onPressed: () => setState(() => _currentIndex = 4),
+                      ),
+                      ToolbarButton(
+                        icon: const Icon(Icons.palette),
+                        label: 'Palette',
+                        onPressed: _showPalette,
+                      ),
+                      ToolbarButton(
+                        icon: const Icon(Icons.school),
+                        label: 'Teach AI',
+                        onPressed: _openTeachAi,
+                      ),
+                    ],
+                  ),
                 ),
-                BottomNavigationBarItem(
-                  icon: const Icon(Icons.mic),
-                  label: l10n.voiceToNote,
-                ),
-                BottomNavigationBarItem(
-                  icon: const Icon(Icons.smart_toy),
-                  label: l10n.chatAI,
-                ),
-                BottomNavigationBarItem(
-                  icon: const Icon(Icons.settings),
-                  label: l10n.settings,
-                ),
-              ],
+              ),
+
             ),
           ),
         ),
