@@ -15,6 +15,7 @@ import '../models/note.dart';
 import '../services/note_repository.dart';
 import '../services/calendar_service.dart';
 import '../services/notification_service.dart';
+import '../services/home_widget_service.dart';
 
 int _noteComparator(Note a, Note b) => (b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0)).compareTo(a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0));
 
@@ -25,6 +26,7 @@ class NoteProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final CalendarService _calendarService;
   final NotificationService _notificationService;
+  final HomeWidgetService _homeWidgetService;
   final Connectivity _connectivity = Connectivity();
   StreamSubscription<ConnectivityResult>? _connectivitySubscription;
 
@@ -43,9 +45,11 @@ class NoteProvider extends ChangeNotifier {
     NoteRepository? repository,
     CalendarService? calendarService,
     NotificationService? notificationService,
+    HomeWidgetService? homeWidgetService,
   })  : _repository = repository ?? NoteRepository(),
         _calendarService = calendarService ?? CalendarService.instance,
-        _notificationService = notificationService ?? NotificationService() {
+        _notificationService = notificationService ?? NotificationService(),
+        _homeWidgetService = homeWidgetService ?? const HomeWidgetService() {
     _init();
   }
 
@@ -174,6 +178,7 @@ class NoteProvider extends ChangeNotifier {
       }
     }
     await _saveUnsyncedNoteIds();
+    await _homeWidgetService.update(_notes.toList());
     notifyListeners();
     return success;
   }
@@ -411,6 +416,7 @@ class NoteProvider extends ChangeNotifier {
       _notes.remove(old);
       _notes.add(updated);
       await _repository.saveNotes(_notes.toList());
+      await _homeWidgetService.update(_notes.toList());
       notifyListeners();
       if (Firebase.apps.isNotEmpty) {
         try {
@@ -461,6 +467,7 @@ class NoteProvider extends ChangeNotifier {
       await _calendarService.deleteEvent(note.eventId!);
     }
     await _repository.saveNotes(_notes.toList());
+    await _homeWidgetService.update(_notes.toList());
     notifyListeners();
     if (Firebase.apps.isNotEmpty) {
       try {
