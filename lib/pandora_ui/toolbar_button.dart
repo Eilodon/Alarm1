@@ -17,32 +17,23 @@ class ToolbarButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final borderColor =
-        disabled ? PandoraTokens.neutral200 : Colors.transparent;
-    return Opacity(
-      opacity: disabled
-          ? PandoraTokens.opacityDisabled
-          : PandoraTokens.opacityEnabled,
-      child: ElevatedButton(
-        onPressed: disabled ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.symmetric(
+
+    return ElevatedButton.icon(
+      onPressed: disabled ? null : onPressed,
+      icon: icon,
+      label: Text(label),
+      style: ElevatedButton.styleFrom(
+        backgroundColor:
+            disabled ? PandoraTokens.neutral300 : PandoraTokens.primary,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(
             vertical: PandoraTokens.spacingS,
-            horizontal: PandoraTokens.spacingM,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
-            side: BorderSide(color: borderColor),
-          ),
-          backgroundColor: PandoraTokens.neutral100,
+            horizontal: PandoraTokens.spacingM),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
         ),
-        child: Row(
-          children: [
-            icon,
-            SizedBox(width: PandoraTokens.spacingS),
-            Text(label),
-          ],
-        ),
+        elevation: PandoraTokens.elevationLow,
+
       ),
     );
   }
