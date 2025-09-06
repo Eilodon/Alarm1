@@ -4,9 +4,16 @@ pluginManagement {
         google()
         mavenCentral()
     }
-    // dùng biến môi trường FLUTTER_ROOT thay vì Properties lằng nhằng
-    val flutterRoot = System.getenv("FLUTTER_ROOT")
-        ?: throw GradleException("FLUTTER_ROOT not set; export it to your Flutter SDK path")
+
+    val localProperties = java.util.Properties()
+    val localPropertiesFile = rootDir.resolve("local.properties")
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.inputStream().use { localProperties.load(it) }
+    }
+    val flutterRoot = localProperties.getProperty("flutter.sdk")
+        ?: throw GradleException(
+            "Flutter SDK not found. Define location with flutter.sdk in the local.properties file."
+        )
     includeBuild("$flutterRoot/packages/flutter_tools/gradle")
 }
 
