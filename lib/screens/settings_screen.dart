@@ -31,6 +31,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   BackupFormat _backupFormat = BackupFormat.json;
 
+  ThemeMode _themeMode = ThemeMode.system;
+
 
   @override
   void initState() {
@@ -153,16 +155,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _settings.saveRequireAuth(v);
   }
 
-  void _cycleThemeMode() {
-    setState(() {
-      _themeMode = ThemeMode.values[(_themeMode.index + 1) % ThemeMode.values.length];
-    });
+  void _setThemeMode(ThemeMode mode) {
+    setState(() => _themeMode = mode);
     widget.onThemeModeChanged(_themeMode);
     _settings.saveThemeMode(_themeMode);
   }
 
-  String _themeModeLabel(AppLocalizations l10n) {
-    switch (_themeMode) {
+  String _themeModeLabel(ThemeMode mode, AppLocalizations l10n) {
+    switch (mode) {
       case ThemeMode.light:
         return l10n.light;
       case ThemeMode.dark:
@@ -266,11 +266,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
             title: Text(AppLocalizations.of(context)!.fontSize),
             onTap: _changeFontScale,
           ),
-          SwitchListTile(
+          ListTile(
             title: Text(AppLocalizations.of(context)!.themeMode),
-            subtitle: Text(_themeModeLabel(AppLocalizations.of(context)!)),
-            value: _themeMode == ThemeMode.dark,
-            onChanged: (_) => _cycleThemeMode(),
+            subtitle: Text(_themeModeLabel(_themeMode, AppLocalizations.of(context)!)),
+            trailing: DropdownButton<ThemeMode>(
+              value: _themeMode,
+              onChanged: (mode) {
+                if (mode != null) {
+                  _setThemeMode(mode);
+                }
+              },
+              items: [
+                DropdownMenuItem(
+                  value: ThemeMode.light,
+                  child: Text(AppLocalizations.of(context)!.light),
+                ),
+                DropdownMenuItem(
+                  value: ThemeMode.dark,
+                  child: Text(AppLocalizations.of(context)!.dark),
+                ),
+                DropdownMenuItem(
+                  value: ThemeMode.system,
+                  child: Text(AppLocalizations.of(context)!.system),
+                ),
+              ],
+            ),
           ),
           ListTile(
             title: Text(AppLocalizations.of(context)!.exportNotes),
