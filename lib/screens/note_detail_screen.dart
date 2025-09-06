@@ -71,7 +71,13 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     final availableTags = provider.notes.expand((n) => n.tags).toSet().toList();
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.note.title),
+        title: Hero(
+          tag: widget.note.id,
+          child: Material(
+            color: Colors.transparent,
+            child: Text(widget.note.title),
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: _readNote,
@@ -131,9 +137,22 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) =>
+                  PageRouteBuilder(
+                    pageBuilder: (_, __, ___) =>
                         ChatScreen(initialMessage: _contentCtrl.text),
+                    transitionsBuilder: (_, animation, __, child) {
+                      final offsetAnimation = Tween<Offset>(
+                        begin: const Offset(1, 0),
+                        end: Offset.zero,
+                      ).animate(animation);
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(
+                          position: offsetAnimation,
+                          child: child,
+                        ),
+                      );
+                    },
                   ),
                 );
               },
