@@ -1,13 +1,9 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:notes_reminder_app/pandora_ui/tokens.dart';
 
-class SnackbarKind {
-  final IconData icon;
-  final Color color;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-  const SnackbarKind._(this.icon, this.color);
 
   static const success =
       SnackbarKind._(Icons.check_circle, PandoraTokens.secondary);
@@ -66,33 +62,30 @@ class _PandoraSnackbarState extends State<PandoraSnackbar>
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _fade,
-      child: SlideTransition(
-        position: _slide,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              color: PandoraTokens.neutral100.withOpacity(0.7),
-              padding: const EdgeInsets.all(PandoraTokens.spacingM),
-              child: Row(
-                children: [
-                  Icon(widget.kind.icon, color: widget.kind.color),
-                  const SizedBox(width: PandoraTokens.spacingS),
-                  Expanded(child: Text(widget.text)),
-                  if (widget.onUndo != null)
-                    TextButton(
-                      onPressed: widget.onUndo,
-                      child: const Text('Undo'),
-                    ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: widget.onClose ?? hide,
-                  ),
-                ],
-              ),
+
+    return AnimatedOpacity(
+      duration: Duration(milliseconds: 300),
+      opacity: 1,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.7),
+          borderRadius: BorderRadius.circular(10),
+          backdropFilter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        ),
+        padding: EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Icon(getIcon(kind)),
+            SizedBox(width: 8),
+            Expanded(child: Text(text)),
+            TextButton(
+              onPressed: onUndo,
+              child: Text(AppLocalizations.of(context)!.undo),
+            ),
+            IconButton(
+              icon: Icon(Icons.close),
+              onPressed: onClose,
+
             ),
           ),
         ),
