@@ -9,6 +9,7 @@ import '../services/settings_service.dart';
 import '../screens/note_search_delegate.dart';
 import '../screens/voice_to_note_screen.dart';
 import '../screens/settings_screen.dart';
+import '../pandora_ui/toolbar_button.dart';
 import 'add_note_dialog.dart';
 import 'tag_filtered_notes_list.dart';
 
@@ -94,8 +95,9 @@ class _NotesTabState extends State<NotesTab> {
               delegate: NoteSearchDelegate(context.read<NoteProvider>().notes),
             ),
           ),
-          IconButton(
+          ToolbarButton(
             icon: const Icon(Icons.mic),
+            label: AppLocalizations.of(context)!.voiceToNote,
             onPressed: () async {
               await Navigator.push(
                 context,
@@ -118,9 +120,9 @@ class _NotesTabState extends State<NotesTab> {
               );
             },
           ),
-          IconButton(
+          ToolbarButton(
             icon: const Icon(Icons.settings),
-            tooltip: AppLocalizations.of(context)!.settingsTooltip,
+            label: AppLocalizations.of(context)!.settings,
             onPressed: () async {
               await Navigator.push(
                 context,
