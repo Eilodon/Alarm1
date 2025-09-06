@@ -83,6 +83,7 @@ void main() async {
   }
   final themeColor = await settings.loadThemeColor();
   final fontScale = await settings.loadFontScale();
+  final themeMode = await settings.loadThemeMode();
 
   final hasSeenOnboarding = await settings.loadHasSeenOnboarding();
 
@@ -92,6 +93,7 @@ void main() async {
       child: MyApp(
         themeColor: themeColor,
         fontScale: fontScale,
+        themeMode: themeMode,
 
         hasSeenOnboarding: hasSeenOnboarding,
 
@@ -114,6 +116,7 @@ class MyApp extends StatefulWidget {
     super.key,
     required this.themeColor,
     required this.fontScale,
+    required this.themeMode,
 
     required this.hasSeenOnboarding,
 
@@ -138,6 +141,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _themeColor = widget.themeColor;
     _fontScale = widget.fontScale;
+    _themeMode = widget.themeMode;
 
     _hasSeenOnboarding = widget.hasSeenOnboarding;
 
@@ -184,6 +188,11 @@ class _MyAppState extends State<MyApp> {
     await SettingsService().saveFontScale(newScale);
   }
 
+  void updateThemeMode(ThemeMode newMode) async {
+    setState(() => _themeMode = newMode);
+    await SettingsService().saveThemeMode(newMode);
+  }
+
 
   void _completeOnboarding() {
     setState(() => _hasSeenOnboarding = true);
@@ -227,6 +236,7 @@ class _MyAppState extends State<MyApp> {
           ? HomeScreen(
               onThemeChanged: updateTheme,
               onFontScaleChanged: updateFontScale,
+              onThemeModeChanged: updateThemeMode,
             )
           : OnboardingScreen(onFinished: _completeOnboarding),
 
