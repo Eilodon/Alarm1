@@ -49,6 +49,14 @@ class Note {
   @JsonKey(defaultValue: [])
   final List<String> attachments;
 
+  /// Display color associated with the note.
+  @JsonKey(defaultValue: 0xFFFFFFFF)
+  final int color;
+
+  /// Whether the note is pinned to the top of lists.
+  @JsonKey(defaultValue: false)
+  final bool pinned;
+
   /// Indicates if the note is locked and requires authentication.
   @JsonKey(defaultValue: false)
   final bool locked;
@@ -88,6 +96,8 @@ class Note {
     this.active = false,
     this.tags = const [],
     this.attachments = const [],
+    this.color = 0xFFFFFFFF,
+    this.pinned = false,
     this.locked = false,
     this.snoozeMinutes = 0,
     this.pinned = false,
@@ -108,6 +118,8 @@ class Note {
     bool? active,
     List<String>? tags,
     List<String>? attachments,
+    int? color,
+    bool? pinned,
     String? summary,
     List<String>? actionItems,
     List<DateTime>? dates,
@@ -134,6 +146,8 @@ class Note {
       active: active ?? this.active,
       tags: tags ?? this.tags,
       attachments: attachments ?? this.attachments,
+      color: color ?? this.color,
+      pinned: pinned ?? this.pinned,
       locked: locked ?? this.locked,
       snoozeMinutes: snoozeMinutes ?? this.snoozeMinutes,
       pinned: pinned ?? this.pinned,

@@ -10,6 +10,7 @@ import '../models/note.dart';
 import '../providers/note_provider.dart';
 import '../services/tts_service.dart';
 import '../widgets/tag_selector.dart';
+import '../l10n/localization_extensions.dart';
 import '../services/gemini_service.dart';
 import '../widgets/attachment_section.dart';
 import '../widgets/reminder_controls.dart';
@@ -37,6 +38,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   RepeatInterval? _repeat;
   int _snoozeMinutes = 5;
   late List<String> _tags;
+  int _color = 0xFFFFFFFF;
+  bool _pinned = false;
   late final TTSService _ttsService;
   String? _titleSuggestion;
   List<String> _tagSuggestions = [];
@@ -56,6 +59,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     _snoozeMinutes = widget.note.snoozeMinutes;
     _attachments = List.from(widget.note.attachments);
     _tags = List.from(widget.note.tags);
+    _color = widget.note.color;
+    _pinned = widget.note.pinned;
   }
 
   @override
@@ -194,6 +199,14 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               allowCreate: true,
               onChanged: (v) => setState(() => _tags = v),
               label: AppLocalizations.of(context)!.tagsLabel,
+              selectedColor: _color,
+              onColorChanged: (c) => setState(() => _color = c),
+              colorLabel: AppLocalizations.of(context)!.colorLabel,
+            ),
+            SwitchListTile(
+              title: Text(AppLocalizations.of(context)!.pinNote),
+              value: _pinned,
+              onChanged: (v) => setState(() => _pinned = v),
             ),
             const SizedBox(height: 12),
             AttachmentSection(
@@ -252,9 +265,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       if (result != null) {
         summary = result.summary;
         actionItems = result.actionItems;
-        tags = result.tags;
-        dates = result.dates;
-      }
+      tags = result.tags;
+      dates = result.dates;
+    }
     }
 
     final updated = widget.note.copyWith(
@@ -271,6 +284,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       summary: summary,
       actionItems: actionItems,
       dates: dates,
+      color: _color,
+      pinned: _pinned,
     );
 
     final ok = await context.read<NoteProvider>().saveNote(updated, l10n);

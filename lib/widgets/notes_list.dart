@@ -107,14 +107,20 @@ class _NotesListState extends State<NotesList> {
         return Card(
 
           child: ListTile(
-            leading: note.locked ? const Icon(Icons.lock) : null,
-            title: Hero(
-              tag: note.id,
-              child: Material(
-                color: Colors.transparent,
-                child: Text(note.title),
+
+            leading: Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Color(note.color),
               ),
+              child: note.locked
+                  ? const Icon(Icons.lock, size: 16, color: Colors.white)
+                  : null,
             ),
+            title: Text(note.title),
+
             subtitle: Text(
               note.alarmTime != null
                   ? '${note.content}\n⏰ ${DateFormat.yMd(Localizations.localeOf(context).toString()).add_Hm().format(note.alarmTime!)}'
@@ -151,12 +157,19 @@ class _NotesListState extends State<NotesList> {
               mainAxisSize: MainAxisSize.min,
 
               children: [
-                SlidableAction(
-                  onPressed: (_) async {
-                    final l10n = AppLocalizations.of(context)!;
-                    await provider.updateNote(
-                      note.copyWith(pinned: !note.pinned),
-                      l10n,
+
+                if (note.pinned)
+                  const Icon(Icons.push_pin, size: 20),
+                if (!provider.isSynced(note.id))
+                  const Icon(Icons.sync_problem, color: Colors.orange),
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  tooltip: AppLocalizations.of(context)!.delete,
+                  onPressed: () {
+                    final provider = context.read<NoteProvider>();
+                    final idx = provider.notes.indexWhere(
+                      (n) => n.id == note.id,
+
                     );
                   },
                   icon: Icons.push_pin,
