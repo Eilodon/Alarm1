@@ -6,9 +6,9 @@ import 'package:provider/provider.dart';
 import '../models/note.dart';
 import '../providers/note_provider.dart';
 import '../services/settings_service.dart';
-import '../services/auth_service.dart';
 import '../widgets/add_note_dialog.dart';
-import 'note_detail_screen.dart';
+import '../widgets/notes_list.dart';
+import '../widgets/tag_filter_menu.dart';
 import 'note_list_for_day_screen.dart';
 import 'note_search_delegate.dart';
 import 'settings_screen.dart';
@@ -33,59 +33,10 @@ class _HomeScreenState extends State<HomeScreen> {
   final DateTime _today = DateTime.now();
   String? _selectedTag;
 
-  final ScrollController _scrollController = ScrollController();
-  bool _isLoadingMore = false;
-  bool _hasMore = true;
-  DateTime? _lastFetched;
-  static const _pageSize = 20;
-
   @override
   void initState() {
     super.initState();
     _loadMascot();
-    _scrollController.addListener(_onScroll);
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final notes =
-          await context.read<NoteProvider>().fetchNotesPage(null, _pageSize);
-      if (!mounted) return;
-      setState(() {
-        if (notes.isNotEmpty) {
-          _lastFetched = notes.last.updatedAt;
-          _hasMore = notes.length == _pageSize;
-        }
-      });
-    });
-  }
-
-  void _onScroll() {
-    if (!_hasMore || _isLoadingMore) return;
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 200) {
-      _loadMore();
-    }
-  }
-
-  Future<void> _loadMore() async {
-    setState(() => _isLoadingMore = true);
-    final notes = await context
-        .read<NoteProvider>()
-        .fetchNotesPage(_lastFetched, _pageSize);
-    if (!mounted) return;
-    setState(() {
-      _isLoadingMore = false;
-      if (notes.isNotEmpty) {
-        _lastFetched = notes.last.updatedAt;
-      }
-      if (notes.length < _pageSize) {
-        _hasMore = false;
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
   }
 
   Future<void> _loadMascot() async {
@@ -94,10 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _addNote() {
-    showDialog(
-      context: context,
-      builder: (_) => const AddNoteDialog(),
-    );
+    showDialog(context: context, builder: (_) => const AddNoteDialog());
   }
 
   List<Note> _notesForDay(DateTime day, List<Note> notes) {
@@ -110,85 +58,6 @@ class _HomeScreenState extends State<HomeScreen> {
               n.alarmTime!.day == day.day,
         )
         .toList();
-  }
-
-  Widget _buildNotesList(List<Note> notes) {
-    if (notes.isEmpty) {
-      return Center(child: Text(AppLocalizations.of(context)!.noNotes));
-    }
-
-    final provider = context.watch<NoteProvider>();
-    final itemCount = notes.length + (_isLoadingMore ? 1 : 0);
-    return ListView.builder(
-      controller: _scrollController,
-      itemCount: itemCount,
-      itemBuilder: (context, index) {
-        if (index >= notes.length) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
-            child: Center(child: CircularProgressIndicator()),
-          );
-        }
-        final note = notes[index];
-        return Card(
-          child: ListTile(
-            leading: note.locked ? const Icon(Icons.lock) : null,
-            title: Text(note.title),
-            subtitle: Text(
-              note.alarmTime != null
-                  ? '${note.content}\n⏰ ${DateFormat.yMd(
-                          Localizations.localeOf(context).toString(),
-                        )
-                          .add_Hm()
-                          .format(note.alarmTime!)}'
-                  : note.content,
-            ),
-            onTap: () async {
-              if (note.locked) {
-                final ok = await AuthService()
-                    .authenticate(AppLocalizations.of(context)!);
-                if (!ok) return;
-              }
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => NoteDetailScreen(note: note)),
-              );
-            },
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (!provider.isSynced(note.id))
-                  const Icon(Icons.sync_problem, color: Colors.orange),
-                IconButton(
-                  icon: const Icon(Icons.delete),
-                  tooltip: AppLocalizations.of(context)!.delete,
-                  onPressed: () {
-                    final provider = context.read<NoteProvider>();
-                    final note = notes[index];
-                    final idx =
-                        provider.notes.indexWhere((n) => n.id == note.id);
-                    if (idx != -1) {
-                      provider.removeNoteAt(idx);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            AppLocalizations.of(context)!.noteDeleted,
-                          ),
-                          action: SnackBarAction(
-                            label: AppLocalizations.of(context)!.undo,
-                            onPressed: () => provider.addNote(note),
-                          ),
-                        ),
-                      );
-                    }
-                  },
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
   }
 
   @override
@@ -205,32 +74,20 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.appTitle),
         actions: [
-          PopupMenuButton<String?>(
-            icon: const Icon(Icons.label),
+          TagFilterMenu(
+            tags: tags,
+            selectedTag: _selectedTag,
             onSelected: (value) {
               setState(() {
                 _selectedTag = value;
               });
             },
-            itemBuilder: (context) => [
-              PopupMenuItem<String?>(
-                value: null,
-                child: Text(AppLocalizations.of(context)!.allTags),
-              ),
-              ...tags.map(
-                (t) => PopupMenuItem<String?>(
-                  value: t,
-                  child: Text(t),
-                ),
-              ),
-            ],
           ),
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () => showSearch(
               context: context,
-              delegate:
-                  NoteSearchDelegate(context.read<NoteProvider>().notes),
+              delegate: NoteSearchDelegate(context.read<NoteProvider>().notes),
             ),
           ),
           IconButton(
@@ -293,7 +150,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(DateFormat.E(Localizations.localeOf(context).toString()).format(d)),
+                        Text(
+                          DateFormat.E(
+                            Localizations.localeOf(context).toString(),
+                          ).format(d),
+                        ),
                         Text('${d.day}'),
                       ],
                     ),
@@ -303,7 +164,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          Expanded(child: _buildNotesList(filteredNotes)),
+          Expanded(child: NotesList(notes: filteredNotes)),
         ],
       ),
       floatingActionButton: FloatingActionButton(
