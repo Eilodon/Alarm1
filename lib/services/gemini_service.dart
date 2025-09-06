@@ -7,14 +7,18 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class GeminiService {
-  static const _apiKey = String.fromEnvironment('GEMINI_API_KEY', defaultValue: '');
-
   final http.Client _client;
   final String _model;
+  final String _apiKey;
 
-  GeminiService({http.Client? client, String model = 'gemini-1.5-flash-latest'})
-      : _client = client ?? http.Client(),
-        _model = model;
+  GeminiService({
+    http.Client? client,
+    String model = 'gemini-1.5-flash-latest',
+    String? apiKey,
+  })  : _client = client ?? http.Client(),
+        _model = model,
+        _apiKey =
+            apiKey ?? const String.fromEnvironment('GEMINI_API_KEY', defaultValue: '');
 
   Future<String> chat(String userText, AppLocalizations l10n) async {
     if (_apiKey.isEmpty) return l10n.geminiApiKeyNotConfigured;
