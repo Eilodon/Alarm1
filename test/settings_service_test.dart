@@ -38,15 +38,24 @@ void main() {
     expect(value, true);
   });
 
+  test('save and load has seen onboarding', () async {
+    final service = SettingsService();
+    await service.saveHasSeenOnboarding(true);
+    final value = await service.loadHasSeenOnboarding();
+    expect(value, true);
+  });
+
   test('default values returned when not set', () async {
     final service = SettingsService();
     final color = await service.loadThemeColor();
     final path = await service.loadMascotPath();
     final scale = await service.loadFontScale();
     final auth = await service.loadRequireAuth();
+    final onboarding = await service.loadHasSeenOnboarding();
     expect(color, Colors.blue);
     expect(path, 'assets/lottie/mascot.json');
     expect(scale, 1.0);
     expect(auth, false);
+    expect(onboarding, false);
   });
 }

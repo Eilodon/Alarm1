@@ -9,6 +9,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'screens/home_screen.dart';
+import 'screens/onboarding_screen.dart';
 import 'services/notification_service.dart';
 import 'services/settings_service.dart';
 import 'services/auth_service.dart';
@@ -50,12 +51,14 @@ void main() async {
   }
   final themeColor = await settings.loadThemeColor();
   final fontScale = await settings.loadFontScale();
+  final hasSeenOnboarding = await settings.loadHasSeenOnboarding();
   runApp(
     ChangeNotifierProvider(
       create: (_) => NoteProvider(),
       child: MyApp(
         themeColor: themeColor,
         fontScale: fontScale,
+        hasSeenOnboarding: hasSeenOnboarding,
         authFailed: authFailed,
         notificationFailed: notificationFailed,
       ),
@@ -69,10 +72,12 @@ class MyApp extends StatefulWidget {
   final double fontScale;
   final bool authFailed;
   final bool notificationFailed;
+  final bool hasSeenOnboarding;
   const MyApp({
     super.key,
     required this.themeColor,
     required this.fontScale,
+    required this.hasSeenOnboarding,
     this.authFailed = false,
     this.notificationFailed = false,
   });
@@ -86,12 +91,14 @@ class _MyAppState extends State<MyApp> {
   Color _themeColor = Colors.blue;
   double _fontScale = 1.0;
   StreamSubscription<ConnectivityResult>? _connSub;
+  bool _hasSeenOnboarding = true;
 
   @override
   void initState() {
     super.initState();
     _themeColor = widget.themeColor;
     _fontScale = widget.fontScale;
+    _hasSeenOnboarding = widget.hasSeenOnboarding;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final l10n = AppLocalizations.of(context)!;
       if (widget.authFailed) {
@@ -135,6 +142,10 @@ class _MyAppState extends State<MyApp> {
     await SettingsService().saveFontScale(newScale);
   }
 
+  void _completeOnboarding() {
+    setState(() => _hasSeenOnboarding = true);
+  }
+
   @override
   void dispose() {
     _connSub?.cancel();
@@ -161,10 +172,12 @@ class _MyAppState extends State<MyApp> {
         data: MediaQuery.of(context).copyWith(textScaleFactor: _fontScale),
         child: child!,
       ),
-      home: HomeScreen(
-        onThemeChanged: updateTheme,
-        onFontScaleChanged: updateFontScale,
-      ),
+      home: _hasSeenOnboarding
+          ? HomeScreen(
+              onThemeChanged: updateTheme,
+              onFontScaleChanged: updateFontScale,
+            )
+          : OnboardingScreen(onFinished: _completeOnboarding),
 
     );
   }
