@@ -1,0 +1,39 @@
+name: Dependency Check
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - name: Check for outdated packages
+        id: outdated
+        run: |
+          flutter pub outdated --exit-code > outdated.log
+        continue-on-error: true
+      - name: Dry-run major version upgrades
+        id: upgrade
+        run: |
+          flutter pub upgrade --major-versions --dry-run > upgrade.log
+        continue-on-error: true
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pub-report
+          path: |
+            outdated.log
+            upgrade.log
+      - name: Fail if updates or conflicts found
+        if: steps.outdated.outcome == 'failure' || steps.upgrade.outcome == 'failure'
+        run: |
+          echo "Dependency updates or conflicts detected."
+          exit 1
