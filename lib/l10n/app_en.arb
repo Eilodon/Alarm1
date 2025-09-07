@@ -148,6 +148,7 @@
   "notes": "Notes",
   "reminders": "Reminders",
   "palette": "Palette",
+  "searchCommandHint": "Type a command...",
   "onboardingTakeNotes": "Take Notes",
   "onboardingTakeNotesDesc": "Write down your thoughts and ideas.",
   "onboardingSetReminders": "Set Reminders",
