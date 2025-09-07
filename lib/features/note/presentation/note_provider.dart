@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     show Time;
+import 'package:collection/collection.dart';
 
 import '../domain/domain.dart';
 import 'package:alarm_data/alarm_data.dart';
@@ -136,13 +137,8 @@ class NoteProvider extends ChangeNotifier {
     await _syncService.init(_getNoteById);
   }
 
-  Note? _getNoteById(String id) {
-    try {
-      return _notes.firstWhere((n) => n.id == id);
-    } catch (_) {
-      return null;
-    }
-  }
+  Note? _getNoteById(String id) =>
+      _notes.firstWhereOrNull((n) => n.id == id);
 
   @override
   void dispose() {
