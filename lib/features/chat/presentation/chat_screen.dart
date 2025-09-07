@@ -39,11 +39,14 @@ class _ChatScreenState extends State<ChatScreen> {
     try {
       final reply =
           await _geminiService.chat(userText, AppLocalizations.of(context)!);
+      if (!mounted) return;
       setState(() => _messages.insert(0, Message(reply, false)));
     } catch (e) {
+      if (!mounted) return;
       setState(() => _messages.insert(
           0, Message(AppLocalizations.of(context)!.errorWithMessage(e.toString()), false)));
     } finally {
+      if (!mounted) return;
       setState(() => _isLoading = false);
     }
   }
