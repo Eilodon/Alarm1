@@ -45,7 +45,7 @@ void main() {
       ),
     ));
 
-    final node = tester.getSemantics(find.byType(PandoraSnackbar));
+    final node = tester.getSemantics(find.bySemanticsLabel('Hello'));
     expect(node.hasFlag(SemanticsFlag.isLiveRegion), isTrue);
     expect(node.label, 'Hello');
 
