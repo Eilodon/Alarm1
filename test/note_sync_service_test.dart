@@ -10,7 +10,7 @@ class DummyRepo extends Fake implements NoteRepository {}
 class FakeConnectivity extends Connectivity {
   @override
   Stream<List<ConnectivityResult>> get onConnectivityChanged =>
-      const Stream.empty();
+      const Stream<List<ConnectivityResult>>.empty();
 }
 
 void main() {
