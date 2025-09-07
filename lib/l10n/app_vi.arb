@@ -38,6 +38,7 @@
   },
   "networkError": "Lỗi mạng. Vui lòng thử lại.",
   "noInternetConnection": "Mất kết nối mạng.",
+  "internetConnectionRestored": "Đã kết nối lại.",
   "microphonePermissionMessage": "Yêu cầu quyền micro. Vui lòng bật trong Cài đặt.",
   "speechNotRecognizedMessage": "Không nhận được giọng nói. Vui lòng thử lại.",
   "readNote": "Đọc Note",

@@ -11,11 +11,17 @@ class ConnectivityService {
   void initialize(BuildContext context, GlobalKey<ScaffoldMessengerState> messengerKey) {
     try {
       _subscription = Connectivity().onConnectivityChanged.listen((result) {
+        final l10n = AppLocalizations.of(context)!;
         if (result == ConnectivityResult.none) {
-          final l10n = AppLocalizations.of(context)!;
           messengerKey.currentState?.showSnackBar(
             SnackBar(
               content: Text(l10n.noInternetConnection),
+            ),
+          );
+        } else {
+          messengerKey.currentState?.showSnackBar(
+            SnackBar(
+              content: Text(l10n.internetConnectionRestored),
             ),
           );
         }
