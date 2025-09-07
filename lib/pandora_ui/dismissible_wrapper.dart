@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'tokens.dart';
+import '../theme/tokens.dart';
 
 /// Wrapper adding swipe-to-dismiss behaviour to any widget.
 class DismissibleWrapper extends StatelessWidget {
@@ -17,14 +17,16 @@ class DismissibleWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = Theme.of(context).extension<Tokens>()!;
     return Dismissible(
       key: dismissibleKey ?? ValueKey(child.hashCode),
       direction: DismissDirection.endToStart,
       onDismissed: (_) => onDismissed?.call(),
       background: Container(
-        color: PandoraTokens.error,
+        color: tokens.colors.error,
         alignment: Alignment.centerRight,
-        padding: const EdgeInsets.symmetric(horizontal: PandoraTokens.spacingM),
+        padding:
+            EdgeInsets.symmetric(horizontal: tokens.spacing.m),
         child: const Icon(Icons.delete, color: Colors.white),
       ),
       child: child,

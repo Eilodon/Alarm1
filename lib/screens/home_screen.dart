@@ -7,7 +7,7 @@ import '../pandora_ui/bottom_sheet.dart';
 import '../pandora_ui/palette_list_item.dart';
 import '../pandora_ui/pandora_snackbar.dart';
 import '../pandora_ui/teach_ai_modal.dart';
-import '../pandora_ui/tokens.dart';
+import '../theme/tokens.dart';
 import '../pandora_ui/toolbar_button.dart';
 
 import '../widgets/notes_tab.dart';
@@ -15,6 +15,8 @@ import 'chat_screen.dart';
 import 'note_list_for_day_screen.dart';
 import 'settings_screen.dart';
 import 'voice_to_note_screen.dart';
+
+const _durationLong = Duration(milliseconds: 500);
 
 class HomeScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
@@ -84,41 +86,45 @@ class _HomeScreenState extends State<HomeScreen> {
   void _showSnackbar(String text, SnackbarKind kind) {
     _snackEntry?.remove();
     _snackEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        left: PandoraTokens.spacingM,
-        right: PandoraTokens.spacingM,
-        bottom: PandoraTokens.spacingL,
-        child: PandoraSnackbar(
-          text: text,
-          kind: kind,
-          onClose: () => _snackEntry?.remove(),
-        ),
-      ),
+      builder: (context) {
+        final tokens = Theme.of(context).extension<Tokens>()!;
+        return Positioned(
+          left: tokens.spacing.m,
+          right: tokens.spacing.m,
+          bottom: tokens.spacing.l,
+          child: PandoraSnackbar(
+            text: text,
+            kind: kind,
+            onClose: () => _snackEntry?.remove(),
+          ),
+        );
+      },
     );
     Overlay.of(context).insert(_snackEntry!);
-    Future.delayed(PandoraTokens.durationLong, () => _snackEntry?.remove());
+    Future.delayed(_durationLong, () => _snackEntry?.remove());
   }
 
   void _showPalette() {
+    final tokens = Theme.of(context).extension<Tokens>()!;
     PandoraBottomSheet.show(
       context,
       Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           PaletteListItem(
-            color: PandoraTokens.primary,
+            color: tokens.colors.primary,
             label: 'Primary',
             onTap: () {
-              widget.onThemeChanged(PandoraTokens.primary);
+              widget.onThemeChanged(tokens.colors.primary);
               Navigator.pop(context);
               _showSnackbar('Theme updated', SnackbarKind.success);
             },
           ),
           PaletteListItem(
-            color: PandoraTokens.secondary,
+            color: tokens.colors.secondary,
             label: 'Secondary',
             onTap: () {
-              widget.onThemeChanged(PandoraTokens.secondary);
+              widget.onThemeChanged(tokens.colors.secondary);
               Navigator.pop(context);
               _showSnackbar('Theme updated', SnackbarKind.success);
             },
@@ -138,6 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final tokens = Theme.of(context).extension<Tokens>()!;
 
     return Scaffold(
       body: Stack(
@@ -147,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
             alignment: Alignment.bottomCenter,
             child: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.all(PandoraTokens.spacingS),
+                padding: EdgeInsets.all(tokens.spacing.s),
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(

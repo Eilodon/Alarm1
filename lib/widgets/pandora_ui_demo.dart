@@ -8,7 +8,7 @@ import 'palette_list_item.dart';
 import '../pandora_ui/result_card.dart';
 import '../pandora_ui/security_cue.dart';
 import '../pandora_ui/teach_ai_modal.dart';
-import '../pandora_ui/tokens.dart';
+import '../theme/tokens.dart';
 
 /// Demonstrates the Pandora UI widgets in a simple screen.
 class PandoraUiDemo extends StatelessWidget {
@@ -16,22 +16,23 @@ class PandoraUiDemo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = Theme.of(context).extension<Tokens>()!;
     return Scaffold(
       appBar: AppBar(title: const Text('Pandora UI Demo')),
       body: ListView(
-        padding: const EdgeInsets.all(PandoraTokens.spacingM),
+        padding: EdgeInsets.all(tokens.spacing.m),
         children: [
           const Text('Security modes'),
-          const Row(
+          Row(
             children: [
-              SecurityCue(mode: SecurityMode.onDevice),
-              SizedBox(width: PandoraTokens.spacingM),
-              SecurityCue(mode: SecurityMode.hybrid),
-              SizedBox(width: PandoraTokens.spacingM),
-              SecurityCue(mode: SecurityMode.cloud),
+              const SecurityCue(mode: SecurityMode.onDevice),
+              SizedBox(width: tokens.spacing.m),
+              const SecurityCue(mode: SecurityMode.hybrid),
+              SizedBox(width: tokens.spacing.m),
+              const SecurityCue(mode: SecurityMode.cloud),
             ],
           ),
-          const SizedBox(height: PandoraTokens.spacingL),
+          SizedBox(height: tokens.spacing.l),
           ResultCard(
             textStream: Stream<String>.periodic(
               const Duration(milliseconds: 400),
@@ -48,13 +49,13 @@ class PandoraUiDemo extends StatelessWidget {
             onFeedback: (liked) {},
             securityMode: SecurityMode.hybrid,
           ),
-          const SizedBox(height: PandoraTokens.spacingL),
+          SizedBox(height: tokens.spacing.l),
           PaletteListItem(
             color: Colors.blue,
             label: 'Blue',
             onTap: () {},
           ),
-          const SizedBox(height: PandoraTokens.spacingL),
+          SizedBox(height: tokens.spacing.l),
           ElevatedButton(
             onPressed: () {
               PandoraBottomSheet.show(
@@ -70,17 +71,17 @@ class PandoraUiDemo extends StatelessWidget {
             },
             child: const Text('Show Bottom Sheet'),
           ),
-          const SizedBox(height: PandoraTokens.spacingL),
+          SizedBox(height: tokens.spacing.l),
           ElevatedButton(
             onPressed: () => TeachAiModal.show(context),
             child: const Text('Teach AI'),
           ),
-          const SizedBox(height: PandoraTokens.spacingL),
+          SizedBox(height: tokens.spacing.l),
           DismissibleWrapper(
             onDismissed: () {},
             child: Container(
               color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
-              padding: const EdgeInsets.all(PandoraTokens.spacingM),
+              padding: EdgeInsets.all(tokens.spacing.m),
               child: const Text('Swipe me'),
             ),
           )

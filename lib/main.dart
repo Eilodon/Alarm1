@@ -17,7 +17,7 @@ import 'package:provider/provider.dart';
 import 'models/note.dart';
 
 import 'firebase_options.dart';
-import 'pandora_ui/tokens.dart';
+import 'theme/tokens.dart';
 
 
 late final NoteProvider noteProvider;
@@ -167,24 +167,26 @@ class _MyAppState extends State<MyApp> {
       supportedLocales: const [Locale('en'), Locale('vi')],
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: PandoraTokens.primary,
-          background: PandoraTokens.lightBg,
-          surface: PandoraTokens.neutral100,
+          seedColor: Tokens.light.colors.primary,
+          background: Tokens.light.colors.background,
+          surface: Tokens.light.colors.surface,
         ),
         textTheme: GoogleFonts.interTextTheme(),
         useMaterial3: true,
+        extensions: const [Tokens.light],
       ),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: PandoraTokens.primary,
-          background: PandoraTokens.darkBg,
-          surface: PandoraTokens.neutral900,
+          seedColor: Tokens.dark.colors.primary,
+          background: Tokens.dark.colors.background,
+          surface: Tokens.dark.colors.surface,
           brightness: Brightness.dark,
         ),
         textTheme: GoogleFonts.interTextTheme(
           ThemeData.dark().textTheme,
         ),
         useMaterial3: true,
+        extensions: const [Tokens.dark],
       ),
       themeMode: _themeMode,
       builder: (context, child) => MediaQuery(

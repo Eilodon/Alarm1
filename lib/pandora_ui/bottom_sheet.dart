@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'tokens.dart';
+import '../theme/tokens.dart';
 
 /// A draggable bottom sheet that traps focus when opened.
 class PandoraBottomSheet extends StatefulWidget {
@@ -36,14 +36,15 @@ class _PandoraBottomSheetState extends State<PandoraBottomSheet> {
       expand: false,
       builder: (context, controller) {
         final theme = Theme.of(context);
+        final tokens = theme.extension<Tokens>()!;
         return FocusScope(
           node: _focusNode,
           autofocus: true,
           child: Container(
             decoration: BoxDecoration(
               color: theme.canvasColor,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(PandoraTokens.radiusL),
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(tokens.radii.l),
               ),
             ),
             child: SingleChildScrollView(

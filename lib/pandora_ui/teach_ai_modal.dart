@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import 'tokens.dart';
+import '../theme/tokens.dart';
 
 /// Simple modal dialog allowing the user to provide feedback to improve the AI.
 class TeachAiModal extends StatefulWidget {
@@ -32,9 +32,12 @@ class _TeachAiModalState extends State<TeachAiModal> {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = Theme.of(context).extension<Tokens>()!;
     return AlertDialog(
-      contentPadding: const EdgeInsets.all(PandoraTokens.spacingM),
-      title: Text(AppLocalizations.of(context)!.teachAi),
+
+      contentPadding: EdgeInsets.all(tokens.spacing.m),
+      title: const Text('Teach AI'),
+
       content: TextField(
         controller: _controller,
         maxLines: 5,
@@ -42,9 +45,9 @@ class _TeachAiModalState extends State<TeachAiModal> {
           hintText: AppLocalizations.of(context)!.teachAiHint,
         ),
       ),
-      actionsPadding: const EdgeInsets.symmetric(
-        horizontal: PandoraTokens.spacingM,
-        vertical: PandoraTokens.spacingS,
+      actionsPadding: EdgeInsets.symmetric(
+        horizontal: tokens.spacing.m,
+        vertical: tokens.spacing.s,
       ),
       actions: [
         TextButton(

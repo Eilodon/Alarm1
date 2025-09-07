@@ -1,23 +1,19 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import 'tokens.dart';
 
-/// Defines the different styles of [PandoraSnackbar].
+import '../theme/tokens.dart';
+
+const _animationDuration = Duration(milliseconds: 150);
+
 class SnackbarKind {
   final IconData icon;
-  final Color color;
+  const SnackbarKind._(this.icon);
 
-  const SnackbarKind._(this.icon, this.color);
+  static const success = SnackbarKind._(Icons.check_circle);
+  static const warn = SnackbarKind._(Icons.warning);
+  static const error = SnackbarKind._(Icons.error);
 
-  static const SnackbarKind success =
-      SnackbarKind._(Icons.check_circle, PandoraTokens.secondary);
-  static const SnackbarKind warn =
-      SnackbarKind._(Icons.warning, PandoraTokens.warning);
-  static const SnackbarKind error =
-      SnackbarKind._(Icons.error, PandoraTokens.error);
 }
 
 class PandoraSnackbar extends StatefulWidget {
@@ -50,7 +46,7 @@ class _PandoraSnackbarState extends State<PandoraSnackbar>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: PandoraTokens.durationShort,
+      duration: _animationDuration,
     );
     final animation = CurvedAnimation(parent: _controller, curve: _curve);
     _fade = animation;
@@ -71,46 +67,50 @@ class _PandoraSnackbarState extends State<PandoraSnackbar>
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final background = scheme.surface.withOpacity(0.9);
-    final iconColor = widget.kind.color;
 
-    return Semantics(
-      container: true,
-      liveRegion: true,
-      label: widget.text,
-      child: FadeTransition(
-        opacity: _fade,
-        child: SlideTransition(
-          position: _slide,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: Container(
-                color: background,
-                padding: const EdgeInsets.all(PandoraTokens.spacingM),
-                child: Row(
-                  children: [
-                    Icon(widget.kind.icon, color: iconColor),
-                    const SizedBox(width: PandoraTokens.spacingS),
-                    Expanded(child: Text(widget.text)),
-                    if (widget.onUndo != null)
-                      TextButton(
-                        onPressed: widget.onUndo,
-                        child: Text(AppLocalizations.of(context)!.undo),
-                      ),
-                    if (widget.onClose != null)
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        color: iconColor,
-                        tooltip: AppLocalizations.of(context)!.cancel,
-                        onPressed: widget.onClose,
-                      ),
-                  ],
-                ),
+    final tokens = Theme.of(context).extension<Tokens>()!;
+    Color iconColor;
+    if (widget.kind == SnackbarKind.success) {
+      iconColor = tokens.colors.secondary;
+    } else if (widget.kind == SnackbarKind.warn) {
+      iconColor = tokens.colors.warning;
+    } else {
+      iconColor = tokens.colors.error;
+    }
+
+    return FadeTransition(
+      opacity: _fade,
+      child: SlideTransition(
+        position: _slide,
+        child: Container(
+          decoration: BoxDecoration(
+            color: tokens.colors.surface,
+            borderRadius: BorderRadius.circular(tokens.radii.m),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 4,
               ),
-            ),
+            ],
+          ),
+          padding: EdgeInsets.all(tokens.spacing.m),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(widget.kind.icon, color: iconColor),
+              SizedBox(width: tokens.spacing.s),
+              Expanded(child: Text(widget.text)),
+              if (widget.onUndo != null)
+                TextButton(
+                  onPressed: widget.onUndo,
+                  child: Text(AppLocalizations.of(context)!.undo),
+                ),
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: widget.onClose ?? hide,
+              ),
+            ],
+
           ),
         ),
       ),

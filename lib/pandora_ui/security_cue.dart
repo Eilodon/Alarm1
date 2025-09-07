@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'tokens.dart';
+import '../theme/tokens.dart';
 
 /// Visual indicator of how a result was processed.
 ///
@@ -9,7 +9,7 @@ import 'tokens.dart';
 enum SecurityMode { onDevice, hybrid, cloud }
 
 class SecurityCue extends StatelessWidget {
-  const SecurityCue({super.key, required this.mode, this.size = PandoraTokens.iconM});
+  const SecurityCue({super.key, required this.mode, this.size = _iconSizeM});
 
   /// Mode the result was processed in.
   final SecurityMode mode;
@@ -25,12 +25,15 @@ class SecurityCue extends StatelessWidget {
       SecurityMode.cloud => Icons.cloud,
     };
 
+    final tokens = Theme.of(context).extension<Tokens>()!;
     final color = switch (mode) {
       SecurityMode.onDevice => Colors.green,
-      SecurityMode.hybrid => PandoraTokens.warning,
-      SecurityMode.cloud => PandoraTokens.info,
+      SecurityMode.hybrid => tokens.colors.warning,
+      SecurityMode.cloud => tokens.colors.info,
     };
 
     return Icon(icon, size: size, color: color);
   }
 }
+
+const _iconSizeM = 24.0;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'tokens.dart';
+import '../theme/tokens.dart';
 
 /// Simple list item displaying a color swatch with a label.
 class PaletteListItem extends StatelessWidget {
@@ -22,16 +22,17 @@ class PaletteListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final baseStyle = Theme.of(context).textTheme.bodyMedium;
-    final textColor = baseStyle?.color;
-    final selected = state == 'selected';
+
+    final tokens = Theme.of(context).extension<Tokens>()!;
+    final textColor = Theme.of(context).textTheme.bodyMedium?.color;
+
     return ListTile(
       leading: Container(
-        width: PandoraTokens.iconL,
-        height: PandoraTokens.iconL,
+        width: _iconSizeL,
+        height: _iconSizeL,
         decoration: BoxDecoration(
           color: color,
-          borderRadius: BorderRadius.circular(PandoraTokens.radiusS),
+          borderRadius: BorderRadius.circular(tokens.radii.s),
         ),
       ),
       title: Text(label, style: baseStyle?.copyWith(color: textColor)),
@@ -59,3 +60,5 @@ class PaletteListItem extends StatelessWidget {
     );
   }
 }
+
+const _iconSizeL = 32.0;
