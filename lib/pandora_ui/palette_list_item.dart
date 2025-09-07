@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../theme/tokens.dart';
+import 'tokens.dart';
 
-/// Simple list item displaying a color swatch with a label.
+/// List item displaying a color swatch with an optional icon and label.
 class PaletteListItem extends StatelessWidget {
   const PaletteListItem({
     super.key,
@@ -22,9 +23,8 @@ class PaletteListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final tokens = Theme.of(context).extension<Tokens>()!;
-    final textColor = Theme.of(context).textTheme.bodyMedium?.color;
+    final selected = state == 'selected';
 
     return ListTile(
       leading: Container(
@@ -35,11 +35,11 @@ class PaletteListItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(tokens.radii.s),
         ),
       ),
-      title: Text(label, style: baseStyle?.copyWith(color: textColor)),
+      title: Text(label),
       trailing: icon != null
           ? IconTheme.merge(
               data: IconThemeData(
-                color: selected ? PandoraTokens.primary : null,
+                color: selected ? tokens.colors.primary : null,
               ),
               child: icon!,
             )
@@ -51,14 +51,16 @@ class PaletteListItem extends StatelessWidget {
             }
           : null,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
+        borderRadius: BorderRadius.circular(tokens.radii.m),
       ),
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: PandoraTokens.spacingM,
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: tokens.spacing.m,
       ),
-      minLeadingWidth: PandoraTokens.touchTarget,
+      minLeadingWidth: _touchTarget,
     );
   }
 }
 
 const _iconSizeL = 32.0;
+const _touchTarget = 48.0;
+

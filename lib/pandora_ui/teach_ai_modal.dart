@@ -1,67 +1,57 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../theme/tokens.dart';
+import '../models/security_cue.dart';
 
-/// Simple modal dialog allowing the user to provide feedback to improve the AI.
+/// Modal dialog that lets user "teach" the AI with custom easing.
 class TeachAiModal extends StatefulWidget {
-  const TeachAiModal({super.key, this.onSubmit});
+  const TeachAiModal({super.key, this.securityCue = SecurityCue.onDevice});
 
-  final void Function(String)? onSubmit;
-
-  /// Convenience method to show the modal.
-  static Future<void> show(BuildContext context, {void Function(String)? onSubmit}) {
-    return showDialog<void>(
-      context: context,
-      builder: (_) => TeachAiModal(onSubmit: onSubmit),
-    );
-  }
+  final SecurityCue securityCue;
 
   @override
   State<TeachAiModal> createState() => _TeachAiModalState();
 }
 
-class _TeachAiModalState extends State<TeachAiModal> {
-  final TextEditingController _controller = TextEditingController();
+class _TeachAiModalState extends State<TeachAiModal>
+    with SingleTickerProviderStateMixin {
+  late final TextEditingController _ctrl;
+  late final AnimationController _anim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = TextEditingController();
+    _anim = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    )..forward();
+  }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _ctrl.dispose();
+    _anim.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final tokens = Theme.of(context).extension<Tokens>()!;
-    return AlertDialog(
-
-      contentPadding: EdgeInsets.all(tokens.spacing.m),
-      title: const Text('Teach AI'),
-
-      content: TextField(
-        controller: _controller,
-        maxLines: 5,
-        decoration: InputDecoration(
-          hintText: AppLocalizations.of(context)!.teachAiHint,
-        ),
+    final curved = CurvedAnimation(parent: _anim, curve: Curves.easeOutQuart);
+    return ScaleTransition(
+      scale: curved,
+      child: AlertDialog(
+        title: const Text('Teach AI'),
+        content: TextField(controller: _ctrl),
+        actions: [
+          TextButton(
+            onPressed: () {
+              widget.securityCue.triggerHaptic();
+              Navigator.pop(context, _ctrl.text);
+            },
+            child: const Text('Send'),
+          ),
+        ],
       ),
-      actionsPadding: EdgeInsets.symmetric(
-        horizontal: tokens.spacing.m,
-        vertical: tokens.spacing.s,
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(AppLocalizations.of(context)!.cancel),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            widget.onSubmit?.call(_controller.text);
-            Navigator.of(context).pop();
-          },
-          child: Text(AppLocalizations.of(context)!.submit),
-        ),
-      ],
     );
   }
 }

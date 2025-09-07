@@ -5,10 +5,13 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../pandora_ui/bottom_sheet.dart';
 import '../pandora_ui/palette_list_item.dart';
-import '../pandora_ui/pandora_snackbar.dart';
+import '../pandora_ui/palette_bottom_sheet.dart';
+import '../pandora_ui/snackbar.dart';
 import '../pandora_ui/teach_ai_modal.dart';
-import '../theme/tokens.dart';
 import '../pandora_ui/toolbar_button.dart';
+import '../models/command.dart';
+import '../models/security_cue.dart';
+import '../theme/tokens.dart';
 
 import '../widgets/notes_tab.dart';
 import 'chat_screen.dart';
@@ -16,7 +19,6 @@ import 'note_list_for_day_screen.dart';
 import 'settings_screen.dart';
 import 'voice_to_note_screen.dart';
 
-const _durationLong = Duration(milliseconds: 500);
 
 class HomeScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
@@ -43,7 +45,6 @@ class _HomeScreenState extends State<HomeScreen> {
   late final List<Widget> _screens;
   late final List<Command> _commands;
 
-  OverlayEntry? _snackEntry;
 
   @override
   void initState() {
@@ -83,25 +84,8 @@ class _HomeScreenState extends State<HomeScreen> {
     showPaletteBottomSheet(context, commands: _commands);
   }
 
-  void _showSnackbar(String text, SnackbarKind kind) {
-    _snackEntry?.remove();
-    _snackEntry = OverlayEntry(
-      builder: (context) {
-        final tokens = Theme.of(context).extension<Tokens>()!;
-        return Positioned(
-          left: tokens.spacing.m,
-          right: tokens.spacing.m,
-          bottom: tokens.spacing.l,
-          child: PandoraSnackbar(
-            text: text,
-            kind: kind,
-            onClose: () => _snackEntry?.remove(),
-          ),
-        );
-      },
-    );
-    Overlay.of(context).insert(_snackEntry!);
-    Future.delayed(_durationLong, () => _snackEntry?.remove());
+  void _showSnackbar(String text) {
+    showSimpleSnackBar(context, text, SecurityCue.onDevice);
   }
 
   void _showPalette() {
@@ -117,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: () {
               widget.onThemeChanged(tokens.colors.primary);
               Navigator.pop(context);
-              _showSnackbar('Theme updated', SnackbarKind.success);
+              _showSnackbar('Theme updated');
             },
           ),
           PaletteListItem(
@@ -126,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: () {
               widget.onThemeChanged(tokens.colors.secondary);
               Navigator.pop(context);
-              _showSnackbar('Theme updated', SnackbarKind.success);
+              _showSnackbar('Theme updated');
             },
           ),
         ],
@@ -137,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _openTeachAi() {
     TeachAiModal.show(
       context,
-      onSubmit: (_) => _showSnackbar('Thanks for teaching!', SnackbarKind.success),
+      onSubmit: (_) => _showSnackbar('Thanks for teaching!'),
     );
   }
 
