@@ -21,6 +21,10 @@ jobs:
             build
           key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
       - run: flutter pub get
+      - name: Check for outdated dependencies
+        run: flutter pub outdated
+      - name: Enforce null-safety dependency constraints
+        run: flutter pub outdated --mode=null-safety --exit-code
       - run: flutter analyze
       - run: flutter test
       - run: flutter test --coverage
