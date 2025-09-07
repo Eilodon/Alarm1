@@ -6,7 +6,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     show Time;
 
-
 import '../domain/domain.dart';
 import 'package:alarm_data/alarm_data.dart';
 import '../data/calendar_service.dart';
@@ -14,14 +13,13 @@ import '../data/notification_service.dart';
 import '../data/home_widget_service.dart';
 import '../../backup/data/note_sync_service.dart';
 
-
 int _noteComparator(Note a, Note b) {
   if (a.pinned != b.pinned) {
     return a.pinned ? -1 : 1;
   }
-  return (b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0)).compareTo(
-    a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
-  );
+  final epoch = DateTime.fromMillisecondsSinceEpoch(0);
+  final cmp = (b.updatedAt ?? epoch).compareTo(a.updatedAt ?? epoch);
+  return cmp != 0 ? cmp : a.id.compareTo(b.id);
 }
 
 class NoteProvider extends ChangeNotifier {
@@ -58,22 +56,23 @@ class NoteProvider extends ChangeNotifier {
     CreateNote? createNote,
     DeleteNote? deleteNote,
     SnoozeNote? snoozeNote,
-  })  : _repository = repository,
+  }) : _repository = repository,
 
-        _calendarService = calendarService,
-        _notificationService = notificationService,
-        _homeWidgetService = homeWidgetService,
-        _syncService = syncService,
-        _createNote = createNote ?? CreateNote(repository, syncService),
-        _deleteNote = deleteNote ??
-            DeleteNote(
-              repository,
-              calendarService,
-              notificationService,
-              homeWidgetService,
-              syncService,
-            ),
-        _snoozeNote = snoozeNote ?? SnoozeNote(notificationService) {
+       _calendarService = calendarService,
+       _notificationService = notificationService,
+       _homeWidgetService = homeWidgetService,
+       _syncService = syncService,
+       _createNote = createNote ?? CreateNote(repository, syncService),
+       _deleteNote =
+           deleteNote ??
+           DeleteNote(
+             repository,
+             calendarService,
+             notificationService,
+             homeWidgetService,
+             syncService,
+           ),
+       _snoozeNote = snoozeNote ?? SnoozeNote(notificationService) {
     unawaited(
       _init().catchError((e) {
         /* log or set error state */
@@ -152,8 +151,7 @@ class NoteProvider extends ChangeNotifier {
     final success = await _syncService.loadFromRemote(_notes);
     await _homeWidgetService.update(_notes.toList());
     notifyListeners();
-    _syncService.setSyncStatus(
-        success ? SyncStatus.idle : SyncStatus.error);
+    _syncService.setSyncStatus(success ? SyncStatus.idle : SyncStatus.error);
     return success;
   }
 
