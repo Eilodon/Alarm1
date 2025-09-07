@@ -5,7 +5,7 @@ import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/foundation.dart';
 
-import 'package:alarm_domain/alarm_domain.dart';
+import '../domain/domain.dart';
 
 class NotificationServiceImpl implements NotificationService {
   static final NotificationServiceImpl _instance =

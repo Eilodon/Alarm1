@@ -11,4 +11,6 @@ export 'src/usecases/update_note.dart';
 export 'src/services/notification_service.dart';
 export 'src/services/calendar_service.dart';
 export 'src/services/home_widget_service.dart';
+
 export 'src/services/backup_service.dart';
+
