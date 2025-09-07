@@ -24,20 +24,26 @@
   "geminiApiKeyNotConfigured": "Chưa cấu hình khóa API Gemini.",
   "noResponse": "Không có phản hồi.",
   "geminiError": "Lỗi Gemini: {error}",
-  "geminiError@placeholders": {
-    "error": {}
+  "@geminiError": {
+    "placeholders": {
+      "error": {}
+    }
   },
   "errorWithMessage": "Lỗi: {error}",
-  "errorWithMessage@placeholders": {
-    "error": {}
+  "@errorWithMessage": {
+    "placeholders": {
+      "error": {}
+    }
   },
   "networkError": "Lỗi mạng. Vui lòng thử lại.",
   "noInternetConnection": "Mất kết nối mạng.",
   "microphonePermissionMessage": "Yêu cầu quyền micro. Vui lòng bật trong Cài đặt.",
   "readNote": "Đọc Note",
   "scheduleForDate": "Lịch ngày {date}",
-  "scheduleForDate@placeholders": {
-    "date": {}
+  "@scheduleForDate": {
+    "placeholders": {
+      "date": {}
+    }
   },
   "noNotesForDay": "Không có ghi chú/nhắc lịch cho ngày này",
   "addNoteTooltip": "Thêm ghi chú",
@@ -63,8 +69,10 @@
   "repeatDaily": "Hàng ngày",
   "repeatWeekly": "Hàng tuần",
   "snoozeLabel": "Báo lại: {minutes} phút",
-  "snoozeLabel@placeholders": {
-    "minutes": {}
+  "@snoozeLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
   },
   "imageLabel": "Ảnh",
   "audioLabel": "Âm thanh",
@@ -89,8 +97,10 @@
   "speak": "Nói",
   "convertToNote": "Chuyển thành ghi chú",
   "convertSpeechPrompt": "Chuyển đoạn nói sau thành ghi chú: {recognized}",
-  "convertSpeechPrompt@placeholders": {
-    "recognized": {}
+  "@convertSpeechPrompt": {
+    "placeholders": {
+      "recognized": {}
+    }
   },
   "offlineMode": "Chế độ ngoại tuyến",
 
