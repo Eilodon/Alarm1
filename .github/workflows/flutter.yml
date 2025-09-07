@@ -10,11 +10,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: subosito/flutter-action@v2
         with:
-          channel: stable
-          flutter-version: '3.22.0'
+          channel: beta
       - uses: actions/cache@v4
         with:
           path: |
@@ -23,6 +22,7 @@ jobs:
           key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
       - run: flutter clean
       - run: flutter pub get
+      - run: flutter gen-l10n
       - name: Check for outdated dependencies
         run: flutter pub outdated
       - name: Enforce null-safety dependency constraints
@@ -30,7 +30,8 @@ jobs:
       - run: flutter analyze
       - run: flutter test
       - run: flutter test --coverage
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v5
+        if: github.actor != 'dependabot[bot]'
         with:
           file: coverage/lcov.info
           token: ${{ secrets.CODECOV_TOKEN }}

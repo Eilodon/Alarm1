@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:notes_reminder_app/features/note/note.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:notes_reminder_app/generated/app_localizations.dart';
 
 class MockRepo extends Mock implements NoteRepository {}
 
@@ -282,6 +282,52 @@ void main() {
     );
     expect(secondPage.map((n) => n.id), ['3']);
     verify(() => repo.getNotes()).called(1);
+  });
+
+  test('notes with identical timestamps are ordered by id', () async {
+    final repo = MockRepo();
+    final sync = MockSyncService();
+    final homeWidget = MockHomeWidget();
+    when(() => repo.getNotes()).thenAnswer(
+      (_) async => [
+        Note(
+          id: '2',
+          title: 'b',
+          content: 'c',
+          updatedAt: DateTime(2024, 1, 1),
+        ),
+        Note(
+          id: '1',
+          title: 'a',
+          content: 'c',
+          updatedAt: DateTime(2024, 1, 1),
+        ),
+      ],
+    );
+    when(() => repo.saveNotes(any())).thenAnswer((_) async {});
+    when(() => sync.init(any())).thenAnswer((_) async {});
+    final controller = StreamController<SyncStatus>.broadcast();
+    when(() => sync.syncStatus).thenAnswer((_) => controller.stream);
+    when(() => sync.setSyncStatus(any())).thenAnswer((invocation) {
+      controller.add(invocation.positionalArguments.first as SyncStatus);
+    });
+    when(() => sync.loadFromRemote(any())).thenAnswer((_) async => true);
+    when(() => homeWidget.update(any())).thenAnswer((_) async {});
+
+    final provider = NoteProvider(
+      getNotes: GetNotes(repo),
+      saveNotes: SaveNotes(repo),
+      updateNote: UpdateNote(repo),
+      autoBackup: AutoBackup(repo),
+      calendarService: MockCalendar(),
+      notificationService: MockNotification(),
+      syncService: sync,
+      homeWidgetService: homeWidget,
+    );
+
+    final notes = await provider.fetchNotesPage(null, 10);
+    expect(notes.length, 2);
+    expect(notes.map((n) => n.id), ['1', '2']);
   });
 
   test('snoozeNote calls notification snooze', () async {

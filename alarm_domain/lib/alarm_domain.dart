@@ -19,5 +19,4 @@ export 'src/services/home_widget_service.dart';
 export 'src/services/note_sync_service.dart';
 
 export 'src/services/backup_service.dart';
-export 'src/services/note_sync_service.dart';
 

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:notes_reminder_app/generated/app_localizations.dart';
 
 class ConnectivityService {
   StreamSubscription<ConnectivityResult>? _subscription;
@@ -32,8 +32,8 @@ class ConnectivityService {
         }
         _lastResult = result;
       });
-    } on MissingPluginException {
-      // Ignore if connectivity plugin is not available (e.g., tests)
+    } on MissingPluginException catch (e, st) {
+      debugPrint('Connectivity plugin missing: $e\n$st');
     }
   }
 

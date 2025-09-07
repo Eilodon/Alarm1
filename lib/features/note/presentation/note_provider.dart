@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:notes_reminder_app/generated/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     show Time;
-
+import 'package:collection/collection.dart';
 
 import '../domain/domain.dart';
 import 'package:alarm_data/alarm_data.dart';
@@ -14,14 +14,13 @@ import '../data/notification_service.dart';
 import '../data/home_widget_service.dart';
 import '../../backup/data/note_sync_service.dart';
 
-
 int _noteComparator(Note a, Note b) {
   if (a.pinned != b.pinned) {
     return a.pinned ? -1 : 1;
   }
-  return (b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0)).compareTo(
-    a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
-  );
+  final epoch = DateTime.fromMillisecondsSinceEpoch(0);
+  final cmp = (b.updatedAt ?? epoch).compareTo(a.updatedAt ?? epoch);
+  return cmp != 0 ? cmp : a.id.compareTo(b.id);
 }
 
 class NoteProvider extends ChangeNotifier {
@@ -29,6 +28,7 @@ class NoteProvider extends ChangeNotifier {
   final SaveNotes _saveNotes;
   final UpdateNote _updateNote;
   final AutoBackup _autoBackup;
+  final NoteRepository _repository;
 
   final CalendarService _calendarService;
   final NotificationService _notificationService;
@@ -40,10 +40,12 @@ class NoteProvider extends ChangeNotifier {
 
   final SplayTreeSet<Note> _notes = SplayTreeSet<Note>(_noteComparator);
   String _draft = '';
+  Object? _initError;
 
   Stream<SyncStatus> get syncStatus => _syncService.syncStatus;
   Set<String> get unsyncedNoteIds => _syncService.unsyncedNoteIds;
   bool isSynced(String id) => _syncService.isSynced(id);
+  Object? get initError => _initError;
 
   NoteProvider._({
     required GetNotes getNotes,
@@ -54,29 +56,36 @@ class NoteProvider extends ChangeNotifier {
     required NotificationService notificationService,
     required HomeWidgetService homeWidgetService,
     required NoteSyncService syncService,
+    required NoteRepository repository,
 
     CreateNote? createNote,
     DeleteNote? deleteNote,
     SnoozeNote? snoozeNote,
-  })  : _repository = repository,
-
-        _calendarService = calendarService,
-        _notificationService = notificationService,
-        _homeWidgetService = homeWidgetService,
-        _syncService = syncService,
-        _createNote = createNote ?? CreateNote(repository, syncService),
-        _deleteNote = deleteNote ??
-            DeleteNote(
-              repository,
-              calendarService,
-              notificationService,
-              homeWidgetService,
-              syncService,
-            ),
-        _snoozeNote = snoozeNote ?? SnoozeNote(notificationService) {
+  })  : _getNotes = getNotes,
+       _saveNotes = saveNotes,
+       _updateNote = updateNote,
+       _autoBackup = autoBackup,
+       _repository = repository,
+       _calendarService = calendarService,
+       _notificationService = notificationService,
+       _homeWidgetService = homeWidgetService,
+       _syncService = syncService,
+       _createNote = createNote ?? CreateNote(repository, syncService),
+       _deleteNote =
+           deleteNote ??
+           DeleteNote(
+             repository,
+             calendarService,
+             notificationService,
+             homeWidgetService,
+             syncService,
+           ),
+       _snoozeNote = snoozeNote ?? SnoozeNote(notificationService) {
     unawaited(
-      _init().catchError((e) {
-        /* log or set error state */
+      _init().catchError((e, s) {
+        _initError = e;
+        debugPrint('NoteProvider init failed: $e');
+        notifyListeners();
       }),
     );
   }
@@ -108,6 +117,7 @@ class NoteProvider extends ChangeNotifier {
         notificationService: notificationService,
         homeWidgetService: homeWidgetService,
         syncService: syncService,
+        repository: getNotes.repository,
       );
     }
     final repo = NoteRepositoryImpl();
@@ -120,6 +130,7 @@ class NoteProvider extends ChangeNotifier {
       notificationService: notificationService ?? NotificationServiceImpl(),
       homeWidgetService: homeWidgetService ?? const HomeWidgetServiceImpl(),
       syncService: syncService ?? NoteSyncServiceImpl(repository: repo),
+      repository: repo,
     );
   }
 
@@ -130,13 +141,8 @@ class NoteProvider extends ChangeNotifier {
     await _syncService.init(_getNoteById);
   }
 
-  Note? _getNoteById(String id) {
-    try {
-      return _notes.firstWhere((n) => n.id == id);
-    } catch (_) {
-      return null;
-    }
-  }
+  Note? _getNoteById(String id) =>
+      _notes.firstWhereOrNull((n) => n.id == id);
 
   @override
   void dispose() {
@@ -152,8 +158,7 @@ class NoteProvider extends ChangeNotifier {
     final success = await _syncService.loadFromRemote(_notes);
     await _homeWidgetService.update(_notes.toList());
     notifyListeners();
-    _syncService.setSyncStatus(
-        success ? SyncStatus.idle : SyncStatus.error);
+    _syncService.setSyncStatus(success ? SyncStatus.idle : SyncStatus.error);
     return success;
   }
 
@@ -192,8 +197,8 @@ class NoteProvider extends ChangeNotifier {
     bool pinned = false,
     required AppLocalizations l10n,
   }) async {
+    final id = DateTime.now().microsecondsSinceEpoch.toString();
     try {
-      final id = DateTime.now().microsecondsSinceEpoch.toString();
       int? notificationId;
       String? eventId;
       if (alarmTime != null) {
@@ -253,7 +258,10 @@ class NoteProvider extends ChangeNotifier {
 
       await addNote(note);
       return true;
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('Failed to create note $id: $e\n$st');
+      await _syncService.markUnsynced(id);
+      notifyListeners();
       return false;
     }
   }
@@ -352,7 +360,8 @@ class NoteProvider extends ChangeNotifier {
       notifyListeners();
       await _syncService.syncNote(updated);
       return true;
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('Failed to update note ${note.id}: $e\n$st');
       await _syncService.markUnsynced(note.id);
       notifyListeners();
       return false;

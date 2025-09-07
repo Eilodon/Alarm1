@@ -14,17 +14,18 @@ class TTSService {
   final AudioPlayer _player;
   final http.Client _client;
 
+  static const Map<String, String> _localeMapping = {
+    'en': 'en-US',
+    'vi': 'vi-VN',
+  };
+
   TTSService({FlutterTts? tts, AudioPlayer? player, http.Client? client})
       : _tts = tts ?? FlutterTts(),
         _player = player ?? AudioPlayer(),
         _client = client ?? http.Client();
 
   String _ttsCodeForLocale(Locale locale) {
-    const mapping = {
-      'en': 'en-US',
-      'vi': 'vi-VN',
-    };
-    return mapping[locale.languageCode] ?? locale.toLanguageTag();
+    return _localeMapping[locale.languageCode] ?? locale.toLanguageTag();
   }
 
   Future<void> speak(String text, {Locale? locale}) async {
@@ -42,7 +43,9 @@ class TTSService {
     if (!kIsWeb) {
       try {
         return Platform.environment['TTS_API_KEY'] ?? '';
-      } catch (_) {}
+      } catch (e, st) {
+        debugPrint('Failed to read TTS_API_KEY from environment: $e\n$st');
+      }
     }
     return '';
   }
@@ -58,11 +61,7 @@ class TTSService {
   }
 
   String _voiceIdForLocale(Locale locale) {
-    const mapping = {
-      'en': 'en-US',
-      'vi': 'vi-VN',
-    };
-    return mapping[locale.languageCode] ?? 'en-US';
+    return _localeMapping[locale.languageCode] ?? 'en-US';
   }
 
   Future<void> speakWithApi(String text,

@@ -40,7 +40,9 @@ class StartupService {
       await FirebaseAnalytics.instance.logAppOpen();
     } catch (e, st) {
       authFailed = true;
+
       debugPrint('Firebase initialization error: $e\n$st');
+
     }
 
     try {
@@ -49,7 +51,9 @@ class StartupService {
       );
     } catch (e, st) {
       notificationFailed = true;
+
       debugPrint('Notification initialization error: $e\n$st');
+
     }
 
     return StartupResult(

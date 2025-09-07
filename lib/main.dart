@@ -1,7 +1,8 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:notes_reminder_app/generated/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     as fln;
 import 'package:provider/provider.dart';
@@ -21,12 +22,7 @@ Future<void> _onNotificationResponse(
   final id = response.payload;
   if (id == null || !context.mounted) return;
   final noteProvider = context.read<NoteProvider>();
-  Note? note;
-  try {
-    note = noteProvider.notes.firstWhere((n) => n.id == id);
-  } catch (_) {
-    note = null;
-  }
+  final note = noteProvider.notes.firstWhereOrNull((n) => n.id == id);
   if (note == null) return;
   final locale = WidgetsBinding.instance.platformDispatcher.locale;
   final supported = AppLocalizations.delegate.isSupported(locale);
