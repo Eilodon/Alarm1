@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/services.dart';
 import 'package:notes_reminder_app/generated/app_localizations.dart';
 import 'package:flutter/foundation.dart';
-import 'dart:ui';
+import 'package:flutter/material.dart';
 import 'package:notes_reminder_app/features/note/data/notification_service.dart';
 import 'package:alarm_domain/alarm_domain.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
@@ -109,7 +109,7 @@ void main() {
       id: 2,
       title: 't',
       body: 'b',
-      time: const Time(10, 0, 0),
+      time: const TimeOfDay(hour: 10, minute: 0),
       l10n: l10n,
     );
     final call = log.singleWhere((c) => c.method == 'zonedSchedule');
@@ -135,6 +135,19 @@ void main() {
     final androidDetails = args['androidDetails'] as Map<dynamic, dynamic>;
     expect(androidDetails['channelName'], l10n.recurring);
     expect(androidDetails['channelDescription'], l10n.recurringDesc);
+  });
+
+  test('scheduleRecurring supports everyMinute interval', () async {
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    final service = NotificationServiceImpl();
+    await service.scheduleRecurring(
+      id: 4,
+      title: 't',
+      body: 'b',
+      repeatInterval: RepeatInterval.everyMinute,
+      l10n: l10n,
+    );
+    expect(log.any((c) => c.method == 'periodicallyShow'), isTrue);
   });
 
   test('scheduleRecurring logs error when permission denied', () async {

@@ -3,8 +3,7 @@ import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:notes_reminder_app/generated/app_localizations.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart'
-    show Time;
+import 'package:flutter/material.dart' show TimeOfDay;
 import 'package:collection/collection.dart';
 
 import 'package:notes_reminder_app/features/note/domain/domain.dart';
@@ -218,7 +217,7 @@ class NoteProvider extends ChangeNotifier {
             id: notificationId,
             title: title,
             body: content,
-            time: Time(alarmTime.hour, alarmTime.minute, alarmTime.second),
+            time: TimeOfDay(hour: alarmTime.hour, minute: alarmTime.minute),
             l10n: l10n,
           );
         } else {
@@ -331,10 +330,9 @@ class NoteProvider extends ChangeNotifier {
             id: nid,
             title: note.title,
             body: note.content,
-            time: Time(
-              note.alarmTime!.hour,
-              note.alarmTime!.minute,
-              note.alarmTime!.second,
+            time: TimeOfDay(
+              hour: note.alarmTime!.hour,
+              minute: note.alarmTime!.minute,
             ),
             l10n: l10n,
           );
