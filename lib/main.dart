@@ -45,37 +45,39 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     AppProviders(
-      child: FutureBuilder<AppInitializationData>(
-        future: AppInitializer().initialize(
-          onDidReceiveNotificationResponse: (response) =>
-              _onNotificationResponse(response, context),
-        ),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return MaterialApp(
-              home: ErrorScreen(onRetry: main),
-            );
-          }
-          if (!snapshot.hasData) {
-            return const MaterialApp(
-              home: Scaffold(
-                body: Center(
-                  child: CircularProgressIndicator(),
+      child: Builder(
+        builder: (context) => FutureBuilder<AppInitializationData>(
+          future: AppInitializer().initialize(
+            onDidReceiveNotificationResponse: (response) =>
+                _onNotificationResponse(response, context),
+          ),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return MaterialApp(
+                home: ErrorScreen(onRetry: main),
+              );
+            }
+            if (!snapshot.hasData) {
+              return const MaterialApp(
+                home: Scaffold(
+                  body: Center(
+                    child: CircularProgressIndicator(),
+                  ),
                 ),
-              ),
+              );
+            }
+            final data = snapshot.data!;
+            return MyApp(
+              themeColor: data.themeColor,
+              fontScale: data.fontScale,
+              themeMode: data.themeMode,
+              hasSeenOnboarding: data.hasSeenOnboarding,
+              authFailed: data.authFailed,
+              notificationFailed: data.notificationFailed,
+              connectivityService: ConnectivityService(),
             );
-          }
-          final data = snapshot.data!;
-          return MyApp(
-            themeColor: data.themeColor,
-            fontScale: data.fontScale,
-            themeMode: data.themeMode,
-            hasSeenOnboarding: data.hasSeenOnboarding,
-            authFailed: data.authFailed,
-            notificationFailed: data.notificationFailed,
-            connectivityService: ConnectivityService(),
-          );
-        },
+          },
+        ),
       ),
     ),
   );
