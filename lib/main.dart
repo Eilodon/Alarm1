@@ -11,9 +11,10 @@ import 'providers/note_provider.dart';
 import 'services/app_initializer.dart';
 import 'services/connectivity_service.dart';
 
-late final NoteProvider noteProvider;
-
-Future<void> _onNotificationResponse(NotificationResponse response) async {
+Future<void> _onNotificationResponse(
+  NotificationResponse response,
+  NoteProvider noteProvider,
+) async {
   final id = response.payload;
   if (id == null) return;
   Note? note;
@@ -37,21 +38,22 @@ Future<void> _onNotificationResponse(NotificationResponse response) async {
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  noteProvider = NoteProvider();
+  final noteProvider = NoteProvider();
 
   runApp(
-    FutureBuilder<AppInitializationData?>(
-      future: AppInitializer().initialize(
-        onDidReceiveNotificationResponse: _onNotificationResponse,
-      ),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const SizedBox.shrink();
-        }
-        final data = snapshot.data!;
-        return ChangeNotifierProvider.value(
-          value: noteProvider,
-          child: MyApp(
+    ChangeNotifierProvider.value(
+      value: noteProvider,
+      child: FutureBuilder<AppInitializationData?>(
+        future: AppInitializer().initialize(
+          onDidReceiveNotificationResponse: (response) =>
+              _onNotificationResponse(response, noteProvider),
+        ),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const SizedBox.shrink();
+          }
+          final data = snapshot.data!;
+          return MyApp(
             themeColor: data.themeColor,
             fontScale: data.fontScale,
             themeMode: data.themeMode,
@@ -59,9 +61,9 @@ void main() {
             authFailed: data.authFailed,
             notificationFailed: data.notificationFailed,
             connectivityService: ConnectivityService(),
-          ),
-        );
-      },
+          );
+        },
+      ),
     ),
   );
 }
