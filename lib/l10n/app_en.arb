@@ -10,6 +10,7 @@
   "noNotes": "No notes",
   "settings": "Settings",
   "chooseThemeColor": "Choose theme color",
+  "lowContrastWarning": "Selected color has low contrast with text",
   "changeThemeColor": "Change theme color",
   "chooseMascot": "Choose mascot",
   "changeMascot": "Change mascot",

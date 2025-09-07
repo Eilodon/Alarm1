@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:lottie/lottie.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'dart:math' as math;
 
 import '../services/settings_service.dart';
 import '../services/note_repository.dart';
@@ -57,37 +59,49 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _pickColor() async {
-    final colors = [
-      Colors.blue,
-      Colors.green,
-      Colors.red,
-      Colors.purple,
-      Colors.orange,
-      Colors.teal,
-    ];
+    Color temp = Theme.of(context).colorScheme.primary;
     await showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: Text(AppLocalizations.of(context)!.chooseThemeColor),
-        content: Wrap(
-          children: colors.map((c) {
-            return GestureDetector(
-              onTap: () {
-                widget.onThemeChanged(c);
-                _settings.saveThemeColor(c);
-                Navigator.pop(context);
-              },
-              child: Container(
-                width: 40,
-                height: 40,
-                margin: const EdgeInsets.all(4),
-                decoration: BoxDecoration(color: c, shape: BoxShape.circle),
-              ),
-            );
-          }).toList(),
+        content: SingleChildScrollView(
+          child: ColorPicker(
+            pickerColor: temp,
+            onColorChanged: (c) => temp = c,
+            enableAlpha: false,
+          ),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppLocalizations.of(context)!.cancel),
+          ),
+          TextButton(
+            onPressed: () {
+              widget.onThemeChanged(temp);
+              _settings.saveThemeColor(temp);
+              _warnIfLowContrast(temp);
+              Navigator.pop(context);
+            },
+            child: Text(AppLocalizations.of(context)!.save),
+          ),
+        ],
       ),
     );
+  }
+
+  void _warnIfLowContrast(Color color) {
+    final brightness = ThemeData.estimateBrightnessForColor(color);
+    final foreground =
+        brightness == Brightness.dark ? Colors.white : Colors.black;
+    final l1 = color.computeLuminance();
+    final l2 = foreground.computeLuminance();
+    final ratio = (math.max(l1, l2) + 0.05) / (math.min(l1, l2) + 0.05);
+    if (ratio < 4.5) {
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l10n.lowContrastWarning)));
+    }
   }
 
   Future<void> _pickMascot() async {
