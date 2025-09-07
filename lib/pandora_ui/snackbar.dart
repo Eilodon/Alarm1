@@ -46,16 +46,17 @@ class _SimpleSnackBarState extends State<SimpleSnackBar>
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return SlideTransition(
       position: _offset,
       child: Material(
-        color: Colors.black87,
+        color: scheme.inverseSurface,
         borderRadius: BorderRadius.circular(8),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Text(
             widget.message,
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: scheme.onInverseSurface),
           ),
         ),
       ),
