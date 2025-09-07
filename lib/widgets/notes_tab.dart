@@ -10,6 +10,9 @@ import '../screens/note_search_delegate.dart';
 import '../screens/voice_to_note_screen.dart';
 import '../screens/settings_screen.dart';
 import '../pandora_ui/toolbar_button.dart';
+import '../pandora_ui/palette_bottom_sheet.dart';
+import '../pandora_ui/teach_ai_modal.dart';
+import '../models/command.dart';
 import 'add_note_dialog.dart';
 import 'tag_filtered_notes_list.dart';
 
@@ -152,21 +155,56 @@ class _NotesTabState extends State<NotesTab> {
           ),
           PopupMenuButton<String>(
             onSelected: (value) async {
+              final l10n = AppLocalizations.of(context)!;
               if (value == 'backup') {
                 final ok = await context.read<NoteProvider>().backupNow();
                 if (!mounted) return;
-                final l10n = AppLocalizations.of(context)!;
                 if (ok) {
                   ScaffoldMessenger.of(
                     context,
                   ).showSnackBar(SnackBar(content: Text(l10n.notesExported)));
                 }
+              } else if (value == 'palette') {
+                await showPaletteBottomSheet(context, commands: [
+                  Command(
+                    title: l10n.voiceToNote,
+                    action: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const VoiceToNoteScreen(),
+                      ),
+                    ),
+                  ),
+                  Command(
+                    title: l10n.settings,
+                    action: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => SettingsScreen(
+                          onThemeChanged: widget.onThemeChanged,
+                          onFontScaleChanged: widget.onFontScaleChanged,
+                          onThemeModeChanged: widget.onThemeModeChanged,
+                        ),
+                      ),
+                    ),
+                  ),
+                ]);
+              } else if (value == 'teachAi') {
+                await TeachAiModal.show(context);
               }
             },
             itemBuilder: (context) => [
               PopupMenuItem(
                 value: 'backup',
                 child: Text(AppLocalizations.of(context)!.backupNow),
+              ),
+              PopupMenuItem(
+                value: 'palette',
+                child: Text(AppLocalizations.of(context)!.palette),
+              ),
+              PopupMenuItem(
+                value: 'teachAi',
+                child: Text(AppLocalizations.of(context)!.teachAi),
               ),
             ],
           ),

@@ -98,28 +98,27 @@ class _HomeScreenState extends State<HomeScreen> {
 
         return Scaffold(
           body: IndexedStack(index: _currentIndex, children: _screens),
-          bottomNavigationBar: NavigationBar(
-            selectedIndex: _currentIndex,
-            onDestinationSelected: (index) =>
-                setState(() => _currentIndex = index),
-            destinations: [
-              NavigationDestination(
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: (index) => setState(() => _currentIndex = index),
+            items: [
+              BottomNavigationBarItem(
                 icon: const Icon(Icons.note),
                 label: l10n.notes,
               ),
-              NavigationDestination(
+              BottomNavigationBarItem(
                 icon: const Icon(Icons.alarm),
                 label: l10n.reminders,
               ),
-              NavigationDestination(
+              BottomNavigationBarItem(
                 icon: const Icon(Icons.mic),
                 label: l10n.voiceToNote,
               ),
-              NavigationDestination(
+              BottomNavigationBarItem(
                 icon: const Icon(Icons.smart_toy),
                 label: l10n.chatAI,
               ),
-              NavigationDestination(
+              BottomNavigationBarItem(
                 icon: const Icon(Icons.settings),
                 label: l10n.settings,
               ),
