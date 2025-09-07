@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:connectivity_plus_platform_interface/connectivity_plus_platform_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:notes_reminder_app/generated/app_localizations.dart';
 import 'package:notes_reminder_app/services/connectivity_service.dart';
 
 class FakeConnectivity extends ConnectivityPlatform {

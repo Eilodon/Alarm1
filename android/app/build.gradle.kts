@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.example.notes_reminder_app"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.notes_reminder_app"
         minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
     }
