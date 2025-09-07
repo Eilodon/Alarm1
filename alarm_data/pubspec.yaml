@@ -4,7 +4,9 @@ publish_to: 'none'
 version: 0.0.1
 
 environment:
-  sdk: '>=3.3.0 <4.0.0'
+  sdk: '>=3.5.0 <4.0.0'
+
+resolution: workspace
 
 dependencies:
   flutter:
@@ -12,15 +14,15 @@ dependencies:
   alarm_domain:
     path: ../alarm_domain
 
-  file_picker: ^6.2.1
-  pdf: ^3.11.3
-  path_provider: ^2.1.5
-  uuid: ^4.5.1
-  encrypt: ^5.0.3
-  cryptography: ^2.7.0
-  flutter_secure_storage: ^9.2.4
-  shared_preferences: ^2.5.3
+  file_picker: ^workspace
+  pdf: ^workspace
+  path_provider: ^workspace
+  uuid: ^workspace
+  encrypt: ^workspace
+  cryptography: ^workspace
+  flutter_secure_storage: ^workspace
+  shared_preferences: ^workspace
 
 dev_dependencies:
-  build_runner: ^2.8.0
-  json_serializable: ^6.11.1
+  build_runner: ^workspace
+  json_serializable: ^workspace
