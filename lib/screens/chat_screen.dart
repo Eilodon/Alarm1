@@ -20,21 +20,13 @@ class _ChatScreenState extends State<ChatScreen> {
   final List<Message> _messages = [];
   final TextEditingController _controller = TextEditingController();
   final GeminiService _geminiService = GeminiService();
-  final ScrollController _scrollCtrl = ScrollController();
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
     if (widget.initialMessage.isNotEmpty) {
-      _messages.add(Message(widget.initialMessage, true));
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollCtrl.animateTo(
-          _scrollCtrl.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
-      });
+      _messages.insert(0, Message(widget.initialMessage, true));
       _sendToGemini(widget.initialMessage);
     }
   }
@@ -45,20 +37,10 @@ class _ChatScreenState extends State<ChatScreen> {
     try {
       final reply =
           await _geminiService.chat(userText, AppLocalizations.of(context)!);
-      setState(() => _messages.add(Message(reply, false)));
-      _scrollCtrl.animateTo(
-        _scrollCtrl.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
+      setState(() => _messages.insert(0, Message(reply, false)));
     } catch (e) {
-      setState(() =>
-          _messages.add(Message(AppLocalizations.of(context)!.errorWithMessage(e.toString()), false)));
-      _scrollCtrl.animateTo(
-        _scrollCtrl.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
+      setState(() => _messages.insert(
+          0, Message(AppLocalizations.of(context)!.errorWithMessage(e.toString()), false)));
     } finally {
       setState(() => _isLoading = false);
     }
@@ -68,21 +50,15 @@ class _ChatScreenState extends State<ChatScreen> {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
     setState(() {
-      _messages.add(Message(text, true));
+      _messages.insert(0, Message(text, true));
       _controller.clear();
     });
-    _scrollCtrl.animateTo(
-      _scrollCtrl.position.maxScrollExtent,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-    );
     _sendToGemini(text);
   }
 
   @override
   void dispose() {
     _controller.dispose();
-    _scrollCtrl.dispose();
     super.dispose();
   }
 
@@ -94,7 +70,7 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           Expanded(
             child: ListView.builder(
-              controller: _scrollCtrl,
+              reverse: true,
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 final msg = _messages[index];
