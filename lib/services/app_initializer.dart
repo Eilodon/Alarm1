@@ -41,10 +41,16 @@ class AppInitializer {
       final l10n = await AppLocalizations.delegate.load(effectiveLocale);
       final ok = await AuthService().authenticate(l10n);
       if (!ok) {
-        final themeColor = await settings.loadThemeColor();
-        final fontScale = await settings.loadFontScale();
-        final themeMode = await settings.loadThemeMode();
-        final hasSeenOnboarding = await settings.loadHasSeenOnboarding();
+        final results = await Future.wait([
+          settings.loadThemeColor(),
+          settings.loadFontScale(),
+          settings.loadThemeMode(),
+          settings.loadHasSeenOnboarding(),
+        ]);
+        final themeColor = results[0] as Color;
+        final fontScale = results[1] as double;
+        final themeMode = results[2] as ThemeMode;
+        final hasSeenOnboarding = results[3] as bool;
         return AppInitializationData(
           themeColor: themeColor,
           fontScale: fontScale,
@@ -55,10 +61,16 @@ class AppInitializer {
         );
       }
     }
-    final themeColor = await settings.loadThemeColor();
-    final fontScale = await settings.loadFontScale();
-    final themeMode = await settings.loadThemeMode();
-    final hasSeenOnboarding = await settings.loadHasSeenOnboarding();
+    final results = await Future.wait([
+      settings.loadThemeColor(),
+      settings.loadFontScale(),
+      settings.loadThemeMode(),
+      settings.loadHasSeenOnboarding(),
+    ]);
+    final themeColor = results[0] as Color;
+    final fontScale = results[1] as double;
+    final themeMode = results[2] as ThemeMode;
+    final hasSeenOnboarding = results[3] as bool;
 
     return AppInitializationData(
       themeColor: themeColor,
