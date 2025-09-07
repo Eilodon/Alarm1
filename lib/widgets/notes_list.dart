@@ -10,6 +10,7 @@ import '../pandora_ui/toolbar_button.dart';
 import '../providers/note_provider.dart';
 import '../screens/note_detail_screen.dart';
 import '../services/auth_service.dart';
+
 import 'note_card.dart';
 
 class NotesList extends StatefulWidget {
@@ -17,6 +18,7 @@ class NotesList extends StatefulWidget {
 
   final List<Note> notes;
   final int gridCount;
+
 
   @override
   State<NotesList> createState() => _NotesListState();
@@ -183,6 +185,7 @@ class _NotesListState extends State<NotesList> {
             ),
           ],
         ),
+
       ),
     );
   }
