@@ -66,7 +66,10 @@ void main() {
     when(() => homeWidget.update(any())).thenAnswer((_) async {});
 
     final provider = NoteProvider(
-      repository: repo,
+      getNotes: GetNotes(repo),
+      saveNotes: SaveNotes(repo),
+      updateNote: UpdateNote(repo),
+      autoBackup: AutoBackup(repo),
       calendarService: calendar,
       notificationService: notification,
       syncService: sync,
@@ -113,7 +116,10 @@ void main() {
     when(() => homeWidget.update(any())).thenAnswer((_) async {});
 
     final provider = NoteProvider(
-      repository: repo,
+      getNotes: GetNotes(repo),
+      saveNotes: SaveNotes(repo),
+      updateNote: UpdateNote(repo),
+      autoBackup: AutoBackup(repo),
       calendarService: calendar,
       notificationService: notification,
       syncService: sync,
@@ -178,7 +184,10 @@ void main() {
       when(() => sync.syncNote(any())).thenAnswer((_) async {});
 
       final provider = NoteProvider(
-        repository: repo,
+        getNotes: GetNotes(repo),
+        saveNotes: SaveNotes(repo),
+        updateNote: UpdateNote(repo),
+        autoBackup: AutoBackup(repo),
         calendarService: calendar,
         notificationService: notification,
         syncService: sync,
@@ -237,7 +246,10 @@ void main() {
     when(() => homeWidget.update(any())).thenAnswer((_) async {});
 
     final provider = NoteProvider(
-      repository: repo,
+      getNotes: GetNotes(repo),
+      saveNotes: SaveNotes(repo),
+      updateNote: UpdateNote(repo),
+      autoBackup: AutoBackup(repo),
       calendarService: MockCalendar(),
       notificationService: MockNotification(),
       syncService: sync,
@@ -293,7 +305,10 @@ void main() {
     when(() => homeWidget.update(any())).thenAnswer((_) async {});
 
     final provider = NoteProvider(
-      repository: repo,
+      getNotes: GetNotes(repo),
+      saveNotes: SaveNotes(repo),
+      updateNote: UpdateNote(repo),
+      autoBackup: AutoBackup(repo),
       calendarService: calendar,
       notificationService: notification,
       syncService: sync,

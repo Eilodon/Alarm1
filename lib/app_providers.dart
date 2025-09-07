@@ -7,6 +7,7 @@ import 'features/note/data/notification_service.dart';
 import 'features/note/data/home_widget_service.dart';
 import 'features/backup/data/note_sync_service.dart';
 import 'package:alarm_data/alarm_data.dart';
+import 'package:alarm_domain/alarm_domain.dart';
 
 /// Wraps the given [child] with all application level providers.
 class AppProviders extends StatelessWidget {
@@ -17,17 +18,42 @@ class AppProviders extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        Provider<DbService>(create: (_) => DbService()),
+        Provider<BackupService>(create: (_) => BackupService()),
+        Provider<NoteRepository>(
+          create: (context) => NoteRepositoryImpl(
+            dbService: context.read<DbService>(),
+            backupService: context.read<BackupService>(),
+          ),
+        ),
+        Provider<GetNotes>(
+          create: (context) => GetNotes(context.read<NoteRepository>()),
+        ),
+        Provider<SaveNotes>(
+          create: (context) => SaveNotes(context.read<NoteRepository>()),
+        ),
+        Provider<UpdateNote>(
+          create: (context) => UpdateNote(context.read<NoteRepository>()),
+        ),
+        Provider<AutoBackup>(
+          create: (context) => AutoBackup(context.read<NoteRepository>()),
+        ),
+        Provider<NoteSyncService>(
+          create: (context) => NoteSyncServiceImpl(
+            repository: context.read<NoteRepository>(),
+          ),
+        ),
         ChangeNotifierProvider<NoteProvider>(
-          create: (_) {
-            final repo = NoteRepositoryImpl();
-            return NoteProvider(
-              repository: repo,
-              calendarService: CalendarServiceImpl.instance,
-              notificationService: NotificationServiceImpl(),
-              homeWidgetService: const HomeWidgetServiceImpl(),
-              syncService: NoteSyncServiceImpl(repository: repo),
-            );
-          },
+          create: (context) => NoteProvider(
+            getNotes: context.read<GetNotes>(),
+            saveNotes: context.read<SaveNotes>(),
+            updateNote: context.read<UpdateNote>(),
+            autoBackup: context.read<AutoBackup>(),
+            calendarService: CalendarServiceImpl.instance,
+            notificationService: NotificationServiceImpl(),
+            homeWidgetService: const HomeWidgetServiceImpl(),
+            syncService: context.read<NoteSyncService>(),
+          ),
         ),
         // Additional providers can be added here.
       ],
