@@ -3,8 +3,8 @@ import 'package:notes_reminder_app/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
-import 'note_provider.dart';
-import '../../chat/data/gemini_service.dart';
+import 'package:notes_reminder_app/features/note/presentation/note_provider.dart';
+import 'package:notes_reminder_app/features/chat/data/gemini_service.dart';
 
 class VoiceToNoteScreen extends StatefulWidget {
   final stt.SpeechToText speech;

@@ -3,12 +3,12 @@ import 'package:notes_reminder_app/generated/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../features/note/domain/domain.dart';
-import '../features/note/presentation/note_provider.dart';
-import '../features/note/presentation/note_list_for_day_screen.dart';
-import 'notes_list.dart';
-import 'tag_filter_menu.dart';
-import 'route_transitions.dart';
+import 'package:notes_reminder_app/features/note/domain/domain.dart';
+import 'package:notes_reminder_app/features/note/presentation/note_provider.dart';
+import 'package:notes_reminder_app/features/note/presentation/note_list_for_day_screen.dart';
+import 'package:notes_reminder_app/widgets/notes_list.dart';
+import 'package:notes_reminder_app/widgets/tag_filter_menu.dart';
+import 'package:notes_reminder_app/widgets/route_transitions.dart';
 
 class TagFilteredNotesList extends StatefulWidget {
   final int gridCount;
