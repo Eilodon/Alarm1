@@ -51,4 +51,36 @@ void main() {
 
     expect(find.text(l10n.noInternetConnection), findsOneWidget);
   });
+
+  testWidgets('shows SnackBar when connection restored', (tester) async {
+    final fake = FakeConnectivity();
+    ConnectivityPlatform.instance = fake;
+
+    final messengerKey = GlobalKey<ScaffoldMessengerState>();
+
+    await tester.pumpWidget(MaterialApp(
+      locale: const Locale('en'),
+      scaffoldMessengerKey: messengerKey,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: Builder(
+        builder: (context) {
+          ConnectivityService().initialize(context, messengerKey);
+          return const Scaffold(body: SizedBox.shrink());
+        },
+      ),
+    ));
+
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+
+    fake.emit(ConnectivityResult.none);
+    await tester.pump();
+
+    messengerKey.currentState!.clearSnackBars();
+
+    fake.emit(ConnectivityResult.wifi);
+    await tester.pump();
+
+    expect(find.text(l10n.internetConnectionRestored), findsOneWidget);
+  });
 }
