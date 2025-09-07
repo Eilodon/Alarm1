@@ -8,23 +8,6 @@ class _ToolbarButtonStyle {
   final Color foreground;
   final bool enabled;
 
-
-  const _ToolbarButtonStyle({
-    required this.background,
-    required this.foreground,
-    required this.enabled,
-  });
-}
-
-const _touchTarget = 48.0;
-
-class ToolbarButton extends StatelessWidget {
-  final Widget icon;
-  final String label;
-  final VoidCallback onPressed;
-  final String state;
-
-
   const _ToolbarButtonStyle({
     required this.background,
     required this.foreground,
@@ -52,7 +35,7 @@ class ToolbarButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = Theme.of(context).extension<Tokens>()!;
-    final toolbarStyles = {
+    final toolbarStyles = <String, _ToolbarButtonStyle>{
       'default': _ToolbarButtonStyle(
         background: tokens.colors.primary,
         foreground: tokens.colors.neutral100,
@@ -72,58 +55,42 @@ class ToolbarButton extends StatelessWidget {
 
     final style = toolbarStyles[state] ?? toolbarStyles['default']!;
 
-
-    final toolbarStyles = {
-      'default': _ToolbarButtonStyle(
-        background: tokens.colors.primary,
-        foreground: tokens.colors.neutral100,
-        enabled: true,
-      ),
-      'active': _ToolbarButtonStyle(
-        background: tokens.colors.secondary,
-        foreground: tokens.colors.neutral100,
-        enabled: true,
-      ),
-      'disabled': _ToolbarButtonStyle(
-        background: tokens.colors.neutral300,
-        foreground: tokens.colors.neutral100,
-        enabled: false,
-      ),
-    };
-
-    final style = toolbarStyles[state] ?? toolbarStyles['default']!;
-
-
-    return ConstrainedBox(
-      constraints: const BoxConstraints(
-        minHeight: _touchTarget,
-        minWidth: _touchTarget,
-      ),
-      child: ElevatedButton.icon(
-        onPressed: style.enabled
-            ? () {
-                HapticFeedback.selectionClick();
-                onPressed();
-              }
-            : null,
-        icon: icon,
-
-        label: Text(label),
-
-        style: ElevatedButton.styleFrom(
-          backgroundColor: style.background,
-          foregroundColor: style.foreground,
-          padding: EdgeInsets.symmetric(
-            vertical: tokens.spacing.s,
-            horizontal: tokens.spacing.m,
+    return Semantics(
+      button: true,
+      enabled: style.enabled,
+      label: label,
+      child: Tooltip(
+        message: label,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            minHeight: _touchTarget,
+            minWidth: _touchTarget,
           ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(tokens.radii.m),
+          child: ElevatedButton.icon(
+            onPressed: style.enabled
+                ? () {
+                    HapticFeedback.selectionClick();
+                    onPressed();
+                  }
+                : null,
+            icon: icon,
+            label: Text(label),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: style.background,
+              foregroundColor: style.foreground,
+              padding: EdgeInsets.symmetric(
+                vertical: tokens.spacing.s,
+                horizontal: tokens.spacing.m,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(tokens.radii.m),
+              ),
+              elevation: tokens.elevation.low,
+            ),
           ),
-          elevation: tokens.elevation.low,
-
         ),
       ),
     );
   }
 }
+
