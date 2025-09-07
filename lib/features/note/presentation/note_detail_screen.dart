@@ -5,7 +5,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-import 'package:alarm_domain/alarm_domain.dart';
+import '../domain/domain.dart';
 import 'note_provider.dart';
 import '../../services/tts_service.dart';
 import '../../widgets/tag_selector.dart';
