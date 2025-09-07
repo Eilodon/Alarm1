@@ -4,7 +4,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     as fln;
 
 import 'auth_service.dart';
-import '../features/settings/data/settings_service.dart';
+import '../features/settings/domain/settings_service.dart';
 import '../features/note/data/notification_service.dart';
 import 'startup_service.dart';
 
@@ -27,11 +27,14 @@ class AppInitializationData {
 }
 
 class AppInitializer {
+  final SettingsService settingsService;
+  AppInitializer({required this.settingsService});
+
   Future<AppInitializationData> initialize({
     Future<void> Function(fln.NotificationResponse)?
         onDidReceiveNotificationResponse,
   }) async {
-    final settings = SettingsService();
+    final settings = settingsService;
     final notificationService = NotificationServiceImpl();
     final futures = await Future.wait([
       StartupService(notificationService).initialize(
