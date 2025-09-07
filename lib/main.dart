@@ -6,6 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 
 import 'app.dart';
+import 'app_providers.dart';
 import 'models/note.dart';
 import 'providers/note_provider.dart';
 import 'services/app_initializer.dart';
@@ -13,10 +14,12 @@ import 'services/connectivity_service.dart';
 
 Future<void> _onNotificationResponse(
   NotificationResponse response,
-  NoteProvider noteProvider,
 ) async {
   final id = response.payload;
   if (id == null) return;
+  final context = messengerKey.currentContext;
+  if (context == null) return;
+  final noteProvider = context.read<NoteProvider>();
   Note? note;
   try {
     note = noteProvider.notes.firstWhere((n) => n.id == id);
@@ -38,15 +41,11 @@ Future<void> _onNotificationResponse(
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  final noteProvider = NoteProvider();
-
   runApp(
-    ChangeNotifierProvider.value(
-      value: noteProvider,
+    AppProviders(
       child: FutureBuilder<AppInitializationData>(
         future: AppInitializer().initialize(
-          onDidReceiveNotificationResponse: (response) =>
-              _onNotificationResponse(response, noteProvider),
+          onDidReceiveNotificationResponse: _onNotificationResponse,
         ),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
