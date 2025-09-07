@@ -6,8 +6,8 @@ import 'features/note/data/calendar_service.dart';
 import 'features/note/data/notification_service.dart';
 import 'features/note/data/home_widget_service.dart';
 import 'features/backup/data/note_sync_service.dart';
-import 'package:alarm_data/alarm_data.dart';
-import 'package:alarm_domain/alarm_domain.dart';
+import 'package:alarm_data/alarm_data.dart' as data;
+import 'package:alarm_domain/alarm_domain.dart' as domain;
 
 /// Wraps the given [child] with all application level providers.
 class AppProviders extends StatelessWidget {
@@ -18,41 +18,50 @@ class AppProviders extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider<DbService>(create: (_) => DbService()),
-        Provider<BackupService>(create: (_) => BackupService()),
-        Provider<NoteRepository>(
-          create: (context) => NoteRepositoryImpl(
-            dbService: context.read<DbService>(),
-            backupService: context.read<BackupService>(),
+        Provider<data.DbService>(create: (_) => data.DbService()),
+        Provider<domain.BackupService>(create: (_) => data.BackupService()),
+        Provider<domain.NoteRepository>(
+          create: (context) => data.NoteRepositoryImpl(
+            dbService: context.read<data.DbService>(),
+            backupService: context.read<domain.BackupService>()
+                as data.BackupService,
           ),
         ),
-        Provider<GetNotes>(
-          create: (context) => GetNotes(context.read<NoteRepository>()),
+        Provider<domain.GetNotes>(
+          create: (context) => domain.GetNotes(
+            context.read<domain.NoteRepository>(),
+          ),
         ),
-        Provider<SaveNotes>(
-          create: (context) => SaveNotes(context.read<NoteRepository>()),
+        Provider<domain.SaveNotes>(
+          create: (context) => domain.SaveNotes(
+            context.read<domain.NoteRepository>(),
+          ),
         ),
-        Provider<UpdateNote>(
-          create: (context) => UpdateNote(context.read<NoteRepository>()),
+        Provider<domain.UpdateNote>(
+          create: (context) => domain.UpdateNote(
+            context.read<domain.NoteRepository>(),
+          ),
         ),
-        Provider<AutoBackup>(
-          create: (context) => AutoBackup(context.read<NoteRepository>()),
+        Provider<domain.AutoBackup>(
+          create: (context) => domain.AutoBackup(
+            context.read<domain.NoteRepository>(),
+          ),
         ),
-        Provider<NoteSyncService>(
+        Provider<domain.NoteSyncService>(
           create: (context) => NoteSyncServiceImpl(
-            repository: context.read<NoteRepository>(),
+            repository: context.read<domain.NoteRepository>(),
           ),
         ),
         ChangeNotifierProvider<NoteProvider>(
           create: (context) => NoteProvider(
-            getNotes: context.read<GetNotes>(),
-            saveNotes: context.read<SaveNotes>(),
-            updateNote: context.read<UpdateNote>(),
-            autoBackup: context.read<AutoBackup>(),
+            getNotes: context.read<domain.GetNotes>(),
+            saveNotes: context.read<domain.SaveNotes>(),
+            updateNote: context.read<domain.UpdateNote>(),
+            autoBackup: context.read<domain.AutoBackup>(),
             calendarService: CalendarServiceImpl.instance,
             notificationService: NotificationServiceImpl(),
             homeWidgetService: const HomeWidgetServiceImpl(),
-            syncService: context.read<NoteSyncService>(),
+            syncService: context.read<domain.NoteSyncService>(),
           ),
         ),
         // Additional providers can be added here.

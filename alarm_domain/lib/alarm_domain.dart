@@ -12,6 +12,7 @@ export 'src/usecases/update_note.dart';
 export 'src/usecases/create_note.dart';
 export 'src/usecases/delete_note.dart';
 export 'src/usecases/snooze_note.dart';
+export 'src/usecases/auto_backup.dart';
 
 export 'src/services/notification_service.dart';
 export 'src/services/calendar_service.dart';
