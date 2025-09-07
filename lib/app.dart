@@ -50,13 +50,6 @@ class _MyAppState extends State<MyApp> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final l10n = AppLocalizations.of(context)!;
-      if (widget.authFailed) {
-        messengerKey.currentState?.showSnackBar(
-          SnackBar(
-            content: Text(l10n.authFailedMessage),
-          ),
-        );
-      }
       if (widget.notificationFailed) {
         messengerKey.currentState?.showSnackBar(
           SnackBar(
@@ -151,13 +144,20 @@ class _MyAppState extends State<MyApp> {
         data: MediaQuery.of(context).copyWith(textScaleFactor: _fontScale),
         child: child!,
       ),
-      home: _hasSeenOnboarding
-          ? HomeScreen(
-              onThemeChanged: updateTheme,
-              onFontScaleChanged: updateFontScale,
-              onThemeModeChanged: updateThemeMode,
+      home: widget.authFailed
+          ? Scaffold(
+              body: Center(
+                child:
+                    Text(AppLocalizations.of(context)!.authFailedMessage),
+              ),
             )
-          : OnboardingScreen(onFinished: _completeOnboarding),
+          : _hasSeenOnboarding
+              ? HomeScreen(
+                  onThemeChanged: updateTheme,
+                  onFontScaleChanged: updateFontScale,
+                  onThemeModeChanged: updateThemeMode,
+                )
+              : OnboardingScreen(onFinished: _completeOnboarding),
     );
   }
 }

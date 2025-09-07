@@ -43,7 +43,7 @@ void main() {
   runApp(
     ChangeNotifierProvider.value(
       value: noteProvider,
-      child: FutureBuilder<AppInitializationData?>(
+      child: FutureBuilder<AppInitializationData>(
         future: AppInitializer().initialize(
           onDidReceiveNotificationResponse: (response) =>
               _onNotificationResponse(response, noteProvider),

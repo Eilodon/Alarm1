@@ -25,7 +25,7 @@ class AppInitializationData {
 }
 
 class AppInitializer {
-  Future<AppInitializationData?> initialize({
+  Future<AppInitializationData> initialize({
     Future<void> Function(NotificationResponse)? onDidReceiveNotificationResponse,
   }) async {
     final startupResult = await StartupService().initialize(
@@ -38,7 +38,20 @@ class AppInitializer {
       final locale = WidgetsBinding.instance.platformDispatcher.locale;
       final l10n = await AppLocalizations.delegate.load(locale);
       final ok = await AuthService().authenticate(l10n);
-      if (!ok) return null;
+      if (!ok) {
+        final themeColor = await settings.loadThemeColor();
+        final fontScale = await settings.loadFontScale();
+        final themeMode = await settings.loadThemeMode();
+        final hasSeenOnboarding = await settings.loadHasSeenOnboarding();
+        return AppInitializationData(
+          themeColor: themeColor,
+          fontScale: fontScale,
+          themeMode: themeMode,
+          hasSeenOnboarding: hasSeenOnboarding,
+          authFailed: true,
+          notificationFailed: startupResult.notificationFailed,
+        );
+      }
     }
     final themeColor = await settings.loadThemeColor();
     final fontScale = await settings.loadFontScale();
