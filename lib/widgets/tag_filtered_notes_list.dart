@@ -10,7 +10,9 @@ import 'notes_list.dart';
 import 'tag_filter_menu.dart';
 
 class TagFilteredNotesList extends StatefulWidget {
-  const TagFilteredNotesList({super.key});
+  final int gridCount;
+
+  const TagFilteredNotesList({super.key, this.gridCount = 1});
 
   @override
   State<TagFilteredNotesList> createState() => _TagFilteredNotesListState();
@@ -107,7 +109,12 @@ class _TagFilteredNotesListState extends State<TagFilteredNotesList> {
           ),
         ),
         const SizedBox(height: 8),
-        Expanded(child: NotesList(notes: filteredNotes)),
+        Expanded(
+          child: NotesList(
+            notes: filteredNotes,
+            gridCount: widget.gridCount,
+          ),
+        ),
       ],
     );
   }
