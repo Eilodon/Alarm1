@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     as fln;
 
@@ -37,16 +38,18 @@ class StartupService {
       await FirebaseCrashlytics.instance
           .setCrashlyticsCollectionEnabled(true);
       await FirebaseAnalytics.instance.logAppOpen();
-    } catch (_) {
+    } catch (e, st) {
       authFailed = true;
+      debugPrint('Firebase initialization error: $e\n$st');
     }
 
     try {
       await _notificationService.init(
         onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
       );
-    } catch (_) {
+    } catch (e, st) {
       notificationFailed = true;
+      debugPrint('Notification initialization error: $e\n$st');
     }
 
     return StartupResult(
