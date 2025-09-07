@@ -6,8 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-import '../models/note.dart';
-import '../services/note_repository.dart';
+import 'package:alarm_domain/alarm_domain.dart';
+import 'package:alarm_data/alarm_data.dart';
 import '../services/calendar_service.dart';
 import '../services/notification_service.dart';
 import '../services/home_widget_service.dart';
@@ -45,7 +45,7 @@ class NoteProvider extends ChangeNotifier {
     NotificationService? notificationService,
     HomeWidgetService? homeWidgetService,
     NoteSyncService? syncService,
-  })  : _repository = repository ?? NoteRepository(),
+  })  : _repository = repository ?? NoteRepositoryImpl(),
         _calendarService = calendarService ?? CalendarService.instance,
         _notificationService = notificationService ?? NotificationService(),
         _homeWidgetService = homeWidgetService ?? const HomeWidgetService(),

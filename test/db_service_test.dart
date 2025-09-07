@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:notes_reminder_app/services/db_service.dart';
-import 'package:notes_reminder_app/models/note.dart';
+import 'package:alarm_data/alarm_data.dart';
+import 'package:alarm_domain/alarm_domain.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

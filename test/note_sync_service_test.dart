@@ -1,7 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:notes_reminder_app/models/note.dart';
-import 'package:notes_reminder_app/services/note_repository.dart';
+import 'package:alarm_domain/alarm_domain.dart';
+import 'package:alarm_data/alarm_data.dart';
 import 'package:notes_reminder_app/services/note_sync_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 
 import 'app.dart';
 import 'app_providers.dart';
-import 'models/note.dart';
+import 'package:alarm_domain/alarm_domain.dart';
 import 'providers/note_provider.dart';
 import 'services/app_initializer.dart';
 import 'services/connectivity_service.dart';

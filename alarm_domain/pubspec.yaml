@@ -1,0 +1,19 @@
+name: alarm_domain
+description: Domain interfaces and models for alarm app
+publish_to: 'none'
+version: 0.0.1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  json_annotation: ^4.9.0
+  flutter_local_notifications: ^19.4.1
+
+dev_dependencies:
+  build_runner: ^2.8.0
+  json_serializable: ^6.11.1
+  flutter_test:
+    sdk: flutter

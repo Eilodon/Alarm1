@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:notes_reminder_app/models/note.dart';
+import 'package:alarm_domain/alarm_domain.dart';
 import 'package:notes_reminder_app/screens/note_search_delegate.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
