@@ -7,8 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:notes_reminder_app/features/note/presentation/note_provider.dart';
 import 'package:notes_reminder_app/widgets/notes_list.dart';
-import 'package:alarm_domain/alarm_domain.dart';
-import 'package:alarm_data/alarm_data.dart';
+import 'package:notes_reminder_app/features/note/note.dart';
 
 class MockRepo extends Mock implements NoteRepository {}
 
