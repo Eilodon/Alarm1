@@ -43,7 +43,9 @@ class TTSService {
     if (!kIsWeb) {
       try {
         return Platform.environment['TTS_API_KEY'] ?? '';
-      } catch (_) {}
+      } catch (e, st) {
+        debugPrint('Failed to read TTS_API_KEY from environment: $e\n$st');
+      }
     }
     return '';
   }
