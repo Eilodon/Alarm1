@@ -89,6 +89,15 @@ class _NotesListState extends State<NotesList> {
     });
   }
 
+  Future<void> _refreshNotes(NoteProvider provider) async {
+    final notes = await provider.fetchNotesPage(null, _pageSize);
+    if (!mounted) return;
+    setState(() {
+      _lastFetched = notes.isNotEmpty ? notes.last.updatedAt : null;
+      _hasMore = notes.length == _pageSize;
+    });
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -278,23 +287,27 @@ class _NotesListState extends State<NotesList> {
     }
 
     if (widget.gridCount > 1) {
-      return GridView.builder(
-        controller: _scrollController,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: widget.gridCount,
-          childAspectRatio: 3,
+      return RefreshIndicator(
+        onRefresh: () => _refreshNotes(provider),
+        child: GridView.builder(
+          controller: _scrollController,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: widget.gridCount,
+            childAspectRatio: 3,
+          ),
+          itemCount: itemCount,
+          itemBuilder: builder,
         ),
-        itemCount: itemCount,
-        itemBuilder: builder,
       );
     }
 
-    return ListView.builder(
-      controller: _scrollController,
-      itemCount: itemCount,
-
-      itemBuilder: builder,
-
+    return RefreshIndicator(
+      onRefresh: () => _refreshNotes(provider),
+      child: ListView.builder(
+        controller: _scrollController,
+        itemCount: itemCount,
+        itemBuilder: builder,
+      ),
     );
   }
 }
