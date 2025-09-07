@@ -8,6 +8,7 @@ import '../providers/note_provider.dart';
 import '../screens/note_list_for_day_screen.dart';
 import 'notes_list.dart';
 import 'tag_filter_menu.dart';
+import 'route_transitions.dart';
 
 class TagFilteredNotesList extends StatefulWidget {
   const TagFilteredNotesList({super.key});
@@ -63,22 +64,8 @@ class _TagFilteredNotesListState extends State<TagFilteredNotesList> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    PageRouteBuilder(
-                      pageBuilder: (_, __, ___) =>
-                          NoteListForDayScreen(date: d),
-                      transitionsBuilder: (_, animation, __, child) {
-                        final offsetAnimation = Tween<Offset>(
-                          begin: const Offset(1, 0),
-                          end: Offset.zero,
-                        ).animate(animation);
-                        return FadeTransition(
-                          opacity: animation,
-                          child: SlideTransition(
-                            position: offsetAnimation,
-                            child: child,
-                          ),
-                        );
-                      },
+                    buildSlideFadeRoute(
+                      NoteListForDayScreen(date: d),
                     ),
                   );
                 },
