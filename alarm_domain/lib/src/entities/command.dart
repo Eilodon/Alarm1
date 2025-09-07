@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 /// Represents an executable command in the command palette.
 class Command {
   /// Display name of the command.
@@ -9,7 +7,7 @@ class Command {
   final String? description;
 
   /// Callback executed when the command is selected.
-  final VoidCallback action;
+  final void Function() action;
 
   /// Creates a new [Command].
   const Command({

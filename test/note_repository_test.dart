@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:notes_reminder_app/services/note_repository.dart';
-import 'package:notes_reminder_app/models/note.dart';
+import 'package:notes_reminder_app/services/note_repository_impl.dart';
+import 'package:alarm_domain/alarm_domain.dart';
 import 'package:uuid/uuid.dart';
 
 void main() {
@@ -17,13 +17,13 @@ void main() {
     });
 
     test('getNotes returns empty list when no data', () async {
-      final repo = NoteRepository();
+      final repo = NoteRepositoryImpl();
       final notes = await repo.getNotes();
       expect(notes, isEmpty);
     });
 
     test('saveNotes and getNotes persist data', () async {
-      final repo = NoteRepository();
+      final repo = NoteRepositoryImpl();
       final id = const Uuid().v4();
       final note = Note(
         id: id,
@@ -54,7 +54,7 @@ void main() {
     });
 
     test('updateNote persists changes', () async {
-      final repo = NoteRepository();
+      final repo = NoteRepositoryImpl();
       final id = const Uuid().v4();
       final note = Note(
         id: id,

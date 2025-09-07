@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:alarm_domain/alarm_domain.dart';
 import 'package:notes_reminder_app/widgets/reminder_controls.dart';
 
 void main() {

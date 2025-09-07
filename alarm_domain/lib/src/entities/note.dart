@@ -1,5 +1,6 @@
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:json_annotation/json_annotation.dart';
+
+import 'repeat_interval.dart';
 
 part 'note.g.dart';
 

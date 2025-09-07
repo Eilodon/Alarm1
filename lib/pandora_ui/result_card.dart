@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../models/security_cue.dart';
+import 'package:alarm_domain/alarm_domain.dart';
+import '../utils/flutter_haptic_feedback_driver.dart';
 
 /// A card that listens to a [Stream] of text and shows a shimmer while loading.
 class ResultCard extends StatefulWidget {
@@ -78,7 +79,7 @@ class _ResultCardState extends State<ResultCard>
 
     return GestureDetector(
       onTap: () {
-        widget.securityCue.triggerHaptic();
+        widget.securityCue.triggerHaptic(hapticFeedbackDriver);
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),

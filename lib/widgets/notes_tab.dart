@@ -11,7 +11,7 @@ import '../screens/voice_to_note_screen.dart';
 import '../screens/settings_screen.dart';
 import '../pandora_ui/palette_bottom_sheet.dart';
 import '../pandora_ui/teach_ai_modal.dart';
-import '../models/command.dart';
+import 'package:alarm_domain/alarm_domain.dart';
 import 'add_note_dialog.dart';
 import 'tag_filtered_notes_list.dart';
 import 'route_transitions.dart';

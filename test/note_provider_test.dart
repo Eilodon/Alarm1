@@ -1,13 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:notes_reminder_app/models/note.dart';
+import 'package:alarm_domain/alarm_domain.dart';
 import 'package:notes_reminder_app/providers/note_provider.dart';
-import 'package:notes_reminder_app/services/note_repository.dart';
+import 'package:notes_reminder_app/services/note_repository_impl.dart';
 import 'package:notes_reminder_app/services/calendar_service.dart';
 import 'package:notes_reminder_app/services/notification_service.dart';
 import 'package:notes_reminder_app/services/note_sync_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class MockRepo extends Mock implements NoteRepository {}
 class MockCalendar extends Mock implements CalendarService {}

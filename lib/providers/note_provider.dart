@@ -4,10 +4,11 @@ import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart'
+    show Time;
 
-import '../models/note.dart';
-import '../services/note_repository.dart';
+import 'package:alarm_domain/alarm_domain.dart';
+import '../services/note_repository_impl.dart';
 import '../services/calendar_service.dart';
 import '../services/notification_service.dart';
 import '../services/home_widget_service.dart';
@@ -45,11 +46,12 @@ class NoteProvider extends ChangeNotifier {
     NotificationService? notificationService,
     HomeWidgetService? homeWidgetService,
     NoteSyncService? syncService,
-  })  : _repository = repository ?? NoteRepository(),
+  })  : _repository = repository ?? NoteRepositoryImpl(),
         _calendarService = calendarService ?? CalendarService.instance,
         _notificationService = notificationService ?? NotificationService(),
         _homeWidgetService = homeWidgetService ?? const HomeWidgetService(),
-        _syncService = syncService ?? NoteSyncService(repository: repository) {
+        _syncService =
+            syncService ?? NoteSyncService(repository: repository ?? NoteRepositoryImpl()) {
     unawaited(_init().catchError((e) { /* log or set error state */ }));
   }
 

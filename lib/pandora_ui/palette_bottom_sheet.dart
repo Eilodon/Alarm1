@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fuse/fuse.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../models/command.dart';
+import 'package:alarm_domain/alarm_domain.dart';
 
 /// Opens a command palette bottom sheet.
 Future<void> showPaletteBottomSheet(

@@ -2,19 +2,20 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart'
+    as fln;
 import 'package:provider/provider.dart';
 
 import 'app.dart';
 import 'app_providers.dart';
-import 'models/note.dart';
+import 'package:alarm_domain/alarm_domain.dart';
 import 'providers/note_provider.dart';
 import 'services/app_initializer.dart';
 import 'services/connectivity_service.dart';
 import 'screens/error_screen.dart';
 
 Future<void> _onNotificationResponse(
-  NotificationResponse response,
+  fln.NotificationResponse response,
   BuildContext context,
 ) async {
   final id = response.payload;

@@ -2,7 +2,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart'
+    as fln;
 
 import '../firebase_options.dart';
 import 'notification_service.dart';
@@ -19,7 +20,7 @@ class StartupResult {
 
 class StartupService {
   Future<StartupResult> initialize({
-    Future<void> Function(NotificationResponse)?
+    Future<void> Function(fln.NotificationResponse)?
         onDidReceiveNotificationResponse,
   }) async {
     bool authFailed = false;

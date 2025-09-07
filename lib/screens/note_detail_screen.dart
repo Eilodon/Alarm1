@@ -3,10 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../models/note.dart';
+import 'package:alarm_domain/alarm_domain.dart';
 import '../providers/note_provider.dart';
 import '../services/tts_service.dart';
 import '../widgets/tag_selector.dart';
@@ -55,8 +54,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     _contentCtrl = TextEditingController(text: widget.note.content);
     _contentCtrl.addListener(_onContentChanged);
     _alarmTime = widget.note.alarmTime;
-    _repeat = widget.note.repeatInterval ??
-        (widget.note.daily ? RepeatInterval.daily : null);
+    _repeat =
+        widget.note.repeatInterval ?? (widget.note.daily ? RepeatInterval.daily : null);
     _snoozeMinutes = widget.note.snoozeMinutes;
     _attachments = List.from(widget.note.attachments);
     _tags = List.from(widget.note.tags);

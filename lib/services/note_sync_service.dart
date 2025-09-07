@@ -7,8 +7,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../models/note.dart';
-import 'note_repository.dart';
+import 'package:alarm_domain/alarm_domain.dart';
+import 'note_repository_impl.dart';
 
 enum SyncStatus { idle, syncing, error }
 
@@ -36,7 +36,7 @@ class NoteSyncService {
     FirebaseFirestore? firestore,
     FirebaseAuth? auth,
     Connectivity? connectivity,
-  })  : _repository = repository ?? NoteRepository(),
+  })  : _repository = repository ?? NoteRepositoryImpl(),
         _firestore = firestore ?? FirebaseFirestore.instance,
         _auth = auth ?? FirebaseAuth.instance,
         _connectivity = connectivity ?? Connectivity();

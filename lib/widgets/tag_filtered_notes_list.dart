@@ -3,7 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../models/note.dart';
+import 'package:alarm_domain/alarm_domain.dart';
 import '../providers/note_provider.dart';
 import '../screens/note_list_for_day_screen.dart';
 import 'notes_list.dart';

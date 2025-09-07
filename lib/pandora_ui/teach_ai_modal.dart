@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../models/security_cue.dart';
+import 'package:alarm_domain/alarm_domain.dart';
 import '../theme/tokens.dart';
+import '../utils/flutter_haptic_feedback_driver.dart';
 
 /// Simple modal dialog allowing the user to provide feedback to improve the AI.
 class TeachAiModal extends StatefulWidget {
@@ -61,7 +62,7 @@ class _TeachAiModalState extends State<TeachAiModal> {
         ),
         ElevatedButton(
           onPressed: () {
-            widget.securityCue.triggerHaptic();
+            widget.securityCue.triggerHaptic(hapticFeedbackDriver);
             widget.onSubmit?.call(_controller.text);
             Navigator.of(context).pop();
           },

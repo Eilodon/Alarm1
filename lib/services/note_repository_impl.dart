@@ -1,35 +1,40 @@
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../models/note.dart';
+import 'package:alarm_domain/alarm_domain.dart';
 import 'db_service.dart';
 import 'backup_service.dart';
 
-class NoteRepository {
+class NoteRepositoryImpl implements NoteRepository {
   final DbService _dbService;
   final BackupService _backupService;
 
-  NoteRepository({DbService? dbService, BackupService? backupService})
-    : _dbService = dbService ?? DbService(),
-      _backupService = backupService ?? BackupService();
+  NoteRepositoryImpl({DbService? dbService, BackupService? backupService})
+      : _dbService = dbService ?? DbService(),
+        _backupService = backupService ?? BackupService();
 
+  @override
   Future<List<Note>> getNotes({
     void Function(String noteId)? onDecryptFailure,
   }) {
     return _dbService.getNotes(onDecryptFailure: onDecryptFailure);
   }
 
+  @override
   Future<void> saveNotes(List<Note> notes) {
     return _dbService.saveNotes(notes);
   }
 
+  @override
   Future<void> updateNote(Note note) {
     return _dbService.updateNote(note);
   }
 
+  @override
   Future<Map<String, dynamic>> encryptNote(Note note, {String? password}) {
     return _dbService.encryptNote(note, password: password);
   }
 
+  @override
   Future<Note> decryptNote(Map<String, dynamic> data, {String? password}) {
     return _dbService.decryptNote(data, password: password);
   }
@@ -64,6 +69,7 @@ class NoteRepository {
     return notes;
   }
 
+  @override
   Future<bool> autoBackup() async {
     final notes = await _dbService.getNotes();
     return _backupService.autoBackup(notes);
