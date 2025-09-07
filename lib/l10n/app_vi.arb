@@ -144,5 +144,13 @@
   "themeUpdated": "Đã cập nhật chủ đề",
   "notes": "Ghi chú",
   "reminders": "Nhắc nhở",
-  "palette": "Bảng màu"
+  "palette": "Bảng màu",
+  "onboardingTakeNotes": "Ghi chú",
+  "onboardingTakeNotesDesc": "Ghi lại suy nghĩ và ý tưởng của bạn.",
+  "onboardingSetReminders": "Đặt nhắc nhở",
+  "onboardingSetRemindersDesc": "Lên lịch báo cho các công việc quan trọng.",
+  "onboardingCustomize": "Tùy chỉnh",
+  "onboardingCustomizeDesc": "Điều chỉnh chủ đề và cỡ chữ theo ý bạn.",
+  "onboardingSkip": "Bỏ qua",
+  "onboardingGetStarted": "Bắt đầu"
 }
