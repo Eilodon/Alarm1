@@ -138,6 +138,17 @@ will replace the existing ones on the device.
 
 
 
+## Contributing
+
+CI runs dependency checks on every pull request. Before submitting your changes, make sure the following commands complete without conflicts or incompatible constraints:
+
+```bash
+flutter pub outdated
+flutter pub outdated --mode=null-safety --exit-code
+```
+
+Resolve any reported issues so the automated workflow can pass before your PR is merged.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
