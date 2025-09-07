@@ -1,8 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:alarm_domain/alarm_domain.dart';
+
+import 'package:notes_reminder_app/features/note/note.dart';
 import 'package:notes_reminder_app/providers/note_provider.dart';
-import 'package:alarm_data/alarm_data.dart';
+
 import 'package:notes_reminder_app/services/calendar_service.dart';
 import 'package:notes_reminder_app/services/notification_service.dart';
 import 'package:notes_reminder_app/services/note_sync_service.dart';
@@ -25,14 +26,16 @@ void main() {
     registerFallbackValue<List<Note>>([]);
     registerFallbackValue(DateTime(0));
     registerFallbackValue(<Note>{});
-    registerFallbackValue(const Note(
-      id: '0',
-      title: '',
-      content: '',
-      summary: '',
-      actionItems: [],
-      dates: [],
-    ));
+    registerFallbackValue(
+      const Note(
+        id: '0',
+        title: '',
+        content: '',
+        summary: '',
+        actionItems: [],
+        dates: [],
+      ),
+    );
     registerFallbackValue<Note? Function(String)>((_) => null);
   });
 
@@ -41,18 +44,20 @@ void main() {
     final calendar = MockCalendar();
     final notification = MockNotification();
     final sync = MockSyncService();
-    when(() => repo.getNotes()).thenAnswer((_) async => [
-          const Note(
-            id: '1',
-            title: 't',
-            content: 'c',
-            summary: '',
-            actionItems: const [],
-            dates: const [],
-            notificationId: 123,
-            eventId: 'e1',
-          )
-        ]);
+    when(() => repo.getNotes()).thenAnswer(
+      (_) async => [
+        const Note(
+          id: '1',
+          title: 't',
+          content: 'c',
+          summary: '',
+          actionItems: const [],
+          dates: const [],
+          notificationId: 123,
+          eventId: 'e1',
+        ),
+      ],
+    );
     when(() => repo.saveNotes(any())).thenAnswer((_) async {});
     when(() => calendar.deleteEvent(any())).thenAnswer((_) async {});
     when(() => notification.cancel(any())).thenAnswer((_) async {});
@@ -139,77 +144,88 @@ void main() {
     expect(captured.first > 0, isTrue);
   });
 
-  test('createNote with repeat interval schedules recurring notification',
-      () async {
-    final repo = MockRepo();
-    final calendar = MockCalendar();
-    final notification = MockNotification();
-    final sync = MockSyncService();
-    final l10n = FakeL10n();
-    when(() => repo.saveNotes(any())).thenAnswer((_) async {});
-    when(
-      () => notification.scheduleRecurring(
-        id: any(named: 'id'),
-        title: any(named: 'title'),
-        body: any(named: 'body'),
-        repeatInterval: any(named: 'repeatInterval'),
-        l10n: l10n,
-      ),
-    ).thenAnswer((_) async {});
-    when(() => calendar.createEvent(
+  test(
+    'createNote with repeat interval schedules recurring notification',
+    () async {
+      final repo = MockRepo();
+      final calendar = MockCalendar();
+      final notification = MockNotification();
+      final sync = MockSyncService();
+      final l10n = FakeL10n();
+      when(() => repo.saveNotes(any())).thenAnswer((_) async {});
+      when(
+        () => notification.scheduleRecurring(
+          id: any(named: 'id'),
+          title: any(named: 'title'),
+          body: any(named: 'body'),
+          repeatInterval: any(named: 'repeatInterval'),
+          l10n: l10n,
+        ),
+      ).thenAnswer((_) async {});
+      when(
+        () => calendar.createEvent(
           title: any(named: 'title'),
           description: any(named: 'description'),
           start: any(named: 'start'),
-        )).thenAnswer((_) async => 'e1');
-    when(() => sync.init(any())).thenAnswer((_) async {});
-    when(() => sync.syncStatus).thenReturn(ValueNotifier(SyncStatus.idle));
-    when(() => sync.loadFromRemote(any())).thenAnswer((_) async => true);
-    when(() => sync.syncNote(any())).thenAnswer((_) async {});
+        ),
+      ).thenAnswer((_) async => 'e1');
+      when(() => sync.init(any())).thenAnswer((_) async {});
+      when(() => sync.syncStatus).thenReturn(ValueNotifier(SyncStatus.idle));
+      when(() => sync.loadFromRemote(any())).thenAnswer((_) async => true);
+      when(() => sync.syncNote(any())).thenAnswer((_) async {});
 
-    final provider = NoteProvider(
-      repository: repo,
-      calendarService: calendar,
-      notificationService: notification,
-      syncService: sync,
-    );
+      final provider = NoteProvider(
+        repository: repo,
+        calendarService: calendar,
+        notificationService: notification,
+        syncService: sync,
+      );
 
-    await provider.createNote(
-      title: 't',
-      content: 'c',
-      alarmTime: DateTime(2025, 1, 1),
-      repeatInterval: RepeatInterval.daily,
-      l10n: l10n,
-    );
+      await provider.createNote(
+        title: 't',
+        content: 'c',
+        alarmTime: DateTime(2025, 1, 1),
+        repeatInterval: RepeatInterval.daily,
+        l10n: l10n,
+      );
 
-    verify(() => notification.scheduleRecurring(
+      verify(
+        () => notification.scheduleRecurring(
           id: any(named: 'id'),
           title: 't',
           body: 'c',
           repeatInterval: RepeatInterval.daily,
           l10n: l10n,
-        )).called(1);
-  });
+        ),
+      ).called(1);
+    },
+  );
 
   test('fetchNotesPage paginates using stored order', () async {
     final repo = MockRepo();
     final sync = MockSyncService();
-    when(() => repo.getNotes()).thenAnswer((_) async => [
-          Note(
-              id: '1',
-              title: 'a',
-              content: 'c',
-              updatedAt: DateTime(2023, 1, 1)),
-          Note(
-              id: '2',
-              title: 'b',
-              content: 'c',
-              updatedAt: DateTime(2024, 1, 1)),
-          Note(
-              id: '3',
-              title: 'c',
-              content: 'c',
-              updatedAt: DateTime(2022, 1, 1)),
-        ]);
+    when(() => repo.getNotes()).thenAnswer(
+      (_) async => [
+        Note(
+          id: '1',
+          title: 'a',
+          content: 'c',
+          updatedAt: DateTime(2023, 1, 1),
+        ),
+        Note(
+          id: '2',
+          title: 'b',
+          content: 'c',
+          updatedAt: DateTime(2024, 1, 1),
+        ),
+        Note(
+          id: '3',
+          title: 'c',
+          content: 'c',
+          updatedAt: DateTime(2022, 1, 1),
+        ),
+      ],
+    );
     when(() => repo.saveNotes(any())).thenAnswer((_) async {});
     when(() => sync.init(any())).thenAnswer((_) async {});
     when(() => sync.syncStatus).thenReturn(ValueNotifier(SyncStatus.idle));
@@ -225,8 +241,10 @@ void main() {
     final firstPage = await provider.fetchNotesPage(null, 2);
     expect(firstPage.map((n) => n.id), ['2', '1']);
 
-    final secondPage =
-        await provider.fetchNotesPage(firstPage.last.updatedAt, 2);
+    final secondPage = await provider.fetchNotesPage(
+      firstPage.last.updatedAt,
+      2,
+    );
     expect(secondPage.map((n) => n.id), ['3']);
     verify(() => repo.getNotes()).called(1);
   });
@@ -237,27 +255,31 @@ void main() {
     final notification = MockNotification();
     final sync = MockSyncService();
     final l10n = FakeL10n();
-    when(() => repo.getNotes()).thenAnswer((_) async => [
-          const Note(
-            id: '1',
-            title: 't',
-            content: 'c',
-            snoozeMinutes: 5,
-            notificationId: 10,
-            summary: '',
-            actionItems: [],
-            dates: [],
-          )
-        ]);
+    when(() => repo.getNotes()).thenAnswer(
+      (_) async => [
+        const Note(
+          id: '1',
+          title: 't',
+          content: 'c',
+          snoozeMinutes: 5,
+          notificationId: 10,
+          summary: '',
+          actionItems: [],
+          dates: [],
+        ),
+      ],
+    );
     when(() => repo.saveNotes(any())).thenAnswer((_) async {});
-    when(() => notification.snoozeNotification(
-          id: any(named: 'id'),
-          title: any(named: 'title'),
-          body: any(named: 'body'),
-          minutes: any(named: 'minutes'),
-          l10n: l10n,
-          payload: any(named: 'payload'),
-        )).thenAnswer((_) async {});
+    when(
+      () => notification.snoozeNotification(
+        id: any(named: 'id'),
+        title: any(named: 'title'),
+        body: any(named: 'body'),
+        minutes: any(named: 'minutes'),
+        l10n: l10n,
+        payload: any(named: 'payload'),
+      ),
+    ).thenAnswer((_) async {});
     when(() => sync.init(any())).thenAnswer((_) async {});
     when(() => sync.syncStatus).thenReturn(ValueNotifier(SyncStatus.idle));
     when(() => sync.loadFromRemote(any())).thenAnswer((_) async => true);
@@ -273,13 +295,15 @@ void main() {
     final note = provider.notes.first;
     await provider.snoozeNote(note, l10n);
 
-    verify(() => notification.snoozeNotification(
-          id: 10,
-          title: 't',
-          body: 'c',
-          minutes: 5,
-          l10n: l10n,
-          payload: note.id,
-        )).called(1);
+    verify(
+      () => notification.snoozeNotification(
+        id: 10,
+        title: 't',
+        body: 'c',
+        minutes: 5,
+        l10n: l10n,
+        payload: note.id,
+      ),
+    ).called(1);
   });
 }

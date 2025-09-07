@@ -7,11 +7,10 @@ import 'package:share_plus/share_plus.dart';
 
 import 'package:alarm_domain/alarm_domain.dart';
 
-import '../providers/note_provider.dart';
+import '../features/note/presentation/note_provider.dart';
 import '../screens/note_detail_screen.dart';
 import '../services/auth_service.dart';
 import 'note_card.dart';
-
 
 /// Displays a scrollable list of notes. When [gridCount] is greater than 1 a
 /// grid layout is used instead of a traditional list.
@@ -20,7 +19,6 @@ class NotesList extends StatefulWidget {
 
   /// Notes to display.
   final List<Note> notes;
-
 
   /// Number of columns to show. A value greater than 1 enables a grid layout.
   final int gridCount;
@@ -73,9 +71,10 @@ class _NotesListState extends State<NotesList> {
   Future<void> _loadMore() async {
     setState(() => _isLoadingMore = true);
 
-    final notes = await context
-        .read<NoteProvider>()
-        .fetchNotesPage(_lastFetched, _pageSize);
+    final notes = await context.read<NoteProvider>().fetchNotesPage(
+      _lastFetched,
+      _pageSize,
+    );
 
     if (!mounted) return;
     setState(() {
@@ -105,7 +104,11 @@ class _NotesListState extends State<NotesList> {
   }
 
   void _deleteNote(
-      BuildContext context, Note note, NoteProvider provider, AppLocalizations l10n) {
+    BuildContext context,
+    Note note,
+    NoteProvider provider,
+    AppLocalizations l10n,
+  ) {
     final idx = provider.notes.indexWhere((n) => n.id == note.id);
     if (idx != -1) {
       provider.removeNoteAt(idx);
@@ -122,7 +125,10 @@ class _NotesListState extends State<NotesList> {
   }
 
   Widget _buildNoteTile(
-      BuildContext context, Note note, NoteProvider provider) {
+    BuildContext context,
+    Note note,
+    NoteProvider provider,
+  ) {
     final l10n = AppLocalizations.of(context)!;
     final locale = Localizations.localeOf(context).toString();
     final subtitle = note.alarmTime != null
@@ -131,8 +137,8 @@ class _NotesListState extends State<NotesList> {
     final noteColor = Color(note.color);
     final lockIconColor =
         ThemeData.estimateBrightnessForColor(noteColor) == Brightness.dark
-            ? Theme.of(context).colorScheme.onPrimary
-            : Theme.of(context).colorScheme.onSurface;
+        ? Theme.of(context).colorScheme.onPrimary
+        : Theme.of(context).colorScheme.onSurface;
 
     return NoteCard(
       endActionPane: ActionPane(
@@ -157,16 +163,9 @@ class _NotesListState extends State<NotesList> {
         leading: Container(
           width: 24,
           height: 24,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: noteColor,
-          ),
+          decoration: BoxDecoration(shape: BoxShape.circle, color: noteColor),
           child: note.locked
-              ? Icon(
-                  Icons.lock,
-                  size: 16,
-                  color: lockIconColor,
-                )
+              ? Icon(Icons.lock, size: 16, color: lockIconColor)
               : null,
         ),
         title: Text(note.title),
@@ -179,9 +178,7 @@ class _NotesListState extends State<NotesList> {
           Navigator.push(
             context,
 
-            MaterialPageRoute(
-              builder: (_) => NoteDetailScreen(note: note),
-            ),
+            MaterialPageRoute(builder: (_) => NoteDetailScreen(note: note)),
           );
         },
         onLongPress: () {
@@ -210,8 +207,7 @@ class _NotesListState extends State<NotesList> {
                       final date = await showDatePicker(
                         context: context,
                         firstDate: DateTime.now(),
-                        lastDate:
-                            DateTime.now().add(const Duration(days: 365)),
+                        lastDate: DateTime.now().add(const Duration(days: 365)),
                         initialDate: DateTime.now(),
                       );
                       if (date == null) return;
@@ -269,7 +265,6 @@ class _NotesListState extends State<NotesList> {
               ),
           ],
         ),
-
       ),
     );
   }
@@ -320,4 +315,3 @@ class _NotesListState extends State<NotesList> {
     );
   }
 }
-

@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'package:alarm_domain/alarm_domain.dart';
-import '../providers/note_provider.dart';
+import '../features/note/presentation/note_provider.dart';
 import '../services/tts_service.dart';
 import '../widgets/tag_selector.dart';
 import '../l10n/localization_extensions.dart';
@@ -55,7 +55,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     _contentCtrl.addListener(_onContentChanged);
     _alarmTime = widget.note.alarmTime;
     _repeat =
-        widget.note.repeatInterval ?? (widget.note.daily ? RepeatInterval.daily : null);
+        widget.note.repeatInterval ??
+        (widget.note.daily ? RepeatInterval.daily : null);
     _snoozeMinutes = widget.note.snoozeMinutes;
     _attachments = List.from(widget.note.attachments);
     _tags = List.from(widget.note.tags);
@@ -95,9 +96,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       setState(() {
         _analysis = analysis;
         _titleSuggestion = analysis?.suggestedTitle;
-        _tagSuggestions = analysis?.suggestedTags
-                .where((t) => !_tags.contains(t))
-                .toList() ??
+        _tagSuggestions =
+            analysis?.suggestedTags.where((t) => !_tags.contains(t)).toList() ??
             [];
       });
     });
@@ -162,8 +162,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                           _titleSuggestion = null;
                         });
                       },
-                      onDeleted: () =>
-                          setState(() => _titleSuggestion = null),
+                      onDeleted: () => setState(() => _titleSuggestion = null),
                     ),
                   ..._tagSuggestions.map(
                     (tag) => InputChip(
@@ -251,9 +250,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       if (result != null) {
         summary = result.summary;
         actionItems = result.actionItems;
-      tags = result.tags;
-      dates = result.dates;
-    }
+        tags = result.tags;
+        dates = result.dates;
+      }
     }
 
     final updated = widget.note.copyWith(
@@ -280,9 +279,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     if (ok) {
       Navigator.pop(context);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.saveNoteFailed)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.saveNoteFailed)));
     }
   }
 }
