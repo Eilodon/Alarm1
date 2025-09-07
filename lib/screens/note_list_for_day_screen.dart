@@ -8,7 +8,7 @@ import '../providers/note_provider.dart';
 import '../services/auth_service.dart';
 import 'note_detail_screen.dart';
 import '../pandora_ui/hint_chip.dart';
-import '../pandora_ui/result_card.dart';
+import '../widgets/note_card.dart';
 import '../widgets/route_transitions.dart';
 
 class NoteListForDayScreen extends StatelessWidget {
@@ -55,7 +55,7 @@ class NoteListForDayScreen extends StatelessWidget {
               ? DateFormat.Hm(Localizations.localeOf(context).toString())
                   .format(note.alarmTime!)
               : null;
-          return ResultCard(
+          return NoteCard(
             child: ListTile(
               title: Hero(
                 tag: note.id,
