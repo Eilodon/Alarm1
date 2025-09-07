@@ -44,7 +44,7 @@ class _TagSelectorState extends State<TagSelector> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final scheme = Theme.of(context).colorScheme;
     final chips = widget.availableTags.map((t) {
       final selected = widget.selectedTags.contains(t);
       return Padding(
@@ -66,18 +66,15 @@ class _TagSelectorState extends State<TagSelector> {
     }).toList();
 
     final tokens = Theme.of(context).extension<Tokens>()!;
-    final scheme = Theme.of(context).colorScheme;
     final colorOptions = <Color>[
-
-      Colors.white,
-      colorScheme.error,
-      colorScheme.tertiary,
-      Colors.yellow,
-      Colors.green,
-      Colors.blue,
-      Colors.purple,
-      Colors.brown,
-
+      scheme.primary,
+      scheme.secondary,
+      scheme.tertiary,
+      scheme.error,
+      tokens.colors.warning,
+      tokens.colors.info,
+      tokens.colors.neutral700,
+      tokens.colors.neutral300,
     ];
     final colorChips = colorOptions.map((c) {
       final selected = widget.selectedColor == c.value;
