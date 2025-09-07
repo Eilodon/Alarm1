@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 import 'app.dart';
 import 'app_providers.dart';
 import 'package:alarm_domain/alarm_domain.dart';
-import 'providers/note_provider.dart';
+import 'features/note/presentation/note_provider.dart';
 import 'services/app_initializer.dart';
 import 'services/connectivity_service.dart';
 import 'screens/error_screen.dart';
@@ -54,16 +54,12 @@ void main() {
           ),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              return MaterialApp(
-                home: ErrorScreen(onRetry: main),
-              );
+              return MaterialApp(home: ErrorScreen(onRetry: main));
             }
             if (!snapshot.hasData) {
               return const MaterialApp(
                 home: Scaffold(
-                  body: Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                  body: Center(child: CircularProgressIndicator()),
                 ),
               );
             }

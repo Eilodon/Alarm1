@@ -3,7 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/note_provider.dart';
+import '../features/note/presentation/note_provider.dart';
 import 'tag_selector.dart';
 import '../l10n/localization_extensions.dart';
 
@@ -91,17 +91,13 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
             children: [
               TextFormField(
                 controller: _titleCtrl,
-                decoration: InputDecoration(
-                  labelText: l10n.titleLabel,
-                ),
+                decoration: InputDecoration(labelText: l10n.titleLabel),
                 validator: (v) =>
                     v == null || v.trim().isEmpty ? l10n.fieldRequired : null,
               ),
               TextFormField(
                 controller: _contentCtrl,
-                decoration: InputDecoration(
-                  labelText: l10n.contentLabel,
-                ),
+                decoration: InputDecoration(labelText: l10n.contentLabel),
                 validator: (v) =>
                     v == null || v.trim().isEmpty ? l10n.fieldRequired : null,
               ),
@@ -132,9 +128,9 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
               ),
               if (_alarmTime != null)
                 Text(
-                  DateFormat.yMd(Localizations.localeOf(context).toString())
-                      .add_Hm()
-                      .format(_alarmTime!),
+                  DateFormat.yMd(
+                    Localizations.localeOf(context).toString(),
+                  ).add_Hm().format(_alarmTime!),
                 ),
             ],
           ),
@@ -168,9 +164,7 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(
-                          l10n.errorWithMessage(l10n.networkError),
-                        ),
+                        content: Text(l10n.errorWithMessage(l10n.networkError)),
                       ),
                     );
                   }
@@ -182,4 +176,3 @@ class _AddNoteDialogState extends State<AddNoteDialog> {
     );
   }
 }
-
