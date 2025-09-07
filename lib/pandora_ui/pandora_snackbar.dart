@@ -66,6 +66,7 @@ class _PandoraSnackbarState extends State<PandoraSnackbar>
   @override
   Widget build(BuildContext context) {
     final tokens = Theme.of(context).extension<Tokens>()!;
+    final colorScheme = Theme.of(context).colorScheme;
     Color iconColor;
     if (widget.kind == SnackbarKind.success) {
       iconColor = tokens.colors.secondary;
@@ -85,7 +86,7 @@ class _PandoraSnackbarState extends State<PandoraSnackbar>
             borderRadius: BorderRadius.circular(tokens.radii.m),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: colorScheme.shadow.withOpacity(0.2),
                 blurRadius: 4,
               ),
             ],
