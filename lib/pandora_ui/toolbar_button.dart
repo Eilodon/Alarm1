@@ -4,32 +4,15 @@ import 'package:flutter/services.dart';
 import '../theme/tokens.dart';
 
 class _ToolbarButtonStyle {
+  const _ToolbarButtonStyle({
+    required this.background,
+    required this.foreground,
+    required this.enabled,
+  });
+
   final Color background;
   final Color foreground;
   final bool enabled;
-
-
-  const _ToolbarButtonStyle({
-    required this.background,
-    required this.foreground,
-    required this.enabled,
-  });
-}
-
-const _touchTarget = 48.0;
-
-class ToolbarButton extends StatelessWidget {
-  final Widget icon;
-  final String label;
-  final VoidCallback onPressed;
-  final String state;
-
-
-  const _ToolbarButtonStyle({
-    required this.background,
-    required this.foreground,
-    required this.enabled,
-  });
 }
 
 const _touchTarget = 48.0;
@@ -72,28 +55,6 @@ class ToolbarButton extends StatelessWidget {
 
     final style = toolbarStyles[state] ?? toolbarStyles['default']!;
 
-
-    final toolbarStyles = {
-      'default': _ToolbarButtonStyle(
-        background: tokens.colors.primary,
-        foreground: tokens.colors.neutral100,
-        enabled: true,
-      ),
-      'active': _ToolbarButtonStyle(
-        background: tokens.colors.secondary,
-        foreground: tokens.colors.neutral100,
-        enabled: true,
-      ),
-      'disabled': _ToolbarButtonStyle(
-        background: tokens.colors.neutral300,
-        foreground: tokens.colors.neutral100,
-        enabled: false,
-      ),
-    };
-
-    final style = toolbarStyles[state] ?? toolbarStyles['default']!;
-
-
     return ConstrainedBox(
       constraints: const BoxConstraints(
         minHeight: _touchTarget,
@@ -107,9 +68,7 @@ class ToolbarButton extends StatelessWidget {
               }
             : null,
         icon: icon,
-
         label: Text(label),
-
         style: ElevatedButton.styleFrom(
           backgroundColor: style.background,
           foregroundColor: style.foreground,
@@ -121,9 +80,9 @@ class ToolbarButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(tokens.radii.m),
           ),
           elevation: tokens.elevation.low,
-
         ),
       ),
     );
   }
 }
+

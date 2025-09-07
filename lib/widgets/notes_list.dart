@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../models/note.dart';
 import '../pandora_ui/result_card.dart';
 import '../pandora_ui/toolbar_button.dart';
-
-import '../models/note.dart';
 import '../providers/note_provider.dart';
-import '../services/auth_service.dart';
 import '../screens/note_detail_screen.dart';
+import '../services/auth_service.dart';
 
 class NotesList extends StatefulWidget {
-  final List<Note> notes;
-
   const NotesList({super.key, required this.notes});
+
+  final List<Note> notes;
 
   @override
   State<NotesList> createState() => _NotesListState();
@@ -66,9 +65,9 @@ class _NotesListState extends State<NotesList> {
   Future<void> _loadMore() async {
     setState(() => _isLoadingMore = true);
     final notes = await context.read<NoteProvider>().fetchNotesPage(
-      _lastFetched,
-      _pageSize,
-    );
+          _lastFetched,
+          _pageSize,
+        );
     if (!mounted) return;
     setState(() {
       _isLoadingMore = false;
@@ -85,6 +84,111 @@ class _NotesListState extends State<NotesList> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  Widget _buildNoteTile(
+      BuildContext context, Note note, NoteProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).toString();
+    final subtitle = note.alarmTime != null
+        ? '${note.content}\n⏰ ${DateFormat.yMd(locale).add_Hm().format(note.alarmTime!)}'
+        : note.content;
+
+    return ResultCard(
+      child: Slidable(
+        endActionPane: ActionPane(
+          motion: const DrawerMotion(),
+          children: [
+            SlidableAction(
+              onPressed: (_) {
+                Share.share('${note.title}\n${note.content}');
+              },
+              icon: Icons.share,
+              label: l10n.share,
+            ),
+            SlidableAction(
+              backgroundColor: Colors.red,
+              onPressed: (_) {
+                final idx = provider.notes.indexWhere((n) => n.id == note.id);
+                if (idx != -1) {
+                  provider.removeNoteAt(idx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(l10n.noteDeleted),
+                      action: SnackBarAction(
+                        label: l10n.undo,
+                        onPressed: () => provider.addNote(note),
+                      ),
+                    ),
+                  );
+                }
+              },
+              icon: Icons.delete,
+              label: l10n.delete,
+            ),
+          ],
+        ),
+        child: ListTile(
+          leading: Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Color(note.color),
+            ),
+            child: note.locked
+                ? const Icon(Icons.lock, size: 16, color: Colors.white)
+                : null,
+          ),
+          title: Text(note.title),
+          subtitle: Text(subtitle),
+          onTap: () async {
+            if (note.locked) {
+              final ok = await AuthService().authenticate(l10n);
+              if (!ok) return;
+            }
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (_, __, ___) => NoteDetailScreen(note: note),
+                transitionsBuilder: (_, animation, __, child) {
+                  final offsetAnimation = Tween<Offset>(
+                    begin: const Offset(1, 0),
+                    end: Offset.zero,
+                  ).animate(animation);
+                  return FadeTransition(
+                    opacity: animation,
+                    child: SlideTransition(
+                      position: offsetAnimation,
+                      child: child,
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (note.pinned) const Icon(Icons.push_pin, size: 20),
+              if (!provider.isSynced(note.id))
+                const Icon(Icons.sync_problem, color: Colors.orange),
+              ToolbarButton(
+                icon: const Icon(Icons.delete),
+                label: l10n.delete,
+                onPressed: () {
+                  final idx =
+                      provider.notes.indexWhere((n) => n.id == note.id);
+                  if (idx != -1) {
+                    provider.removeNoteAt(idx);
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -107,201 +211,9 @@ class _NotesListState extends State<NotesList> {
           );
         }
         final note = notes[index];
-        return ResultCard(
-          child: ListTile(
-
-            leading: Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color(note.color),
-              ),
-              child: note.locked
-                  ? const Icon(Icons.lock, size: 16, color: Colors.white)
-                  : null,
-            ),
-            title: Text(note.title),
-
-            subtitle: Text(
-              note.alarmTime != null
-                  ? '${note.content}\n⏰ ${DateFormat.yMd(Localizations.localeOf(context).toString()).add_Hm().format(note.alarmTime!)}'
-                  : note.content,
-            ),
-            onTap: () async {
-              if (note.locked) {
-                final ok = await AuthService().authenticate(
-                  AppLocalizations.of(context)!,
-                );
-                if (!ok) return;
-              }
-              Navigator.push(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (_, __, ___) => NoteDetailScreen(note: note),
-                  transitionsBuilder: (_, animation, __, child) {
-                    final offsetAnimation = Tween<Offset>(
-                      begin: const Offset(1, 0),
-                      end: Offset.zero,
-                    ).animate(animation);
-                    return FadeTransition(
-                      opacity: animation,
-                      child: SlideTransition(
-                        position: offsetAnimation,
-                        child: child,
-                      ),
-                    );
-                  },
-                ),
-              );
-            },
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-
-              children: [
-
-                if (note.pinned)
-                  const Icon(Icons.push_pin, size: 20),
-                if (!provider.isSynced(note.id))
-                  const Icon(Icons.sync_problem, color: Colors.orange),
-                ToolbarButton(
-                  icon: const Icon(Icons.delete),
-                  label: AppLocalizations.of(context)!.delete,
-                  onPressed: () {
-                    final provider = context.read<NoteProvider>();
-                    final idx = provider.notes.indexWhere(
-                      (n) => n.id == note.id,
-                    );
-                    if (idx != -1) {
-                      provider.removeNoteAt(idx);
-                    }
-                  },
-                ),
-              ],
-            ),
-            endActionPane: ActionPane(
-              motion: const DrawerMotion(),
-              children: [
-                SlidableAction(
-                  onPressed: (_) {
-                    Share.share('${note.title}\n${note.content}');
-                  },
-                  icon: Icons.share,
-                  label: AppLocalizations.of(context)!.share,
-                ),
-                SlidableAction(
-                  backgroundColor: Colors.red,
-                  onPressed: (_) {
-                    final idx = provider.notes.indexWhere((n) => n.id == note.id);
-                    if (idx != -1) {
-                      provider.removeNoteAt(idx);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content:
-                              Text(AppLocalizations.of(context)!.noteDeleted),
-                          action: SnackBarAction(
-                            label: AppLocalizations.of(context)!.undo,
-                            onPressed: () => provider.addNote(note),
-                          ),
-                        ),
-                      );
-                    }
-                  },
-                  icon: Icons.delete,
-                  label: AppLocalizations.of(context)!.delete,
-                ),
-              ],
-            ),
-            child: ListTile(
-              leading: note.locked ? const Icon(Icons.lock) : null,
-              title: Text(note.title),
-              subtitle: Text(
-                note.alarmTime != null
-                    ? '${note.content}\n⏰ ${DateFormat.yMd(Localizations.localeOf(context).toString()).add_Hm().format(note.alarmTime!)}'
-                    : note.content,
-              ),
-              onTap: () async {
-                if (note.locked) {
-                  final ok = await AuthService().authenticate(
-                    AppLocalizations.of(context)!,
-                  );
-                  if (!ok) return;
-                }
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => NoteDetailScreen(note: note)),
-                );
-              },
-              onLongPress: () {
-                final l10n = AppLocalizations.of(context)!;
-                showModalBottomSheet(
-                  context: context,
-                  builder: (ctx) => SafeArea(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        ListTile(
-                          leading: const Icon(Icons.check),
-                          title: Text(l10n.markDone),
-                          onTap: () async {
-                            Navigator.pop(ctx);
-                            await provider.updateNote(
-                              note.copyWith(done: true, active: false),
-                              l10n,
-                            );
-                          },
-                        ),
-                        ListTile(
-                          leading: const Icon(Icons.alarm),
-                          title: Text(l10n.setReminder),
-                          onTap: () async {
-                            Navigator.pop(ctx);
-                            final date = await showDatePicker(
-                              context: context,
-                              firstDate: DateTime.now(),
-                              lastDate:
-                                  DateTime.now().add(const Duration(days: 365)),
-                              initialDate: DateTime.now(),
-                            );
-                            if (date == null) return;
-                            final time = await showTimePicker(
-                              context: context,
-                              initialTime: TimeOfDay.now(),
-                            );
-                            if (time == null) return;
-                            final alarmTime = DateTime(
-                              date.year,
-                              date.month,
-                              date.day,
-                              time.hour,
-                              time.minute,
-                            );
-                            await provider.updateNote(
-                              note.copyWith(alarmTime: alarmTime),
-                              l10n,
-                            );
-                          },
-                        ),
-                        ListTile(
-                          leading: const Icon(Icons.share),
-                          title: Text(l10n.share),
-                          onTap: () {
-                            Navigator.pop(ctx);
-                            Share.share('${note.title}\n${note.content}');
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-              trailing: provider.isSynced(note.id)
-                  ? null
-                  : const Icon(Icons.sync_problem, color: Colors.orange),
-            ),
-          ),
-        );
+        return _buildNoteTile(context, note, provider);
       },
     );
   }
 }
+
