@@ -28,12 +28,24 @@ class AppInitializer {
   Future<AppInitializationData> initialize({
     Future<void> Function(NotificationResponse)? onDidReceiveNotificationResponse,
   }) async {
-    final startupResult = await StartupService().initialize(
-      onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
-    );
-
     final settings = SettingsService();
-    final requireAuth = await settings.loadRequireAuth();
+    final futures = await Future.wait([
+      StartupService().initialize(
+        onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
+      ),
+      settings.loadThemeColor(),
+      settings.loadFontScale(),
+      settings.loadThemeMode(),
+      settings.loadHasSeenOnboarding(),
+      settings.loadRequireAuth(),
+    ]);
+    final startupResult = futures[0] as StartupResult;
+    final themeColor = futures[1] as Color;
+    final fontScale = futures[2] as double;
+    final themeMode = futures[3] as ThemeMode;
+    final hasSeenOnboarding = futures[4] as bool;
+    final requireAuth = futures[5] as bool;
+
     if (requireAuth) {
       final locale = WidgetsBinding.instance.platformDispatcher.locale;
       final supported = AppLocalizations.delegate.isSupported(locale);
@@ -41,16 +53,6 @@ class AppInitializer {
       final l10n = await AppLocalizations.delegate.load(effectiveLocale);
       final ok = await AuthService().authenticate(l10n);
       if (!ok) {
-        final results = await Future.wait([
-          settings.loadThemeColor(),
-          settings.loadFontScale(),
-          settings.loadThemeMode(),
-          settings.loadHasSeenOnboarding(),
-        ]);
-        final themeColor = results[0] as Color;
-        final fontScale = results[1] as double;
-        final themeMode = results[2] as ThemeMode;
-        final hasSeenOnboarding = results[3] as bool;
         return AppInitializationData(
           themeColor: themeColor,
           fontScale: fontScale,
@@ -61,16 +63,6 @@ class AppInitializer {
         );
       }
     }
-    final results = await Future.wait([
-      settings.loadThemeColor(),
-      settings.loadFontScale(),
-      settings.loadThemeMode(),
-      settings.loadHasSeenOnboarding(),
-    ]);
-    final themeColor = results[0] as Color;
-    final fontScale = results[1] as double;
-    final themeMode = results[2] as ThemeMode;
-    final hasSeenOnboarding = results[3] as bool;
 
     return AppInitializationData(
       themeColor: themeColor,
