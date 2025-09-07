@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:notes_reminder_app/pandora_ui/toolbar_button.dart';
 import 'package:notes_reminder_app/pandora_ui/tokens.dart';
+import 'package:notes_reminder_app/theme/tokens.dart';
 
 void main() {
   testWidgets('ToolbarButton enabled state respects touch target',
@@ -9,6 +10,16 @@ void main() {
     var pressed = false;
     await tester.pumpWidget(
       MaterialApp(
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Tokens.light.colors.primary,
+            background: Tokens.light.colors.background,
+            surface: Tokens.light.colors.surface,
+          ),
+          fontFamily: Tokens.light.typography.fontFamily,
+          useMaterial3: true,
+          extensions: const [Tokens.light],
+        ),
         home: ToolbarButton(
           icon: const Icon(Icons.add),
           label: 'Add',
@@ -34,6 +45,16 @@ void main() {
     var pressed = false;
     await tester.pumpWidget(
       MaterialApp(
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Tokens.light.colors.primary,
+            background: Tokens.light.colors.background,
+            surface: Tokens.light.colors.surface,
+          ),
+          fontFamily: Tokens.light.typography.fontFamily,
+          useMaterial3: true,
+          extensions: const [Tokens.light],
+        ),
         home: ToolbarButton(
           icon: const Icon(Icons.add),
           label: 'Add',
