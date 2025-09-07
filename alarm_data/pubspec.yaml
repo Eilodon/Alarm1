@@ -4,13 +4,16 @@ publish_to: 'none'
 version: 0.0.1
 
 environment:
-  sdk: '>=3.3.0 <4.0.0'
+  sdk: '>=3.5.0 <4.0.0'
+
+resolution: workspace
 
 dependencies:
   flutter:
     sdk: flutter
   alarm_domain:
     path: ../alarm_domain
+
 
   file_picker: 6.2.1
   pdf: 3.11.3
@@ -24,3 +27,4 @@ dependencies:
 dev_dependencies:
   build_runner: 2.8.0
   json_serializable: 6.11.1
+
