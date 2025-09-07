@@ -1,10 +1,11 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/calendar/v3.dart' as calendar;
 import 'package:http/http.dart' as http;
+import 'package:alarm_domain/alarm_domain.dart';
 
-class CalendarService {
-  CalendarService._();
-  static final CalendarService instance = CalendarService._();
+class CalendarServiceImpl implements CalendarService {
+  CalendarServiceImpl._();
+  static final CalendarServiceImpl instance = CalendarServiceImpl._();
 
   GoogleSignIn? _googleSignIn;
   GoogleSignIn get _signIn => _googleSignIn ??=
@@ -23,6 +24,7 @@ class CalendarService {
     }
   }
 
+  @override
   Future<String?> createEvent({
     required String title,
     required String description,
@@ -47,6 +49,7 @@ class CalendarService {
     }
   }
 
+  @override
   Future<void> updateEvent(
     String eventId, {
     required String title,
@@ -71,6 +74,7 @@ class CalendarService {
     }
   }
 
+  @override
   Future<void> deleteEvent(String eventId) async {
     final api = await _getApi();
     if (api == null) return;

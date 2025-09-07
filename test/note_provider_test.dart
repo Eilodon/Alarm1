@@ -2,11 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:notes_reminder_app/features/note/note.dart';
-import 'package:notes_reminder_app/providers/note_provider.dart';
-
-import 'package:notes_reminder_app/services/calendar_service.dart';
-import 'package:notes_reminder_app/services/notification_service.dart';
-import 'package:notes_reminder_app/services/note_sync_service.dart';
+import 'package:notes_reminder_app/features/backup/backup.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MockRepo extends Mock implements NoteRepository {}

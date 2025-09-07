@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_sign_in_platform_interface/google_sign_in_platform_interface.dart';
-import 'package:notes_reminder_app/services/calendar_service.dart';
+import 'package:notes_reminder_app/features/note/data/calendar_service.dart';
 
 class FakeSignInSuccess extends GoogleSignInPlatform {
   @override
@@ -136,7 +136,7 @@ void main() {
     final previous = GoogleSignInPlatform.instance;
     GoogleSignInPlatform.instance = FakeSignInSuccess();
     final id = await HttpOverrides.runZoned(() async {
-      return await CalendarService.instance.createEvent(
+      return await CalendarServiceImpl.instance.createEvent(
         title: 't',
         description: 'd',
         start: DateTime(2024, 1, 1),
@@ -149,7 +149,7 @@ void main() {
   test('createEvent returns null when sign in fails', () async {
     final previous = GoogleSignInPlatform.instance;
     GoogleSignInPlatform.instance = FakeSignInFail();
-    final id = await CalendarService.instance.createEvent(
+    final id = await CalendarServiceImpl.instance.createEvent(
       title: 't',
       description: 'd',
       start: DateTime(2024, 1, 1),

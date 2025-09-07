@@ -11,28 +11,28 @@ void main() {
   });
 
   test('save and load theme color', () async {
-    final service = SettingsService();
+    final service = SettingsServiceImpl();
     await service.saveThemeColor(Colors.red);
     final color = await service.loadThemeColor();
     expect(color, Colors.red);
   });
 
   test('save and load mascot path', () async {
-    final service = SettingsService();
+    final service = SettingsServiceImpl();
     await service.saveMascotPath('path.json');
     final path = await service.loadMascotPath();
     expect(path, 'path.json');
   });
 
   test('save and load font scale', () async {
-    final service = SettingsService();
+    final service = SettingsServiceImpl();
     await service.saveFontScale(1.5);
     final scale = await service.loadFontScale();
     expect(scale, 1.5);
   });
 
   test('save and load require auth', () async {
-    final service = SettingsService();
+    final service = SettingsServiceImpl();
     await service.saveRequireAuth(true);
     final value = await service.loadRequireAuth();
     expect(value, true);
@@ -40,7 +40,7 @@ void main() {
 
 
   test('save and load has seen onboarding', () async {
-    final service = SettingsService();
+    final service = SettingsServiceImpl();
     await service.saveHasSeenOnboarding(true);
     final value = await service.loadHasSeenOnboarding();
     expect(value, true);
@@ -48,7 +48,7 @@ void main() {
   });
 
   test('default values returned when not set', () async {
-    final service = SettingsService();
+    final service = SettingsServiceImpl();
     final color = await service.loadThemeColor();
     final path = await service.loadMascotPath();
     final scale = await service.loadFontScale();

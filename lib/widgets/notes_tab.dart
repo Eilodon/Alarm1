@@ -5,11 +5,11 @@ import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
 
-import '../providers/note_provider.dart';
+import '../features/note/presentation/note_provider.dart';
 import '../features/settings/data/settings_service.dart';
 
-import '../screens/note_search_delegate.dart';
-import '../screens/voice_to_note_screen.dart';
+import '../features/note/presentation/note_search_delegate.dart';
+import '../features/note/presentation/voice_to_note_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
 import '../pandora_ui/palette_bottom_sheet.dart';
 import '../pandora_ui/teach_ai_modal.dart';
@@ -54,7 +54,7 @@ class _NotesTabState extends State<NotesTab> {
     });
   }
 
-  Future<String> _loadMascot() => SettingsService().loadMascotPath();
+  Future<String> _loadMascot() => SettingsServiceImpl().loadMascotPath();
 
   void _addNote() {
     showDialog(context: context, builder: (_) => const AddNoteDialog());
@@ -125,6 +125,7 @@ class _NotesTabState extends State<NotesTab> {
                         onThemeChanged: widget.onThemeChanged,
                         onFontScaleChanged: widget.onFontScaleChanged,
                         onThemeModeChanged: widget.onThemeModeChanged,
+                        settingsService: SettingsServiceImpl(),
                       ),
                     ),
                   );
@@ -168,6 +169,7 @@ class _NotesTabState extends State<NotesTab> {
                                 onThemeChanged: widget.onThemeChanged,
                                 onFontScaleChanged: widget.onFontScaleChanged,
                                 onThemeModeChanged: widget.onThemeModeChanged,
+                                settingsService: SettingsServiceImpl(),
                               ),
                             ),
                           ),

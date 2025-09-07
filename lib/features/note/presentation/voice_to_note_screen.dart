@@ -3,8 +3,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
-import '../features/note/presentation/note_provider.dart';
-import '../services/gemini_service.dart';
+import 'note_provider.dart';
+import '../../chat/data/gemini_service.dart';
 
 class VoiceToNoteScreen extends StatefulWidget {
   final stt.SpeechToText speech;
@@ -87,7 +87,7 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
       context,
     )!.convertSpeechPrompt(_recognized);
     final l10n = AppLocalizations.of(context)!;
-    final reply = await GeminiService().chat(prompt, l10n);
+    final reply = await GeminiServiceImpl().chat(prompt, l10n);
     if (!mounted) return;
     context.read<NoteProvider>().setDraft(reply);
     setState(() => _isProcessing = false);

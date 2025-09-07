@@ -5,23 +5,25 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'dart:math' as math;
 
 
-import '../../../services/settings_service.dart';
+import '../domain/settings_service.dart';
 import 'package:alarm_data/alarm_data.dart';
 import 'package:alarm_domain/alarm_domain.dart';
 import 'package:provider/provider.dart';
-import '../../../providers/note_provider.dart';
+import '../../note/presentation/note_provider.dart';
 
 
 class SettingsScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
   final Function(double) onFontScaleChanged;
   final Function(ThemeMode) onThemeModeChanged;
+  final SettingsService settingsService;
 
   const SettingsScreen({
     super.key,
     required this.onThemeChanged,
     required this.onFontScaleChanged,
     required this.onThemeModeChanged,
+    required this.settingsService,
   });
 
   @override
@@ -29,7 +31,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  final SettingsService _settings = SettingsService();
+  late final SettingsService _settings;
   final NoteRepository _noteRepository = NoteRepositoryImpl();
   bool _requireAuth = false;
 
@@ -40,6 +42,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
+    _settings = widget.settingsService;
     _settings.loadRequireAuth().then((v) {
       if (mounted) {
         setState(() => _requireAuth = v);

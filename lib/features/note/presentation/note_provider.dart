@@ -8,10 +8,10 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart'
 
 import 'package:alarm_domain/alarm_domain.dart';
 import 'package:alarm_data/alarm_data.dart';
-import '../../../services/calendar_service.dart';
-import '../../../services/notification_service.dart';
-import '../../../services/home_widget_service.dart';
-import '../../../services/note_sync_service.dart';
+import '../data/calendar_service.dart';
+import '../data/notification_service.dart';
+import '../data/home_widget_service.dart';
+import '../../backup/data/note_sync_service.dart';
 
 int _noteComparator(Note a, Note b) {
   if (a.pinned != b.pinned) {
@@ -44,9 +44,12 @@ class NoteProvider extends ChangeNotifier {
     HomeWidgetService? homeWidgetService,
     NoteSyncService? syncService,
   }) : _repository = repository ?? NoteRepositoryImpl(),
-       _calendarService = calendarService ?? CalendarService.instance,
-       _notificationService = notificationService ?? NotificationService(),
-       _homeWidgetService = homeWidgetService ?? const HomeWidgetService(),
+       _calendarService =
+            calendarService ?? CalendarServiceImpl.instance,
+       _notificationService =
+            notificationService ?? NotificationServiceImpl(),
+       _homeWidgetService =
+            homeWidgetService ?? const HomeWidgetServiceImpl(),
        _syncService =
            syncService ??
            NoteSyncService(repository: repository ?? NoteRepositoryImpl()) {

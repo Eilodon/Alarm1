@@ -8,7 +8,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:alarm_domain/alarm_domain.dart';
 
 import '../features/note/presentation/note_provider.dart';
-import '../screens/note_detail_screen.dart';
+import '../features/note/presentation/note_detail_screen.dart';
 import '../services/auth_service.dart';
 import 'note_card.dart';
 
