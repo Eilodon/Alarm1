@@ -38,6 +38,7 @@
   "networkError": "Network error. Please try again.",
   "noInternetConnection": "No internet connection.",
   "microphonePermissionMessage": "Microphone permission is required. Please enable it in Settings.",
+  "speechNotRecognizedMessage": "No speech detected. Please try again.",
   "readNote": "Read Note",
   "scheduleForDate": "Schedule for {date}",
   "@scheduleForDate": {
