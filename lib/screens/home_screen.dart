@@ -10,6 +10,7 @@ import '../models/command.dart';
 import '../pandora_ui/palette_bottom_sheet.dart';
 import '../pandora_ui/teach_ai_modal.dart';
 
+enum _MenuAction { palette, teachAi }
 
 class HomeScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
@@ -63,6 +64,32 @@ class _HomeScreenState extends State<HomeScreen> {
 
         if (constraints.maxWidth >= 600) {
           return Scaffold(
+            appBar: AppBar(
+              actions: [
+                PopupMenuButton<_MenuAction>(
+                  onSelected: (value) {
+                    switch (value) {
+                      case _MenuAction.palette:
+                        _showPalette();
+                        break;
+                      case _MenuAction.teachAi:
+                        _openTeachAi();
+                        break;
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: _MenuAction.palette,
+                      child: Text(l10n.palette),
+                    ),
+                    PopupMenuItem(
+                      value: _MenuAction.teachAi,
+                      child: Text(l10n.teachAi),
+                    ),
+                  ],
+                ),
+              ],
+            ),
             body: Row(
               children: [
                 NavigationRail(
@@ -94,22 +121,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       label: Text(l10n.settings),
                     ),
                   ],
-
-                  trailing: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.palette),
-                        onPressed: _showPalette,
-                        tooltip: l10n.palette,
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.school),
-                        onPressed: _openTeachAi,
-                        tooltip: l10n.teachAi,
-                      ),
-                    ],
-                  ),
                 ),
                 Expanded(
                   child: IndexedStack(
@@ -124,20 +135,37 @@ class _HomeScreenState extends State<HomeScreen> {
 
         // Mobile layout with a bottom navigation bar.
         return Scaffold(
+          appBar: AppBar(
+            actions: [
+              PopupMenuButton<_MenuAction>(
+                onSelected: (value) {
+                  switch (value) {
+                    case _MenuAction.palette:
+                      _showPalette();
+                      break;
+                    case _MenuAction.teachAi:
+                      _openTeachAi();
+                      break;
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: _MenuAction.palette,
+                    child: Text(l10n.palette),
+                  ),
+                  PopupMenuItem(
+                    value: _MenuAction.teachAi,
+                    child: Text(l10n.teachAi),
+                  ),
+                ],
+              ),
+            ],
+          ),
           body: IndexedStack(index: _currentIndex, children: _screens),
           bottomNavigationBar: NavigationBar(
             selectedIndex: _currentIndex,
-            onDestinationSelected: (index) {
-              if (index < _screens.length) {
-                setState(() => _currentIndex = index);
-              } else if (index == _screens.length) {
-                _showPalette();
-                setState(() {});
-              } else if (index == _screens.length + 1) {
-                _openTeachAi();
-                setState(() {});
-              }
-            },
+            onDestinationSelected: (index) =>
+                setState(() => _currentIndex = index),
             destinations: [
               NavigationDestination(
                 icon: const Icon(Icons.note),
@@ -158,14 +186,6 @@ class _HomeScreenState extends State<HomeScreen> {
               NavigationDestination(
                 icon: const Icon(Icons.settings),
                 label: l10n.settings,
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.palette),
-                label: l10n.palette,
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.school),
-                label: l10n.teachAi,
               ),
             ],
           ),
