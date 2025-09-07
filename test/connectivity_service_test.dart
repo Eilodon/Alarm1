@@ -41,7 +41,8 @@ void main() {
       supportedLocales: AppLocalizations.supportedLocales,
       home: Builder(
         builder: (context) {
-          ConnectivityService().initialize(context, messengerKey);
+          final l10n = AppLocalizations.of(context)!;
+          ConnectivityService().initialize(l10n, messengerKey);
           return const Scaffold(body: SizedBox.shrink());
         },
       ),
@@ -68,7 +69,8 @@ void main() {
       supportedLocales: AppLocalizations.supportedLocales,
       home: Builder(
         builder: (context) {
-          ConnectivityService().initialize(context, messengerKey);
+          final l10n = AppLocalizations.of(context)!;
+          ConnectivityService().initialize(l10n, messengerKey);
           return const Scaffold(body: SizedBox.shrink());
         },
       ),
