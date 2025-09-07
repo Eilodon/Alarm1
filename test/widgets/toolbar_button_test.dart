@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:notes_reminder_app/widgets/toolbar_button.dart';
+import 'package:notes_reminder_app/pandora_ui/toolbar_button.dart';
 
 import 'package:notes_reminder_app/theme/tokens.dart';
 

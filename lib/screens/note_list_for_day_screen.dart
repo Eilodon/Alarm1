@@ -7,7 +7,7 @@ import '../models/note.dart';
 import '../providers/note_provider.dart';
 import '../services/auth_service.dart';
 import 'note_detail_screen.dart';
-import '../widgets/hint_chip.dart';
+import '../pandora_ui/hint_chip.dart';
 import '../pandora_ui/result_card.dart';
 
 class NoteListForDayScreen extends StatelessWidget {

@@ -1,40 +1,92 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
 import '../theme/tokens.dart';
 
-class ToolbarButton extends StatelessWidget {
-  final Widget icon;
-  final String label;
-  final VoidCallback onPressed;
-  final bool disabled;
+class _ToolbarButtonStyle {
+  final Color background;
+  final Color foreground;
+  final bool enabled;
 
+  const _ToolbarButtonStyle({
+    required this.background,
+    required this.foreground,
+    required this.enabled,
+  });
+}
+
+const _touchTarget = 48.0;
+
+/// Toolbar button with icon and label.
+class ToolbarButton extends StatelessWidget {
   const ToolbarButton({
     super.key,
     required this.icon,
     required this.label,
     required this.onPressed,
-    this.disabled = false,
+    this.state = 'default',
   });
+
+  final Widget icon;
+  final String label;
+  final VoidCallback onPressed;
+  final String state;
 
   @override
   Widget build(BuildContext context) {
 
     final tokens = Theme.of(context).extension<Tokens>()!;
+    final toolbarStyles = {
+      'default': _ToolbarButtonStyle(
+        background: tokens.colors.primary,
+        foreground: tokens.colors.neutral100,
+        enabled: true,
+      ),
+      'active': _ToolbarButtonStyle(
+        background: tokens.colors.secondary,
+        foreground: tokens.colors.neutral100,
+        enabled: true,
+      ),
+      'disabled': _ToolbarButtonStyle(
+        background: tokens.colors.neutral300,
+        foreground: tokens.colors.neutral100,
+        enabled: false,
+      ),
+    };
 
-    return ElevatedButton.icon(
-      onPressed: disabled ? null : onPressed,
-      icon: icon,
-      label: Text(label),
-      style: ElevatedButton.styleFrom(
-        backgroundColor:
-            disabled ? tokens.colors.neutral300 : tokens.colors.primary,
-        foregroundColor: Colors.white,
-        padding: EdgeInsets.symmetric(
-            vertical: tokens.spacing.s, horizontal: tokens.spacing.m),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(tokens.radii.m),
+    final style = toolbarStyles[state] ?? toolbarStyles['default']!;
+
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(
+        minHeight: _touchTarget,
+        minWidth: _touchTarget,
+      ),
+      child: ElevatedButton.icon(
+        onPressed: style.enabled
+            ? () {
+                HapticFeedback.selectionClick();
+                onPressed();
+              }
+            : null,
+        icon: icon,
+        label: Text(label, style: textStyle),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: style.background,
+          foregroundColor: style.foreground,
+          padding: EdgeInsets.symmetric(
+            vertical: tokens.spacing.s,
+            horizontal: tokens.spacing.m,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(tokens.radii.m),
+          ),
+          elevation: tokens.elevation.low,
+          minimumSize: const Size(
+            _touchTarget,
+            _touchTarget,
+          ),
         ),
-        elevation: tokens.elevation.low,
       ),
     );
   }
