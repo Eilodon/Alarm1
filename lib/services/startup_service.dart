@@ -6,7 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     as fln;
 
 import '../firebase_options.dart';
-import '../features/note/data/notification_service.dart';
+import 'package:alarm_domain/alarm_domain.dart';
 
 class StartupResult {
   final bool authFailed;
@@ -19,6 +19,9 @@ class StartupResult {
 }
 
 class StartupService {
+  final NotificationService _notificationService;
+  StartupService(this._notificationService);
+
   Future<StartupResult> initialize({
     Future<void> Function(fln.NotificationResponse)?
         onDidReceiveNotificationResponse,
@@ -31,14 +34,15 @@ class StartupService {
         options: DefaultFirebaseOptions.currentPlatform,
       );
       await FirebaseAuth.instance.signInAnonymously();
-      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+      await FirebaseCrashlytics.instance
+          .setCrashlyticsCollectionEnabled(true);
       await FirebaseAnalytics.instance.logAppOpen();
     } catch (_) {
       authFailed = true;
     }
 
     try {
-      await NotificationServiceImpl().init(
+      await _notificationService.init(
         onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
       );
     } catch (_) {
