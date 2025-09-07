@@ -26,6 +26,9 @@ linter:
     - prefer_final_fields
     - avoid_print
     - unused_import
+    - always_use_package_imports
+    - prefer_const_literals_to_create_immutables
+    - avoid_unused_constructor_parameters
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
