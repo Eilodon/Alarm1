@@ -8,7 +8,8 @@ class DummyRepo extends Fake implements NoteRepository {}
 
 class FakeConnectivity extends Connectivity {
   @override
-  Stream<ConnectivityResult> get onConnectivityChanged => const Stream.empty();
+  Stream<List<ConnectivityResult>> get onConnectivityChanged =>
+      const Stream.empty();
 }
 
 void main() {

@@ -16,7 +16,7 @@ class NoteSyncServiceImpl implements NoteSyncService {
   final FirebaseAuth _auth;
   final Connectivity _connectivity;
 
-  StreamSubscription<ConnectivityResult>? _connectivitySubscription;
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
   SharedPreferences? _prefs;
 
   static const _unsyncedKey = 'unsyncedNoteIds';
@@ -60,8 +60,8 @@ class NoteSyncServiceImpl implements NoteSyncService {
       _firestore.settings = const Settings(persistenceEnabled: true);
     }
     _connectivitySubscription =
-        _connectivity.onConnectivityChanged.listen((result) {
-      if (result != ConnectivityResult.none) {
+        _connectivity.onConnectivityChanged.listen((results) {
+      if (!results.contains(ConnectivityResult.none)) {
         syncUnsyncedNotes();
       }
     });

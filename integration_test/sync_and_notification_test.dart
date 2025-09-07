@@ -27,10 +27,16 @@ class DummyHomeWidget extends Fake implements HomeWidgetService {
 }
 
 class FakeConnectivityPlatform extends Fake implements ConnectivityPlatform {
-  final _controller = StreamController<ConnectivityResult>.broadcast();
+  final _controller = StreamController<List<ConnectivityResult>>.broadcast();
   @override
-  Stream<ConnectivityResult> get onConnectivityChanged => _controller.stream;
-  void emit(ConnectivityResult result) => _controller.add(result);
+  Stream<List<ConnectivityResult>> get onConnectivityChanged =>
+      _controller.stream;
+
+  @override
+  Future<List<ConnectivityResult>> checkConnectivity() async =>
+      [ConnectivityResult.wifi];
+
+  void emit(ConnectivityResult result) => _controller.add([result]);
 }
 
 void setupFirebase() {
