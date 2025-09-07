@@ -27,10 +27,10 @@ dependencies:
   provider: ^6.1.5+1
   flutter_tts: ^4.2.3
   speech_to_text: ^7.3.0
-  share_plus: ^10.1.4
+  share_plus: ^11.1.0
   connectivity_plus: ^6.1.5
 
-  home_widget: ^0.5.0
+  home_widget: ^0.8.0
 
 
   local_auth: ^2.3.0
@@ -57,7 +57,7 @@ dependencies:
   firebase_analytics: ^12.0.1
 
   googleapis: ^14.0.0
-  google_sign_in: ^6.3.0
+  google_sign_in: ^7.1.1
   uuid: ^4.5.1
   google_fonts: ^6.2.1
   fuse: ^0.0.99
@@ -70,7 +70,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.3
+  flutter_lints: ^6.0.0
   mocktail: ^1.0.4
   integration_test:
     sdk: flutter
