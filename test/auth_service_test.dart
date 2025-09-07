@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:notes_reminder_app/services/auth_service.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:notes_reminder_app/generated/app_localizations.dart';
 import 'package:logger/logger.dart';
 
 class MockLocalAuth extends Mock implements LocalAuthentication {}
