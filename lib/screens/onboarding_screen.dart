@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import '../services/settings_service.dart';
+import '../features/settings/data/settings_service.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final VoidCallback onFinished;

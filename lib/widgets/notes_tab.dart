@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
 import '../providers/note_provider.dart';
-import '../services/settings_service.dart';
+import '../features/settings/data/settings_service.dart';
 import '../screens/note_search_delegate.dart';
 import '../screens/voice_to_note_screen.dart';
 import '../screens/settings_screen.dart';
