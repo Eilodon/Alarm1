@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:notes_reminder_app/models/security_cue.dart';
-import 'package:notes_reminder_app/widgets/result_card.dart';
+import 'package:notes_reminder_app/pandora_ui/result_card.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
