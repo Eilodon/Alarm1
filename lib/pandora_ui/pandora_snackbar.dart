@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+
 import '../theme/tokens.dart';
 
 const _animationDuration = Duration(milliseconds: 150);
@@ -12,6 +13,7 @@ class SnackbarKind {
   static const success = SnackbarKind._(Icons.check_circle);
   static const warn = SnackbarKind._(Icons.warning);
   static const error = SnackbarKind._(Icons.error);
+
 }
 
 class PandoraSnackbar extends StatefulWidget {
@@ -65,6 +67,7 @@ class _PandoraSnackbarState extends State<PandoraSnackbar>
 
   @override
   Widget build(BuildContext context) {
+
     final tokens = Theme.of(context).extension<Tokens>()!;
     Color iconColor;
     if (widget.kind == SnackbarKind.success) {
@@ -107,6 +110,7 @@ class _PandoraSnackbarState extends State<PandoraSnackbar>
                 onPressed: widget.onClose ?? hide,
               ),
             ],
+
           ),
         ),
       ),

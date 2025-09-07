@@ -34,6 +34,7 @@ class ToolbarButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final tokens = Theme.of(context).extension<Tokens>()!;
     final toolbarStyles = {
       'default': _ToolbarButtonStyle(
@@ -55,6 +56,7 @@ class ToolbarButton extends StatelessWidget {
 
     final style = toolbarStyles[state] ?? toolbarStyles['default']!;
 
+
     return ConstrainedBox(
       constraints: const BoxConstraints(
         minHeight: _touchTarget,
@@ -68,7 +70,7 @@ class ToolbarButton extends StatelessWidget {
               }
             : null,
         icon: icon,
-        label: Text(label),
+        label: Text(label, style: textStyle),
         style: ElevatedButton.styleFrom(
           backgroundColor: style.background,
           foregroundColor: style.foreground,

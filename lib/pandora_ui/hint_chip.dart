@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../theme/tokens.dart';
+
 
 class _ChipStyle {
   final Color background;
@@ -14,14 +16,17 @@ class _ChipStyle {
   });
 }
 
+
 const _opacityDisabled = 0.5;
 const _opacityFocus = 0.85;
 const _opacityEnabled = 1.0;
 const _iconSizeS = 20.0;
 const _hintIcon = Icons.lightbulb_outline;
 
+
 class HintChip extends StatelessWidget {
   final String label;
+  final Widget? icon;
   final String state;
   final VoidCallback onPressed;
   final TextStyle? style;
@@ -29,6 +34,7 @@ class HintChip extends StatelessWidget {
   const HintChip({
     Key? key,
     required this.label,
+    this.icon,
     this.state = 'default',
     required this.onPressed,
     this.style,
@@ -37,6 +43,7 @@ class HintChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = Theme.of(context).extension<Tokens>()!;
+
     final chipStyles = {
       'default': _ChipStyle(
         background: tokens.colors.neutral200,
@@ -86,6 +93,7 @@ class HintChip extends StatelessWidget {
                   .copyWith(color: styleData.text),
             ),
           ],
+
         ),
       ),
     );
