@@ -67,7 +67,9 @@ class _NotesTabState extends State<NotesTab> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final gridCount = constraints.maxWidth >= 600 ? 2 : 1;
+        // Use a grid on wider layouts. One column on phones, two on tablets
+        // and more as space allows.
+        final gridCount = (constraints.maxWidth ~/ 300).clamp(1, 4);
         return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.appTitle),

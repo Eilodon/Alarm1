@@ -51,6 +51,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
+    // Use a layout builder to switch between mobile and tablet/desktop
+    // scaffolds depending on the available width.
     return LayoutBuilder(
       builder: (context, constraints) {
 
