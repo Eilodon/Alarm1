@@ -8,6 +8,7 @@ import '../features/note/presentation/note_list_for_day_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
 import '../features/note/presentation/voice_to_note_screen.dart';
 import '../features/settings/data/settings_service.dart';
+import '../features/backup/data/backup_service.dart';
 import 'package:alarm_domain/alarm_domain.dart';
 import '../pandora_ui/palette_bottom_sheet.dart';
 import '../pandora_ui/teach_ai_modal.dart';
@@ -47,7 +48,8 @@ class _HomeScreenState extends State<HomeScreen> {
           onThemeChanged: widget.onThemeChanged,
           onFontScaleChanged: widget.onFontScaleChanged,
           onThemeModeChanged: widget.onThemeModeChanged,
-          settingsService: SettingsServiceImpl(),
+          settingsService:
+              SettingsServiceImpl(backupService: BackupServiceImpl()),
         ),
       ];
   }
