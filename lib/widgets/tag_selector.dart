@@ -84,12 +84,15 @@ class _TagSelectorState extends State<TagSelector> {
         padding: const EdgeInsets.symmetric(horizontal: 4),
         child: Tooltip(
           message: label,
-          child: ChoiceChip(
-            label: const SizedBox(width: 24, height: 24),
-            selectedColor: color,
-            backgroundColor: color,
-            selected: selected,
-            onSelected: (_) => widget.onColorChanged(color.value),
+          child: Semantics(
+            label: label,
+            child: ChoiceChip(
+              label: const SizedBox(width: 24, height: 24),
+              selectedColor: color,
+              backgroundColor: color,
+              selected: selected,
+              onSelected: (_) => widget.onColorChanged(color.value),
+            ),
           ),
         ),
       );
