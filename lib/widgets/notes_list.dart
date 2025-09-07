@@ -5,10 +5,10 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../models/note.dart';
+import 'package:notes_reminder_app/features/note/domain/entities/note.dart';
 
-import '../providers/note_provider.dart';
-import '../screens/note_detail_screen.dart';
+import 'package:notes_reminder_app/features/note/presentation/providers/note_provider.dart';
+import 'package:notes_reminder_app/features/note/presentation/screens/note_detail_screen.dart';
 import '../services/auth_service.dart';
 import 'note_card.dart';
 

@@ -10,8 +10,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
 
-import '../models/note.dart';
-import 'db_service.dart';
+import '../../note/domain/entities/note.dart';
+import '../../note/data/db_service.dart';
 
 enum BackupFormat { json, pdf, md }
 

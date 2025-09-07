@@ -1,6 +1,6 @@
 import 'package:home_widget/home_widget.dart';
 
-import '../models/note.dart';
+import '../domain/entities/note.dart';
 
 /// Service to update the native home screen widget with the next upcoming note.
 class HomeWidgetService {

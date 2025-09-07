@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../models/note.dart';
+import '../domain/entities/note.dart';
 
 class DbService {
   static const _kNotes = 'notes_v2';

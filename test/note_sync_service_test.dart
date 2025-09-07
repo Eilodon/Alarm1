@@ -1,8 +1,8 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:notes_reminder_app/models/note.dart';
-import 'package:notes_reminder_app/services/note_repository.dart';
-import 'package:notes_reminder_app/services/note_sync_service.dart';
+import 'package:notes_reminder_app/features/note/domain/entities/note.dart';
+import 'package:notes_reminder_app/features/note/data/note_repository.dart';
+import 'package:notes_reminder_app/features/note/data/note_sync_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DummyRepo extends Fake implements NoteRepository {}

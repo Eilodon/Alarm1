@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:notes_reminder_app/models/note.dart';
-import 'package:notes_reminder_app/providers/note_provider.dart';
-import 'package:notes_reminder_app/services/note_repository.dart';
-import 'package:notes_reminder_app/services/calendar_service.dart';
-import 'package:notes_reminder_app/services/notification_service.dart';
-import 'package:notes_reminder_app/services/note_sync_service.dart';
+import 'package:notes_reminder_app/features/note/domain/entities/note.dart';
+import 'package:notes_reminder_app/features/note/presentation/providers/note_provider.dart';
+import 'package:notes_reminder_app/features/note/data/note_repository.dart';
+import 'package:notes_reminder_app/features/note/data/calendar_service.dart';
+import 'package:notes_reminder_app/features/note/data/notification_service.dart';
+import 'package:notes_reminder_app/features/note/data/note_sync_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 

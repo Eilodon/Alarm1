@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import '../services/gemini_service.dart';
+import '../../domain/usecases/chat_with_gemini.dart';
 
 class ChatScreen extends StatefulWidget {
   final String initialMessage;
@@ -19,7 +19,7 @@ class Message {
 class _ChatScreenState extends State<ChatScreen> {
   final List<Message> _messages = [];
   final TextEditingController _controller = TextEditingController();
-  final GeminiService _geminiService = GeminiService();
+  final ChatWithGemini _chatWithGemini = ChatWithGemini();
   bool _isLoading = false;
 
   @override
@@ -36,7 +36,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     try {
       final reply =
-          await _geminiService.chat(userText, AppLocalizations.of(context)!);
+          await _chatWithGemini(userText, AppLocalizations.of(context)!);
       setState(() => _messages.insert(0, Message(reply, false)));
     } catch (e) {
       setState(() => _messages.insert(

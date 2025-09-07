@@ -4,7 +4,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:ui';
-import 'package:notes_reminder_app/services/notification_service.dart';
+import 'package:notes_reminder_app/features/note/data/notification_service.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 

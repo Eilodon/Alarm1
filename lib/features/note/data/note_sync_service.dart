@@ -7,7 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../models/note.dart';
+import '../domain/entities/note.dart';
 import 'note_repository.dart';
 
 enum SyncStatus { idle, syncing, error }

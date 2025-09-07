@@ -7,9 +7,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:notes_reminder_app/models/note.dart';
-import 'package:notes_reminder_app/services/backup_service.dart';
-import 'package:notes_reminder_app/services/db_service.dart';
+import 'package:notes_reminder_app/features/note/domain/entities/note.dart';
+import 'package:notes_reminder_app/features/backup/data/backup_service.dart';
+import 'package:notes_reminder_app/features/note/data/db_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 const MethodChannel _channel = MethodChannel(

@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:notes_reminder_app/services/gemini_service.dart';
+import 'package:notes_reminder_app/features/chat/data/gemini_service.dart';
 
 class MockL10n extends Mock implements AppLocalizations {}
 

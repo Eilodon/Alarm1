@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_sign_in_platform_interface/google_sign_in_platform_interface.dart';
-import 'package:notes_reminder_app/services/calendar_service.dart';
+import 'package:notes_reminder_app/features/note/data/calendar_service.dart';
 
 class FakeSignInSuccess extends GoogleSignInPlatform {
   @override

@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
-import 'providers/note_provider.dart';
+import 'features/note/presentation/providers/note_provider.dart';
 
 /// Wraps the given [child] with all application level providers.
 class AppProviders extends StatelessWidget {

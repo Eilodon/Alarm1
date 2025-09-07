@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import '../models/note.dart';
+import '../../domain/entities/note.dart';
 import 'note_detail_screen.dart';
-import '../services/auth_service.dart';
-import '../widgets/route_transitions.dart';
+import 'package:notes_reminder_app/services/auth_service.dart';
+import 'package:notes_reminder_app/widgets/route_transitions.dart';
 
 class NoteSearchDelegate extends SearchDelegate {
   final List<Note> notes;

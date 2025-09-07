@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:notes_reminder_app/widgets/ai_suggestions_dialog.dart';
-import 'package:notes_reminder_app/services/gemini_service.dart';
+import 'package:notes_reminder_app/features/chat/data/gemini_service.dart';
 
 void main() {
   testWidgets('AISuggestionsDialog returns edited data', (tester) async {

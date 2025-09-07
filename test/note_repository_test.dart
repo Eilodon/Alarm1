@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:notes_reminder_app/services/note_repository.dart';
-import 'package:notes_reminder_app/models/note.dart';
+import 'package:notes_reminder_app/features/note/data/note_repository.dart';
+import 'package:notes_reminder_app/features/note/domain/entities/note.dart';
 import 'package:uuid/uuid.dart';
 
 void main() {

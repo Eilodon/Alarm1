@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../widgets/notes_tab.dart';
-import 'chat_screen.dart';
-import 'note_list_for_day_screen.dart';
+import 'package:notes_reminder_app/features/chat/presentation/screens/chat_screen.dart';
+import 'package:notes_reminder_app/features/note/presentation/screens/note_list_for_day_screen.dart';
 import 'settings_screen.dart';
-import 'voice_to_note_screen.dart';
+import 'package:notes_reminder_app/features/note/presentation/screens/voice_to_note_screen.dart';
 import '../models/command.dart';
 import '../pandora_ui/palette_bottom_sheet.dart';
 import '../pandora_ui/teach_ai_modal.dart';

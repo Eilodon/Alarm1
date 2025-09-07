@@ -7,8 +7,8 @@ import 'package:provider/provider.dart';
 
 import 'app.dart';
 import 'app_providers.dart';
-import 'models/note.dart';
-import 'providers/note_provider.dart';
+import 'features/note/domain/entities/note.dart';
+import 'features/note/presentation/providers/note_provider.dart';
 import 'services/app_initializer.dart';
 import 'services/connectivity_service.dart';
 import 'screens/error_screen.dart';

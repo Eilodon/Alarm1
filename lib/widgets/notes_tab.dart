@@ -4,10 +4,10 @@ import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
-import '../providers/note_provider.dart';
+import 'package:notes_reminder_app/features/note/presentation/providers/note_provider.dart';
 import '../services/settings_service.dart';
-import '../screens/note_search_delegate.dart';
-import '../screens/voice_to_note_screen.dart';
+import 'package:notes_reminder_app/features/note/presentation/screens/note_search_delegate.dart';
+import 'package:notes_reminder_app/features/note/presentation/screens/voice_to_note_screen.dart';
 import '../screens/settings_screen.dart';
 import '../pandora_ui/palette_bottom_sheet.dart';
 import '../pandora_ui/teach_ai_modal.dart';

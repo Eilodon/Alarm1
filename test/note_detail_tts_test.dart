@@ -8,9 +8,9 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:provider/provider.dart';
-import 'package:notes_reminder_app/models/note.dart';
-import 'package:notes_reminder_app/providers/note_provider.dart';
-import 'package:notes_reminder_app/screens/note_detail_screen.dart';
+import 'package:notes_reminder_app/features/note/domain/entities/note.dart';
+import 'package:notes_reminder_app/features/note/presentation/providers/note_provider.dart';
+import 'package:notes_reminder_app/features/note/presentation/screens/note_detail_screen.dart';
 import 'package:notes_reminder_app/services/tts_service.dart';
 
 class MockTTS extends Mock implements TTSService {}

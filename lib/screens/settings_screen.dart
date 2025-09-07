@@ -5,10 +5,10 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'dart:math' as math;
 
 import '../services/settings_service.dart';
-import '../services/note_repository.dart';
-import '../services/backup_service.dart';
+import 'package:notes_reminder_app/features/note/data/note_repository.dart';
+import 'package:notes_reminder_app/features/backup/data/backup_service.dart';
 import 'package:provider/provider.dart';
-import '../providers/note_provider.dart';
+import 'package:notes_reminder_app/features/note/presentation/providers/note_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
