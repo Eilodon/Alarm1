@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../theme/tokens.dart';
 
 class TagSelector extends StatefulWidget {
   final List<String> availableTags;
@@ -63,15 +64,17 @@ class _TagSelectorState extends State<TagSelector> {
       );
     }).toList();
 
+    final tokens = Theme.of(context).extension<Tokens>()!;
+    final scheme = Theme.of(context).colorScheme;
     final colorOptions = <Color>[
-      Colors.white,
-      Colors.red,
-      Colors.orange,
-      Colors.yellow,
-      Colors.green,
-      Colors.blue,
-      Colors.purple,
-      Colors.brown,
+      scheme.background,
+      tokens.colors.primary,
+      tokens.colors.secondary,
+      tokens.colors.error,
+      tokens.colors.warning,
+      tokens.colors.info,
+      tokens.colors.neutral700,
+      tokens.colors.neutral900,
     ];
     final colorChips = colorOptions.map((c) {
       final selected = widget.selectedColor == c.value;
