@@ -40,10 +40,12 @@ class NoteProvider extends ChangeNotifier {
 
   final SplayTreeSet<Note> _notes = SplayTreeSet<Note>(_noteComparator);
   String _draft = '';
+  Object? _initError;
 
   Stream<SyncStatus> get syncStatus => _syncService.syncStatus;
   Set<String> get unsyncedNoteIds => _syncService.unsyncedNoteIds;
   bool isSynced(String id) => _syncService.isSynced(id);
+  Object? get initError => _initError;
 
   NoteProvider._({
     required GetNotes getNotes,
@@ -80,8 +82,10 @@ class NoteProvider extends ChangeNotifier {
            ),
        _snoozeNote = snoozeNote ?? SnoozeNote(notificationService) {
     unawaited(
-      _init().catchError((e) {
-        /* log or set error state */
+      _init().catchError((e, s) {
+        _initError = e;
+        debugPrint('NoteProvider init failed: $e');
+        notifyListeners();
       }),
     );
   }
