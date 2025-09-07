@@ -4,15 +4,18 @@ import 'package:flutter/services.dart';
 import '../theme/tokens.dart';
 
 class _ToolbarButtonStyle {
-  final Color background;
-  final Color foreground;
-  final bool enabled;
+
 
   const _ToolbarButtonStyle({
     required this.background,
     required this.foreground,
     required this.enabled,
   });
+
+  final Color background;
+  final Color foreground;
+  final bool enabled;
+
 }
 
 const _touchTarget = 48.0;
@@ -55,16 +58,28 @@ class ToolbarButton extends StatelessWidget {
 
     final style = toolbarStyles[state] ?? toolbarStyles['default']!;
 
-    return Semantics(
-      button: true,
-      enabled: style.enabled,
-      label: label,
-      child: Tooltip(
-        message: label,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            minHeight: _touchTarget,
-            minWidth: _touchTarget,
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(
+        minHeight: _touchTarget,
+        minWidth: _touchTarget,
+      ),
+      child: ElevatedButton.icon(
+        onPressed: style.enabled
+            ? () {
+                HapticFeedback.selectionClick();
+                onPressed();
+              }
+            : null,
+        icon: icon,
+        label: Text(label),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: style.background,
+          foregroundColor: style.foreground,
+          padding: EdgeInsets.symmetric(
+            vertical: tokens.spacing.s,
+            horizontal: tokens.spacing.m,
+
           ),
           child: ElevatedButton.icon(
             onPressed: style.enabled
@@ -88,6 +103,9 @@ class ToolbarButton extends StatelessWidget {
               elevation: tokens.elevation.low,
             ),
           ),
+
+          elevation: tokens.elevation.low,
+
         ),
       ),
     );
