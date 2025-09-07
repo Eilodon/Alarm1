@@ -8,6 +8,8 @@ import 'package:share_plus/share_plus.dart';
 import '../models/note.dart';
 import '../pandora_ui/result_card.dart';
 import '../pandora_ui/toolbar_button.dart';
+
+
 import '../providers/note_provider.dart';
 import '../screens/note_detail_screen.dart';
 import '../services/auth_service.dart';
@@ -211,7 +213,9 @@ class _NotesListState extends State<NotesList> {
           );
         }
         final note = notes[index];
+
         return _buildNoteTile(context, note, provider);
+
       },
     );
   }

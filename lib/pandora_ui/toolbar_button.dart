@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import '../theme/tokens.dart';
 
 class _ToolbarButtonStyle {
+
+
   const _ToolbarButtonStyle({
     required this.background,
     required this.foreground,
@@ -13,6 +15,7 @@ class _ToolbarButtonStyle {
   final Color background;
   final Color foreground;
   final bool enabled;
+
 }
 
 const _touchTarget = 48.0;
@@ -35,7 +38,7 @@ class ToolbarButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = Theme.of(context).extension<Tokens>()!;
-    final toolbarStyles = {
+    final toolbarStyles = <String, _ToolbarButtonStyle>{
       'default': _ToolbarButtonStyle(
         background: tokens.colors.primary,
         foreground: tokens.colors.neutral100,
@@ -54,6 +57,7 @@ class ToolbarButton extends StatelessWidget {
     };
 
     final style = toolbarStyles[state] ?? toolbarStyles['default']!;
+
 
     return ConstrainedBox(
       constraints: const BoxConstraints(
@@ -75,11 +79,33 @@ class ToolbarButton extends StatelessWidget {
           padding: EdgeInsets.symmetric(
             vertical: tokens.spacing.s,
             horizontal: tokens.spacing.m,
+
           ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(tokens.radii.m),
+          child: ElevatedButton.icon(
+            onPressed: style.enabled
+                ? () {
+                    HapticFeedback.selectionClick();
+                    onPressed();
+                  }
+                : null,
+            icon: icon,
+            label: Text(label),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: style.background,
+              foregroundColor: style.foreground,
+              padding: EdgeInsets.symmetric(
+                vertical: tokens.spacing.s,
+                horizontal: tokens.spacing.m,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(tokens.radii.m),
+              ),
+              elevation: tokens.elevation.low,
+            ),
           ),
+
           elevation: tokens.elevation.low,
+
         ),
       ),
     );

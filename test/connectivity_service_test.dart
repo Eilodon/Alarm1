@@ -1,0 +1,54 @@
+import 'dart:async';
+
+import 'package:connectivity_plus_platform_interface/connectivity_plus_platform_interface.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:notes_reminder_app/services/connectivity_service.dart';
+
+class FakeConnectivity extends ConnectivityPlatform {
+  final _controller = StreamController<ConnectivityResult>();
+
+  @override
+  Stream<ConnectivityResult> get onConnectivityChanged => _controller.stream;
+
+  @override
+  Future<ConnectivityResult> checkConnectivity() async {
+    return ConnectivityResult.wifi;
+  }
+
+  void emit(ConnectivityResult result) {
+    _controller.add(result);
+  }
+}
+
+void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  testWidgets('shows SnackBar when connection lost', (tester) async {
+    final fake = FakeConnectivity();
+    ConnectivityPlatform.instance = fake;
+
+    final messengerKey = GlobalKey<ScaffoldMessengerState>();
+
+    await tester.pumpWidget(MaterialApp(
+      locale: const Locale('en'),
+      scaffoldMessengerKey: messengerKey,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: Builder(
+        builder: (context) {
+          ConnectivityService().initialize(context, messengerKey);
+          return const Scaffold(body: SizedBox.shrink());
+        },
+      ),
+    ));
+
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+
+    fake.emit(ConnectivityResult.none);
+    await tester.pump();
+
+    expect(find.text(l10n.noInternetConnection), findsOneWidget);
+  });
+}

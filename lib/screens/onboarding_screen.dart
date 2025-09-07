@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../services/settings_service.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -13,10 +14,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _controller = PageController();
   int _currentPage = 0;
 
-  final List<_PageData> _pages = const [
-    _PageData(Icons.note, 'Take Notes', 'Write down your thoughts and ideas.'),
-    _PageData(Icons.alarm, 'Set Reminders', 'Schedule alarms for important tasks.'),
-    _PageData(Icons.settings, 'Customize', 'Adjust themes and font sizes to your liking.'),
+  final List<_PageData> _pages = [
+    _PageData(
+      Icons.note,
+      (l10n) => l10n.onboardingTakeNotes,
+      (l10n) => l10n.onboardingTakeNotesDesc,
+    ),
+    _PageData(
+      Icons.alarm,
+      (l10n) => l10n.onboardingSetReminders,
+      (l10n) => l10n.onboardingSetRemindersDesc,
+    ),
+    _PageData(
+      Icons.settings,
+      (l10n) => l10n.onboardingCustomize,
+      (l10n) => l10n.onboardingCustomizeDesc,
+    ),
   ];
 
   Future<void> _finish() async {
@@ -26,12 +39,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         actions: [
           TextButton(
             onPressed: _finish,
-            child: const Text('Skip'),
+            child: Text(l10n.onboardingSkip),
           ),
         ],
       ),
@@ -48,10 +62,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               children: [
                 Icon(page.icon, size: 120),
                 const SizedBox(height: 24),
-                Text(page.title, style: Theme.of(context).textTheme.headlineSmall),
+                Text(
+                  page.title(l10n),
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
                 const SizedBox(height: 12),
                 Text(
-                  page.description,
+                  page.description(l10n),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -64,7 +81,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               padding: const EdgeInsets.all(16),
               child: ElevatedButton(
                 onPressed: _finish,
-                child: const Text('Get Started'),
+                child: Text(l10n.onboardingGetStarted),
               ),
             )
           : null,
@@ -74,7 +91,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
 class _PageData {
   final IconData icon;
-  final String title;
-  final String description;
+  final String Function(AppLocalizations l10n) title;
+  final String Function(AppLocalizations l10n) description;
   const _PageData(this.icon, this.title, this.description);
 }

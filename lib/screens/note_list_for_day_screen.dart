@@ -9,6 +9,7 @@ import '../services/auth_service.dart';
 import 'note_detail_screen.dart';
 import '../pandora_ui/hint_chip.dart';
 import '../pandora_ui/result_card.dart';
+import '../widgets/route_transitions.dart';
 
 class NoteListForDayScreen extends StatelessWidget {
   final DateTime date;
@@ -98,22 +99,7 @@ class NoteListForDayScreen extends StatelessWidget {
                 }
                 Navigator.push(
                   context,
-                  PageRouteBuilder(
-                    pageBuilder: (_, __, ___) => NoteDetailScreen(note: note),
-                    transitionsBuilder: (_, animation, __, child) {
-                      final offsetAnimation = Tween<Offset>(
-                        begin: const Offset(1, 0),
-                        end: Offset.zero,
-                      ).animate(animation);
-                      return FadeTransition(
-                        opacity: animation,
-                        child: SlideTransition(
-                          position: offsetAnimation,
-                          child: child,
-                        ),
-                      );
-                    },
-                  ),
+                  buildSlideFadeRoute(NoteDetailScreen(note: note)),
                 );
               },
             ),
