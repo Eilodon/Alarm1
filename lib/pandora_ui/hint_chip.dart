@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-import 'tokens.dart';
+import '../theme/tokens.dart';
+import 'tokens.dart' as pui;
 
 class _ChipStyle {
   final Color background;
@@ -14,26 +16,27 @@ class _ChipStyle {
   });
 }
 
-const Map<String, _ChipStyle> _chipStyles = {
-  'default': _ChipStyle(
-    background: PandoraTokens.neutral200,
-    text: PandoraTokens.neutral900,
-    opacity: PandoraTokens.opacityDisabled,
-  ),
-  'armed': _ChipStyle(
-    background: PandoraTokens.error,
-    text: PandoraTokens.neutral100,
-    opacity: PandoraTokens.opacityFocus,
-  ),
-  'active': _ChipStyle(
-    background: PandoraTokens.secondary,
-    text: PandoraTokens.neutral100,
-    opacity: PandoraTokens.opacityEnabled,
-  ),
-};
+Map<String, _ChipStyle> _chipStyles(Tokens tokens) => {
+      'default': _ChipStyle(
+        background: tokens.colors.neutral200,
+        text: tokens.colors.neutral900,
+        opacity: pui.PandoraTokens.opacityDisabled,
+      ),
+      'armed': _ChipStyle(
+        background: tokens.colors.error,
+        text: tokens.colors.neutral100,
+        opacity: pui.PandoraTokens.opacityFocus,
+      ),
+      'active': _ChipStyle(
+        background: tokens.colors.secondary,
+        text: tokens.colors.neutral100,
+        opacity: pui.PandoraTokens.opacityEnabled,
+      ),
+    };
 
 class HintChip extends StatelessWidget {
   final String label;
+  final Widget? icon;
   final String state;
   final VoidCallback onPressed;
   final TextStyle? style;
@@ -41,6 +44,7 @@ class HintChip extends StatelessWidget {
   const HintChip({
     Key? key,
     required this.label,
+    this.icon,
     this.state = 'default',
     required this.onPressed,
     this.style,
@@ -48,33 +52,42 @@ class HintChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _ChipStyle styleData = _chipStyles[state] ?? _chipStyles['default']!;
+    final tokens = Theme.of(context).extension<Tokens>()!;
+    final styles = _chipStyles(tokens);
+    final _ChipStyle styleData = styles[state] ?? styles['default']!;
     final baseStyle =
         style ?? Theme.of(context).textTheme.bodySmall ?? const TextStyle();
 
     return ConstrainedBox(
       constraints: const BoxConstraints(
-        minHeight: PandoraTokens.touchTarget,
-        minWidth: PandoraTokens.touchTarget,
+        minHeight: pui.PandoraTokens.touchTarget,
+        minWidth: pui.PandoraTokens.touchTarget,
       ),
       child: InkWell(
-        onTap: onPressed,
-        borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
+        onTap: () {
+          HapticFeedback.selectionClick();
+          onPressed();
+        },
+        borderRadius: BorderRadius.circular(tokens.radii.m),
         child: Ink(
           decoration: BoxDecoration(
             color: styleData.background.withOpacity(styleData.opacity),
-            borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
+            borderRadius: BorderRadius.circular(tokens.radii.m),
           ),
-          padding: const EdgeInsets.all(PandoraTokens.spacingM),
+          padding: EdgeInsets.symmetric(
+            horizontal: tokens.spacing.m,
+            vertical: tokens.spacing.s,
+          ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                PandoraTokens.hintIcon,
-                size: PandoraTokens.iconS,
-                color: PandoraTokens.warning,
-              ),
-              const SizedBox(width: PandoraTokens.spacingM),
+              icon ??
+                  Icon(
+                    pui.PandoraTokens.hintIcon,
+                    size: pui.PandoraTokens.iconS,
+                    color: tokens.colors.warning,
+                  ),
+              SizedBox(width: tokens.spacing.m),
               Text(label, style: baseStyle.copyWith(color: styleData.text)),
             ],
           ),
