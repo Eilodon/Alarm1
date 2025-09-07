@@ -56,4 +56,94 @@ void main() {
     expect(find.text('n1'), findsOneWidget);
     expect(find.text('n2'), findsNothing);
   });
+
+  testWidgets('uses theme colors for day indicators in light theme',
+      (tester) async {
+    final provider = NoteProvider();
+    final now = DateTime.now();
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: provider,
+        child: MaterialApp(
+          locale: const Locale('vi'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          theme: ThemeData.light(),
+          home: const Scaffold(body: TagFilteredNotesList()),
+        ),
+      ),
+    );
+
+    await provider.addNote(
+      Note(
+        id: '1',
+        title: 'n1',
+        content: 'c1',
+        summary: '',
+        actionItems: const [],
+        dates: const [],
+        alarmTime: now,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final ctx = tester.element(find.byType(TagFilteredNotesList));
+    final colorScheme = Theme.of(ctx).colorScheme;
+    final containers = tester
+        .widgetList<Container>(find.byType(Container))
+        .where((c) => c.width == 60 && c.decoration is BoxDecoration)
+        .toList();
+
+    final todayBox = containers.first.decoration as BoxDecoration;
+    final nextDayBox = containers[1].decoration as BoxDecoration;
+
+    expect(todayBox.color, colorScheme.secondary);
+    expect((todayBox.border as Border).top.color, colorScheme.onSurface);
+    expect(nextDayBox.color, colorScheme.surface);
+  });
+
+  testWidgets('uses theme colors for day indicators in dark theme',
+      (tester) async {
+    final provider = NoteProvider();
+    final now = DateTime.now();
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: provider,
+        child: MaterialApp(
+          locale: const Locale('vi'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          theme: ThemeData.dark(),
+          home: const Scaffold(body: TagFilteredNotesList()),
+        ),
+      ),
+    );
+
+    await provider.addNote(
+      Note(
+        id: '1',
+        title: 'n1',
+        content: 'c1',
+        summary: '',
+        actionItems: const [],
+        dates: const [],
+        alarmTime: now,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final ctx = tester.element(find.byType(TagFilteredNotesList));
+    final colorScheme = Theme.of(ctx).colorScheme;
+    final containers = tester
+        .widgetList<Container>(find.byType(Container))
+        .where((c) => c.width == 60 && c.decoration is BoxDecoration)
+        .toList();
+
+    final todayBox = containers.first.decoration as BoxDecoration;
+    final nextDayBox = containers[1].decoration as BoxDecoration;
+
+    expect(todayBox.color, colorScheme.secondary);
+    expect((todayBox.border as Border).top.color, colorScheme.onSurface);
+    expect(nextDayBox.color, colorScheme.surface);
+  });
 }
