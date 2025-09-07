@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../theme/tokens.dart';
+import 'tokens.dart';
 
 /// Simple list item displaying a color swatch with a label.
 class PaletteListItem extends StatelessWidget {
