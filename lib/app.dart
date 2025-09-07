@@ -56,8 +56,8 @@ class _MyAppState extends State<MyApp> {
           ),
         );
       }
+      widget.connectivityService.initialize(l10n, messengerKey);
     });
-    widget.connectivityService.initialize(AppLocalizations.of(context)!, messengerKey);
   }
 
   void updateTheme(Color newColor) async {
