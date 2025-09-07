@@ -17,7 +17,8 @@ class DismissibleWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tokens = Theme.of(context).extension<Tokens>()!;
+    final theme = Theme.of(context);
+    final tokens = theme.extension<Tokens>()!;
     return Dismissible(
       key: dismissibleKey ?? ValueKey(child.hashCode),
       direction: DismissDirection.endToStart,
@@ -25,9 +26,11 @@ class DismissibleWrapper extends StatelessWidget {
       background: Container(
         color: tokens.colors.error,
         alignment: Alignment.centerRight,
-        padding:
-            EdgeInsets.symmetric(horizontal: tokens.spacing.m),
-        child: const Icon(Icons.delete, color: Colors.white),
+        padding: EdgeInsets.symmetric(horizontal: tokens.spacing.m),
+        child: Icon(
+          Icons.delete,
+          color: theme.colorScheme.onError,
+        ),
       ),
       child: child,
     );
