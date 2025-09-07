@@ -128,6 +128,11 @@ class _NotesListState extends State<NotesList> {
     final subtitle = note.alarmTime != null
         ? '${note.content}\n⏰ ${DateFormat.yMd(locale).add_Hm().format(note.alarmTime!)}'
         : note.content;
+    final noteColor = Color(note.color);
+    final lockIconColor =
+        ThemeData.estimateBrightnessForColor(noteColor) == Brightness.dark
+            ? Theme.of(context).colorScheme.onPrimary
+            : Theme.of(context).colorScheme.onSurface;
 
     return NoteCard(
       endActionPane: ActionPane(
@@ -154,10 +159,14 @@ class _NotesListState extends State<NotesList> {
           height: 24,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Color(note.color),
+            color: noteColor,
           ),
           child: note.locked
-              ? const Icon(Icons.lock, size: 16, color: Colors.white)
+              ? Icon(
+                  Icons.lock,
+                  size: 16,
+                  color: lockIconColor,
+                )
               : null,
         ),
         title: Text(note.title),
