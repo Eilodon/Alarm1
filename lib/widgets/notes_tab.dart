@@ -65,7 +65,10 @@ class _NotesTabState extends State<NotesTab> {
   Widget build(BuildContext context) {
     final provider = context.watch<NoteProvider>();
 
-    return Scaffold(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final gridCount = constraints.maxWidth >= 600 ? 2 : 1;
+        return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.appTitle),
         actions: [
@@ -208,7 +211,7 @@ class _NotesTabState extends State<NotesTab> {
             ),
           ),
           const SizedBox(height: 8),
-          const Expanded(child: TagFilteredNotesList()),
+          Expanded(child: TagFilteredNotesList(gridCount: gridCount)),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -216,6 +219,8 @@ class _NotesTabState extends State<NotesTab> {
         tooltip: AppLocalizations.of(context)!.addNoteTooltip,
         child: const Icon(Icons.add),
       ),
+    );
+      },
     );
   }
 }

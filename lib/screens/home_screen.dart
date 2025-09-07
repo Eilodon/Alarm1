@@ -53,6 +53,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
+
+        // Wide layouts use a navigation rail with the content in a row.
+
         if (constraints.maxWidth >= 600) {
           return Scaffold(
             body: Row(
@@ -61,7 +64,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   selectedIndex: _currentIndex,
                   onDestinationSelected: (index) =>
                       setState(() => _currentIndex = index),
-                  labelType: NavigationRailLabelType.selected,
+
+                  labelType: NavigationRailLabelType.all,
+
                   destinations: [
                     NavigationRailDestination(
                       icon: const Icon(Icons.note),
@@ -84,6 +89,22 @@ class _HomeScreenState extends State<HomeScreen> {
                       label: Text(l10n.settings),
                     ),
                   ],
+
+                  trailing: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.palette),
+                        onPressed: _showPalette,
+                        tooltip: l10n.palette,
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.school),
+                        onPressed: _openTeachAi,
+                        tooltip: l10n.teachAi,
+                      ),
+                    ],
+                  ),
                 ),
                 Expanded(
                   child: IndexedStack(
@@ -96,31 +117,62 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         }
 
+        // Mobile layout with toolbar buttons at the bottom.
         return Scaffold(
-          body: IndexedStack(index: _currentIndex, children: _screens),
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: _currentIndex,
-            onTap: (index) => setState(() => _currentIndex = index),
-            items: [
-              BottomNavigationBarItem(
-                icon: const Icon(Icons.note),
-                label: l10n.notes,
-              ),
-              BottomNavigationBarItem(
-                icon: const Icon(Icons.alarm),
-                label: l10n.reminders,
-              ),
-              BottomNavigationBarItem(
-                icon: const Icon(Icons.mic),
-                label: l10n.voiceToNote,
-              ),
-              BottomNavigationBarItem(
-                icon: const Icon(Icons.smart_toy),
-                label: l10n.chatAI,
-              ),
-              BottomNavigationBarItem(
-                icon: const Icon(Icons.settings),
-                label: l10n.settings,
+          body: Stack(
+            children: [
+              IndexedStack(index: _currentIndex, children: _screens),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: SafeArea(
+                  child: Padding(
+                    padding: EdgeInsets.all(tokens.spacing.s),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ToolbarButton(
+                            icon: const Icon(Icons.note),
+                            label: l10n.notes,
+                            onPressed: () => setState(() => _currentIndex = 0),
+                          ),
+                          ToolbarButton(
+                            icon: const Icon(Icons.alarm),
+                            label: l10n.reminders,
+                            onPressed: () => setState(() => _currentIndex = 1),
+                          ),
+                          ToolbarButton(
+                            icon: const Icon(Icons.mic),
+                            label: l10n.voiceToNote,
+                            onPressed: () => setState(() => _currentIndex = 2),
+                          ),
+                          ToolbarButton(
+                            icon: const Icon(Icons.smart_toy),
+                            label: l10n.chatAI,
+                            onPressed: () => setState(() => _currentIndex = 3),
+                          ),
+                          ToolbarButton(
+                            icon: const Icon(Icons.settings),
+                            label: l10n.settings,
+                            onPressed: () => setState(() => _currentIndex = 4),
+                          ),
+                          ToolbarButton(
+                            icon: const Icon(Icons.palette),
+                            label: l10n.palette,
+                            onPressed: _showPalette,
+                          ),
+                          ToolbarButton(
+                            icon: const Icon(Icons.school),
+                            label: l10n.teachAi,
+                            onPressed: _openTeachAi,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
               ),
             ],
           ),

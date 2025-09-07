@@ -15,7 +15,12 @@ import '../screens/note_detail_screen.dart';
 import '../services/auth_service.dart';
 
 class NotesList extends StatefulWidget {
-  const NotesList({super.key, required this.notes});
+
+  final List<Note> notes;
+  final int gridCount;
+
+  const NotesList({super.key, required this.notes, this.gridCount = 1});
+
 
   final List<Note> notes;
 
@@ -202,21 +207,134 @@ class _NotesListState extends State<NotesList> {
 
     final provider = context.watch<NoteProvider>();
     final itemCount = notes.length + (_isLoadingMore ? 1 : 0);
+
+
+    Widget buildItem(BuildContext context, int index) {
+      if (index >= notes.length) {
+        return const Padding(
+          padding: EdgeInsets.symmetric(vertical: 16),
+          child: Center(child: CircularProgressIndicator()),
+        );
+      }
+      final note = notes[index];
+      return ResultCard(
+        child: ListTile(
+          leading: Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Color(note.color),
+            ),
+            child: note.locked
+                ? const Icon(Icons.lock, size: 16, color: Colors.white)
+                : null,
+          ),
+          title: Text(note.title),
+          subtitle: Text(
+            note.alarmTime != null
+                ? '${note.content}\n⏰ ${DateFormat.yMd(Localizations.localeOf(context).toString()).add_Hm().format(note.alarmTime!)}'
+                : note.content,
+          ),
+          onTap: () async {
+            if (note.locked) {
+              final ok = await AuthService().authenticate(
+                AppLocalizations.of(context)!,
+              );
+              if (!ok) return;
+            }
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (_, __, ___) => NoteDetailScreen(note: note),
+                transitionsBuilder: (_, animation, __, child) {
+                  final offsetAnimation = Tween<Offset>(
+                    begin: const Offset(1, 0),
+                    end: Offset.zero,
+                  ).animate(animation);
+                  return FadeTransition(
+                    opacity: animation,
+                    child: SlideTransition(
+                      position: offsetAnimation,
+                      child: child,
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (note.pinned) const Icon(Icons.push_pin, size: 20),
+              if (!provider.isSynced(note.id))
+                const Icon(Icons.sync_problem, color: Colors.orange),
+              ToolbarButton(
+                icon: const Icon(Icons.delete),
+                label: AppLocalizations.of(context)!.delete,
+                onPressed: () {
+                  final idx = provider.notes.indexWhere((n) => n.id == note.id);
+                  if (idx != -1) {
+                    provider.removeNoteAt(idx);
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+        endActionPane: ActionPane(
+          motion: const DrawerMotion(),
+          children: [
+            SlidableAction(
+              onPressed: (_) {
+                Share.share('${note.title}\n${note.content}');
+              },
+              icon: Icons.share,
+              label: AppLocalizations.of(context)!.share,
+            ),
+            SlidableAction(
+              backgroundColor: Colors.red,
+              onPressed: (_) {
+                final idx = provider.notes.indexWhere((n) => n.id == note.id);
+                if (idx != -1) {
+                  provider.removeNoteAt(idx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content:
+                          Text(AppLocalizations.of(context)!.noteDeleted),
+                      action: SnackBarAction(
+                        label: AppLocalizations.of(context)!.undo,
+                        onPressed: () => provider.addNote(note),
+                      ),
+                    ),
+                  );
+                }
+              },
+              icon: Icons.delete,
+              label: AppLocalizations.of(context)!.delete,
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (widget.gridCount > 1) {
+      return GridView.builder(
+        controller: _scrollController,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: widget.gridCount,
+          childAspectRatio: 3,
+        ),
+        itemCount: itemCount,
+        itemBuilder: buildItem,
+      );
+    }
+
     return ListView.builder(
       controller: _scrollController,
       itemCount: itemCount,
-      itemBuilder: (context, index) {
-        if (index >= notes.length) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
-            child: Center(child: CircularProgressIndicator()),
-          );
-        }
-        final note = notes[index];
+      itemBuilder: buildItem,
 
-        return _buildNoteTile(context, note, provider);
-
-      },
     );
   }
 }
