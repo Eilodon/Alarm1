@@ -53,9 +53,7 @@ class _NotesTabState extends State<NotesTab> {
     });
   }
 
-  Future<String> _loadMascot() async {
-    return SettingsService().loadMascotPath();
-  }
+  Future<String> _loadMascot() => SettingsService().loadMascotPath();
 
   void _addNote() {
     showDialog(context: context, builder: (_) => const AddNoteDialog());
