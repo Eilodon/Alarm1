@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../theme/tokens.dart';
+import 'package:notes_reminder_app/theme/tokens.dart';
 
 /// A draggable bottom sheet that traps focus when opened.
 class PandoraBottomSheet extends StatefulWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notes_reminder_app/generated/app_localizations.dart';
-import '../features/settings/data/settings_service.dart';
+import 'package:notes_reminder_app/features/settings/data/settings_service.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final VoidCallback onFinished;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notes_reminder_app/generated/app_localizations.dart';
-import '../domain/chat_service.dart';
+import 'package:notes_reminder_app/features/chat/domain/chat_service.dart';
 
 class ChatScreen extends StatefulWidget {
   final String initialMessage;

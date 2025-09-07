@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     as fln;
 
-import '../firebase_options.dart';
+import 'package:notes_reminder_app/firebase_options.dart';
 import 'package:alarm_domain/alarm_domain.dart';
 
 class StartupResult {

@@ -58,6 +58,5 @@ fix_agp.sh
 # Ignore old sample project
 notes_reminder_app/
 
-# Local environment and Firebase config
+# Local environment
 .env
-lib/firebase_options.dart

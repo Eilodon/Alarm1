@@ -7,7 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:http/http.dart' as http;
 
-import 'tts_platform_stub.dart' if (dart.library.io) 'dart:io';
+import 'package:notes_reminder_app/services/tts_platform_stub.dart'
+    if (dart.library.io) 'dart:io';
 
 class TTSService {
   final FlutterTts _tts;
