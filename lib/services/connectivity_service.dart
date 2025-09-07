@@ -32,8 +32,8 @@ class ConnectivityService {
         }
         _lastResult = result;
       });
-    } on MissingPluginException {
-      // Ignore if connectivity plugin is not available (e.g., tests)
+    } on MissingPluginException catch (e, st) {
+      debugPrint('Connectivity plugin missing: $e\n$st');
     }
   }
 
