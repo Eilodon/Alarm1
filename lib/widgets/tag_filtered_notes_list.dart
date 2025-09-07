@@ -62,6 +62,7 @@ class _TagFilteredNotesListState extends State<TagFilteredNotesList> {
             itemBuilder: (context, i) {
               final d = weekDays[i];
               final hasNotes = _notesForDay(d, filteredNotes).isNotEmpty;
+              final theme = Theme.of(context);
               return GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -75,8 +76,10 @@ class _TagFilteredNotesListState extends State<TagFilteredNotesList> {
                   width: 60,
                   margin: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: hasNotes ? Colors.orange : Colors.white,
-                    border: Border.all(color: Colors.black),
+                    color: hasNotes
+                        ? theme.colorScheme.secondary
+                        : theme.colorScheme.surface,
+                    border: Border.all(color: theme.colorScheme.onSurface),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(
