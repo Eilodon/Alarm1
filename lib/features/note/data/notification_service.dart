@@ -1,5 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart' as fln;
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:notes_reminder_app/generated/app_localizations.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;

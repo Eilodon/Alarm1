@@ -35,4 +35,5 @@ jobs:
             ${{ runner.os }}-android-
       - run: flutter clean
       - run: flutter pub get
+      - run: flutter gen-l10n
       - run: flutter build apk --debug

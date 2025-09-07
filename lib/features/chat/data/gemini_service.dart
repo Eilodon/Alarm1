@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:notes_reminder_app/generated/app_localizations.dart';
 
 import '../domain/chat_service.dart';
 import '../domain/note_analysis.dart';
