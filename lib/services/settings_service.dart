@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/tokens.dart';
-import 'backup_service.dart';
+import 'package:alarm_data/alarm_data.dart';
 
 class SettingsService {
   SettingsService({SharedPreferences? sharedPreferences})
@@ -15,7 +15,6 @@ class SettingsService {
   static const _kThemeMode = 'theme_mode';
 
   static const _kHasSeenOnboarding = 'has_seen_onboarding';
-
 
   SharedPreferences? _preferences;
 
@@ -65,7 +64,6 @@ class SettingsService {
     return sp.getBool(_kRequireAuth) ?? false;
   }
 
-
   Future<void> saveBackupFormat(BackupFormat format) async {
     final sp = await _sp;
     await sp.setString(_kBackupFormat, format.name);
@@ -78,7 +76,6 @@ class SettingsService {
       (f) => f.name == value,
       orElse: () => BackupFormat.json,
     );
-
   }
 
   Future<void> saveThemeMode(ThemeMode mode) async {

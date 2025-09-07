@@ -57,6 +57,8 @@ dependencies:
 
   alarm_domain:
     path: alarm_domain
+  alarm_data:
+    path: alarm_data
 
 
 dev_dependencies:

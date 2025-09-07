@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:alarm_domain/alarm_domain.dart';
-import 'note_repository_impl.dart';
+import 'package:alarm_data/alarm_data.dart';
 
 enum SyncStatus { idle, syncing, error }
 
@@ -193,4 +193,3 @@ class NoteSyncService {
     return success;
   }
 }
-

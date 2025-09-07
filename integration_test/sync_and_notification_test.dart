@@ -10,14 +10,16 @@ import 'package:mocktail/mocktail.dart';
 import 'package:alarm_domain/alarm_domain.dart';
 import 'package:notes_reminder_app/providers/note_provider.dart';
 import 'package:notes_reminder_app/services/calendar_service.dart';
-import 'package:notes_reminder_app/services/note_repository_impl.dart';
+import 'package:alarm_data/alarm_data.dart';
 import 'package:notes_reminder_app/services/notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 
 class MockRepo extends Mock implements NoteRepository {}
+
 class MockCalendar extends Mock implements CalendarService {}
+
 class MockNotification extends Mock implements NotificationService {}
 
 class FakeConnectivityPlatform extends Fake implements ConnectivityPlatform {
@@ -30,7 +32,8 @@ class FakeConnectivityPlatform extends Fake implements ConnectivityPlatform {
 void setupFirebase() {
   const MethodChannel core = MethodChannel('plugins.flutter.io/firebase_core');
   const MethodChannel auth = MethodChannel('plugins.flutter.io/firebase_auth');
-  const MethodChannel firestore = MethodChannel('plugins.flutter.io/firebase_firestore');
+  const MethodChannel firestore =
+      MethodChannel('plugins.flutter.io/firebase_firestore');
 
   TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
       .setMockMethodCallHandler(core, (call) async {
@@ -157,4 +160,3 @@ void main() {
     expect(calls.any((c) => c.method == 'cancel'), isTrue);
   });
 }
-

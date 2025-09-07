@@ -1,8 +1,8 @@
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:alarm_domain/alarm_domain.dart';
-import 'db_service.dart';
-import 'backup_service.dart';
+import '../datasources/db_service.dart';
+import '../datasources/backup_service.dart';
 
 class NoteRepositoryImpl implements NoteRepository {
   final DbService _dbService;
