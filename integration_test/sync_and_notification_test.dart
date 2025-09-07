@@ -115,7 +115,10 @@ void main() {
     });
 
     final provider = NoteProvider(
-      repository: repo,
+      getNotes: GetNotes(repo),
+      saveNotes: SaveNotes(repo),
+      updateNote: UpdateNote(repo),
+      autoBackup: AutoBackup(repo),
       calendarService: calendar,
       notificationService: notification,
       homeWidgetService: DummyHomeWidget(),

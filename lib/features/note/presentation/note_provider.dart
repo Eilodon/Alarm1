@@ -25,7 +25,10 @@ int _noteComparator(Note a, Note b) {
 }
 
 class NoteProvider extends ChangeNotifier {
-  final NoteRepository _repository;
+  final GetNotes _getNotes;
+  final SaveNotes _saveNotes;
+  final UpdateNote _updateNote;
+  final AutoBackup _autoBackup;
 
   final CalendarService _calendarService;
   final NotificationService _notificationService;
@@ -39,13 +42,19 @@ class NoteProvider extends ChangeNotifier {
   Set<String> get unsyncedNoteIds => _syncService.unsyncedNoteIds;
   bool isSynced(String id) => _syncService.isSynced(id);
 
-  NoteProvider({
-    required NoteRepository repository,
+  NoteProvider._({
+    required GetNotes getNotes,
+    required SaveNotes saveNotes,
+    required UpdateNote updateNote,
+    required AutoBackup autoBackup,
     required CalendarService calendarService,
     required NotificationService notificationService,
     required HomeWidgetService homeWidgetService,
     required NoteSyncService syncService,
-  })  : _repository = repository,
+  })  : _getNotes = getNotes,
+        _saveNotes = saveNotes,
+        _updateNote = updateNote,
+        _autoBackup = autoBackup,
         _calendarService = calendarService,
         _notificationService = notificationService,
         _homeWidgetService = homeWidgetService,
@@ -54,6 +63,48 @@ class NoteProvider extends ChangeNotifier {
       _init().catchError((e) {
         /* log or set error state */
       }),
+    );
+  }
+
+  factory NoteProvider({
+    GetNotes? getNotes,
+    SaveNotes? saveNotes,
+    UpdateNote? updateNote,
+    AutoBackup? autoBackup,
+    CalendarService? calendarService,
+    NotificationService? notificationService,
+    HomeWidgetService? homeWidgetService,
+    NoteSyncService? syncService,
+  }) {
+    if (getNotes != null &&
+        saveNotes != null &&
+        updateNote != null &&
+        autoBackup != null &&
+        calendarService != null &&
+        notificationService != null &&
+        homeWidgetService != null &&
+        syncService != null) {
+      return NoteProvider._(
+        getNotes: getNotes,
+        saveNotes: saveNotes,
+        updateNote: updateNote,
+        autoBackup: autoBackup,
+        calendarService: calendarService,
+        notificationService: notificationService,
+        homeWidgetService: homeWidgetService,
+        syncService: syncService,
+      );
+    }
+    final repo = NoteRepositoryImpl();
+    return NoteProvider._(
+      getNotes: getNotes ?? GetNotes(repo),
+      saveNotes: saveNotes ?? SaveNotes(repo),
+      updateNote: updateNote ?? UpdateNote(repo),
+      autoBackup: autoBackup ?? AutoBackup(repo),
+      calendarService: calendarService ?? CalendarServiceImpl.instance,
+      notificationService: notificationService ?? NotificationServiceImpl(),
+      homeWidgetService: homeWidgetService ?? const HomeWidgetServiceImpl(),
+      syncService: syncService ?? NoteSyncServiceImpl(repository: repo),
     );
   }
 
@@ -75,14 +126,14 @@ class NoteProvider extends ChangeNotifier {
   @override
   void dispose() {
     _syncService.dispose();
-    unawaited(_repository.autoBackup());
+    unawaited(_autoBackup());
     super.dispose();
   }
 
   Future<bool> loadNotes() async {
     _syncService.syncStatus.value = SyncStatus.syncing;
     _notes..clear();
-    _notes.addAll(await _repository.getNotes());
+    _notes.addAll(await _getNotes());
     final success = await _syncService.loadFromRemote(_notes);
     await _homeWidgetService.update(_notes.toList());
     notifyListeners();
@@ -93,12 +144,12 @@ class NoteProvider extends ChangeNotifier {
   }
 
   Future<bool> backupNow() {
-    return _repository.autoBackup();
+    return _autoBackup();
   }
 
   Future<List<Note>> fetchNotesPage(DateTime? startAfter, int limit) async {
     if (_notes.isEmpty && startAfter == null) {
-      _notes.addAll(await _repository.getNotes());
+      _notes.addAll(await _getNotes());
     }
 
     final result = <Note>[];
@@ -195,7 +246,7 @@ class NoteProvider extends ChangeNotifier {
 
   Future<void> addNote(Note note) async {
     _notes.add(note);
-    await _repository.saveNotes(_notes.toList());
+    await _saveNotes(_notes.toList());
     notifyListeners();
     await _syncService.syncNote(note);
   }
@@ -281,7 +332,7 @@ class NoteProvider extends ChangeNotifier {
 
       _notes.remove(old);
       _notes.add(updated);
-      await _repository.saveNotes(_notes.toList());
+      await _updateNote(updated);
       await _homeWidgetService.update(_notes.toList());
       notifyListeners();
       await _syncService.syncNote(updated);
@@ -318,7 +369,7 @@ class NoteProvider extends ChangeNotifier {
     if (note.eventId != null) {
       await _calendarService.deleteEvent(note.eventId!);
     }
-    await _repository.saveNotes(_notes.toList());
+    await _saveNotes(_notes.toList());
     await _homeWidgetService.update(_notes.toList());
     notifyListeners();
     await _syncService.deleteNote(note.id);
