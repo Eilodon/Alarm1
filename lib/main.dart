@@ -29,7 +29,9 @@ Future<void> _onNotificationResponse(
   }
   if (note == null) return;
   final locale = WidgetsBinding.instance.platformDispatcher.locale;
-  final l10n = await AppLocalizations.delegate.load(locale);
+  final supported = AppLocalizations.delegate.isSupported(locale);
+  final effectiveLocale = supported ? locale : const Locale('en');
+  final l10n = await AppLocalizations.delegate.load(effectiveLocale);
   if (response.actionId == 'done') {
     await noteProvider.updateNote(
       note.copyWith(alarmTime: null, notificationId: null, active: false),
