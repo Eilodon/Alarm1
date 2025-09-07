@@ -6,19 +6,25 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../models/note.dart';
-import '../pandora_ui/toolbar_button.dart';
+
 import '../providers/note_provider.dart';
 import '../screens/note_detail_screen.dart';
 import '../services/auth_service.dart';
-
+import '../pandora_ui/toolbar_button.dart';
 import 'note_card.dart';
 
+
+/// Displays a scrollable list of notes. When [gridCount] is greater than 1 a
+/// grid layout is used instead of a traditional list.
 class NotesList extends StatefulWidget {
   const NotesList({super.key, required this.notes, this.gridCount = 1});
 
+  /// Notes to display.
   final List<Note> notes;
-  final int gridCount;
 
+
+  /// Number of columns to show. A value greater than 1 enables a grid layout.
+  final int gridCount;
 
   @override
   State<NotesList> createState() => _NotesListState();
@@ -67,8 +73,11 @@ class _NotesListState extends State<NotesList> {
 
   Future<void> _loadMore() async {
     setState(() => _isLoadingMore = true);
-    final notes =
-        await context.read<NoteProvider>().fetchNotesPage(_lastFetched, _pageSize);
+
+    final notes = await context
+        .read<NoteProvider>()
+        .fetchNotesPage(_lastFetched, _pageSize);
+
     if (!mounted) return;
     setState(() {
       _isLoadingMore = false;
@@ -149,24 +158,75 @@ class _NotesListState extends State<NotesList> {
           }
           Navigator.push(
             context,
-            PageRouteBuilder(
-              pageBuilder: (_, __, ___) => NoteDetailScreen(note: note),
-              transitionsBuilder: (_, animation, __, child) {
-                final offsetAnimation = Tween<Offset>(
-                  begin: const Offset(1, 0),
-                  end: Offset.zero,
-                ).animate(animation);
-                return FadeTransition(
-                  opacity: animation,
-                  child: SlideTransition(
-                    position: offsetAnimation,
-                    child: child,
-                  ),
-                );
-              },
+
+            MaterialPageRoute(
+              builder: (_) => NoteDetailScreen(note: note),
             ),
           );
         },
+        onLongPress: () {
+          showModalBottomSheet(
+            context: context,
+            builder: (ctx) => SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.check),
+                    title: Text(l10n.markDone),
+                    onTap: () async {
+                      Navigator.pop(ctx);
+                      await provider.updateNote(
+                        note.copyWith(done: true, active: false),
+                        l10n,
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.alarm),
+                    title: Text(l10n.setReminder),
+                    onTap: () async {
+                      Navigator.pop(ctx);
+                      final date = await showDatePicker(
+                        context: context,
+                        firstDate: DateTime.now(),
+                        lastDate:
+                            DateTime.now().add(const Duration(days: 365)),
+                        initialDate: DateTime.now(),
+                      );
+                      if (date == null) return;
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      );
+                      if (time == null) return;
+                      final alarmTime = DateTime(
+                        date.year,
+                        date.month,
+                        date.day,
+                        time.hour,
+                        time.minute,
+                      );
+                      await provider.updateNote(
+                        note.copyWith(alarmTime: alarmTime),
+                        l10n,
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.share),
+                    title: Text(l10n.share),
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      Share.share('${note.title}\n${note.content}');
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -177,7 +237,10 @@ class _NotesListState extends State<NotesList> {
               icon: const Icon(Icons.delete),
               label: l10n.delete,
               onPressed: () {
-                final idx = provider.notes.indexWhere((n) => n.id == note.id);
+
+                final idx =
+                    provider.notes.indexWhere((n) => n.id == note.id);
+
                 if (idx != -1) {
                   provider.removeNoteAt(idx);
                 }
@@ -200,19 +263,35 @@ class _NotesListState extends State<NotesList> {
     final provider = context.watch<NoteProvider>();
     final itemCount = notes.length + (_isLoadingMore ? 1 : 0);
 
+    Widget builder(BuildContext context, int index) {
+      if (index >= notes.length) {
+        return const Padding(
+          padding: EdgeInsets.symmetric(vertical: 16),
+          child: Center(child: CircularProgressIndicator()),
+        );
+      }
+      final note = notes[index];
+      return _buildNoteTile(context, note, provider);
+    }
+
+    if (widget.gridCount > 1) {
+      return GridView.builder(
+        controller: _scrollController,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: widget.gridCount,
+          childAspectRatio: 3,
+        ),
+        itemCount: itemCount,
+        itemBuilder: builder,
+      );
+    }
+
     return ListView.builder(
       controller: _scrollController,
       itemCount: itemCount,
-      itemBuilder: (context, index) {
-        if (index >= notes.length) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
-            child: Center(child: CircularProgressIndicator()),
-          );
-        }
-        final note = notes[index];
-        return _buildNoteTile(context, note, provider);
-      },
+
+      itemBuilder: builder,
+
     );
   }
 }
