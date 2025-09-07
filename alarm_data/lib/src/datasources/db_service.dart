@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:cryptography/cryptography.dart';
@@ -51,7 +52,7 @@ class DbService {
     final algorithm = AesGcm.with256bits();
     final secretKey = SecretKey(keyBytes);
     final legacyEncrypter = encrypt.Encrypter(
-      encrypt.AES(encrypt.Key(keyBytes)),
+      encrypt.AES(encrypt.Key(Uint8List.fromList(keyBytes))),
     );
     final list = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
     final notes = <Note>[];
@@ -71,9 +72,10 @@ class DbService {
           final decrypted = await algorithm.decrypt(box, secretKey: secretKey);
           m['content'] = utf8.decode(decrypted);
         } else {
-          final iv = ivString != null
-              ? encrypt.IV.fromBase64(ivString)
-              : encrypt.IV.fromLength(16);
+          final iv =
+              ivString != null
+                  ? encrypt.IV.fromBase64(ivString)
+                  : encrypt.IV.fromLength(16);
           final decrypted = legacyEncrypter.decrypt64(content, iv: iv);
           m['content'] = decrypted;
         }
@@ -115,9 +117,10 @@ class DbService {
     Note note, {
     String? password,
   }) async {
-    final keyBytes = password != null
-        ? await _deriveKeyFromPassword(password)
-        : await _getKey();
+    final keyBytes =
+        password != null
+            ? await _deriveKeyFromPassword(password)
+            : await _getKey();
     final algorithm = AesGcm.with256bits();
     final secretKey = SecretKey(keyBytes);
     final m = note.toJson();
@@ -137,13 +140,14 @@ class DbService {
     Map<String, dynamic> data, {
     String? password,
   }) async {
-    final keyBytes = password != null
-        ? await _deriveKeyFromPassword(password)
-        : await _getKey();
+    final keyBytes =
+        password != null
+            ? await _deriveKeyFromPassword(password)
+            : await _getKey();
     final algorithm = AesGcm.with256bits();
     final secretKey = SecretKey(keyBytes);
     final legacyEncrypter = encrypt.Encrypter(
-      encrypt.AES(encrypt.Key(keyBytes)),
+      encrypt.AES(encrypt.Key(Uint8List.fromList(keyBytes))),
     );
     final ivString = data['iv'];
     final tagString = data['tag'];
@@ -157,9 +161,10 @@ class DbService {
       final decrypted = await algorithm.decrypt(box, secretKey: secretKey);
       data['content'] = utf8.decode(decrypted);
     } else {
-      final iv = ivString != null
-          ? encrypt.IV.fromBase64(ivString)
-          : encrypt.IV.fromLength(16);
+      final iv =
+          ivString != null
+              ? encrypt.IV.fromBase64(ivString)
+              : encrypt.IV.fromLength(16);
       final decrypted = legacyEncrypter.decrypt64(content, iv: iv);
       data['content'] = decrypted;
     }
