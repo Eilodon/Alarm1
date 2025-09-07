@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:notes_reminder_app/pandora_ui/pandora_snackbar.dart';
-import 'package:notes_reminder_app/pandora_ui/tokens.dart';
+import 'package:notes_reminder_app/theme/tokens.dart';
 
 void main() {
   testWidgets('snackIn and snackOut animations run', (tester) async {
-    await tester.pumpWidget(const MaterialApp(
-      home: Scaffold(
+    const durationShort = Duration(milliseconds: 150);
+    await tester.pumpWidget(MaterialApp(
+      theme: ThemeData(extensions: const [Tokens.light]),
+      home: const Scaffold(
         body: PandoraSnackbar(
           text: 'Hello',
           kind: SnackbarKind.success,
@@ -16,7 +18,7 @@ void main() {
     ));
 
     await tester.pump();
-    await tester.pump(PandoraTokens.durationShort);
+    await tester.pump(durationShort);
 
     final fade = tester.widget<FadeTransition>(find.byType(FadeTransition));
     expect(fade.opacity.value, 1);
@@ -24,7 +26,7 @@ void main() {
     final state = tester.state(find.byType(PandoraSnackbar)) as dynamic;
     state.hide();
     await tester.pump();
-    await tester.pump(PandoraTokens.durationShort);
+    await tester.pump(durationShort);
 
     final fadeAfter =
         tester.widget<FadeTransition>(find.byType(FadeTransition));
