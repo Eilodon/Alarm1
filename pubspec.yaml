@@ -71,6 +71,8 @@ dev_dependencies:
     sdk: flutter
   build_runner: ^2.8.0
   json_serializable: ^6.11.1
+  connectivity_plus_platform_interface: ^2.0.1
+  google_sign_in_platform_interface: ^3.0.0
 flutter:
   generate: true
   uses-material-design: true
