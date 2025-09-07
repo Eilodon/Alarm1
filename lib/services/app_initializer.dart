@@ -36,7 +36,9 @@ class AppInitializer {
     final requireAuth = await settings.loadRequireAuth();
     if (requireAuth) {
       final locale = WidgetsBinding.instance.platformDispatcher.locale;
-      final l10n = await AppLocalizations.delegate.load(locale);
+      final supported = AppLocalizations.delegate.isSupported(locale);
+      final effectiveLocale = supported ? locale : const Locale('en');
+      final l10n = await AppLocalizations.delegate.load(effectiveLocale);
       final ok = await AuthService().authenticate(l10n);
       if (!ok) {
         final themeColor = await settings.loadThemeColor();
