@@ -50,7 +50,13 @@ void main() {
         ),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return const SizedBox.shrink();
+            return const MaterialApp(
+              home: Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            );
           }
           final data = snapshot.data!;
           return MyApp(
