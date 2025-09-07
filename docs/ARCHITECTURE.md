@@ -23,3 +23,15 @@ Các thành phần giao diện người dùng: danh sách ghi chú, màn hình c
 4. Sau khi lưu thành công, provider gọi `NotificationService` để lên lịch nhắc nhở.
 5. Người dùng nhận thông báo khi đến thời điểm đã đặt.
 
+<a id="authservice-flow"></a>
+## Luồng AuthService
+1. Ứng dụng khởi động.
+2. `AuthService` kiểm tra trạng thái đăng nhập hiện tại.
+3. Điều hướng đến màn hình phù hợp dựa trên trạng thái đó.
+
+<a id="connectivityservice-strategy"></a>
+## Chiến lược ConnectivityService
+- Theo dõi trạng thái kết nối mạng.
+- Khi mất kết nối, đánh dấu dữ liệu cần đồng bộ và thông báo người dùng.
+- Khi kết nối khôi phục, đồng bộ lại các thay đổi với máy chủ.
+
