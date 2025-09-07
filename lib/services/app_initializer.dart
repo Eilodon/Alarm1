@@ -4,7 +4,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     as fln;
 
 import 'auth_service.dart';
-import 'settings_service.dart';
+import '../features/settings/data/settings_service.dart';
 import 'startup_service.dart';
 
 class AppInitializationData {

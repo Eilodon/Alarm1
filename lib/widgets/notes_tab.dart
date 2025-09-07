@@ -4,8 +4,10 @@ import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
+
 import '../providers/note_provider.dart';
-import '../services/settings_service.dart';
+import '../features/settings/data/settings_service.dart';
+
 import '../screens/note_search_delegate.dart';
 import '../screens/voice_to_note_screen.dart';
 import '../screens/settings_screen.dart';
@@ -68,157 +70,162 @@ class _NotesTabState extends State<NotesTab> {
         // and more as space allows.
         final gridCount = (constraints.maxWidth ~/ 300).clamp(1, 4);
         return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.appTitle),
-        actions: [
-          ValueListenableBuilder<SyncStatus>(
-            valueListenable: provider.syncStatus,
-            builder: (context, status, _) {
-              final l10n = AppLocalizations.of(context)!;
-              String text;
-              switch (status) {
-                case SyncStatus.syncing:
-                  text = l10n.syncStatusSyncing;
-                  break;
-                case SyncStatus.error:
-                  text = l10n.syncStatusError;
-                  break;
-                case SyncStatus.idle:
-                default:
-                  text = l10n.syncStatusIdle;
-              }
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Center(child: Text(text)),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () => showSearch(
-              context: context,
-              delegate: NoteSearchDelegate(context.read<NoteProvider>().notes),
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.mic),
-            tooltip: AppLocalizations.of(context)!.voiceToNote,
-            onPressed: () async {
-              await Navigator.push(
-                context,
-                buildSlideFadeRoute(const VoiceToNoteScreen()),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings),
-            tooltip: AppLocalizations.of(context)!.settings,
-            onPressed: () async {
-              await Navigator.push(
-                context,
-                buildSlideFadeRoute(
-                  SettingsScreen(
-                    onThemeChanged: widget.onThemeChanged,
-                    onFontScaleChanged: widget.onFontScaleChanged,
-                    onThemeModeChanged: widget.onThemeModeChanged,
+          appBar: AppBar(
+            title: Text(AppLocalizations.of(context)!.appTitle),
+            actions: [
+              ValueListenableBuilder<SyncStatus>(
+                valueListenable: provider.syncStatus,
+                builder: (context, status, _) {
+                  final l10n = AppLocalizations.of(context)!;
+                  String text;
+                  switch (status) {
+                    case SyncStatus.syncing:
+                      text = l10n.syncStatusSyncing;
+                      break;
+                    case SyncStatus.error:
+                      text = l10n.syncStatusError;
+                      break;
+                    case SyncStatus.idle:
+                    default:
+                      text = l10n.syncStatusIdle;
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Center(child: Text(text)),
+                  );
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: () => showSearch(
+                  context: context,
+                  delegate: NoteSearchDelegate(
+                    context.read<NoteProvider>().notes,
                   ),
                 ),
-              );
-              if (mounted) {
-                setState(() {
-                  _mascotFuture = _loadMascot();
-                });
-              }
-            },
-          ),
-          PopupMenuButton<String>(
-            onSelected: (value) async {
-              final l10n = AppLocalizations.of(context)!;
-              if (value == 'backup') {
-                final ok = await context.read<NoteProvider>().backupNow();
-                if (!mounted) return;
-                if (ok) {
-                  ScaffoldMessenger.of(
+              ),
+              IconButton(
+                icon: const Icon(Icons.mic),
+                tooltip: AppLocalizations.of(context)!.voiceToNote,
+                onPressed: () async {
+                  await Navigator.push(
                     context,
-                  ).showSnackBar(SnackBar(content: Text(l10n.notesExported)));
-                }
-              } else if (value == 'palette') {
-                await showPaletteBottomSheet(context, commands: [
-                  Command(
-                    title: l10n.voiceToNote,
-                    action: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const VoiceToNoteScreen(),
+                    buildSlideFadeRoute(const VoiceToNoteScreen()),
+                  );
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.settings),
+                tooltip: AppLocalizations.of(context)!.settings,
+                onPressed: () async {
+                  await Navigator.push(
+                    context,
+                    buildSlideFadeRoute(
+                      SettingsScreen(
+                        onThemeChanged: widget.onThemeChanged,
+                        onFontScaleChanged: widget.onFontScaleChanged,
+                        onThemeModeChanged: widget.onThemeModeChanged,
                       ),
                     ),
-                  ),
-                  Command(
-                    title: l10n.settings,
-                    action: () => Navigator.push(
+                  );
+                  if (mounted) {
+                    setState(() {
+                      _mascotFuture = _loadMascot();
+                    });
+                  }
+                },
+              ),
+              PopupMenuButton<String>(
+                onSelected: (value) async {
+                  final l10n = AppLocalizations.of(context)!;
+                  if (value == 'backup') {
+                    final ok = await context.read<NoteProvider>().backupNow();
+                    if (!mounted) return;
+                    if (ok) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(l10n.notesExported)),
+                      );
+                    }
+                  } else if (value == 'palette') {
+                    await showPaletteBottomSheet(
                       context,
-                      MaterialPageRoute(
-                        builder: (_) => SettingsScreen(
-                          onThemeChanged: widget.onThemeChanged,
-                          onFontScaleChanged: widget.onFontScaleChanged,
-                          onThemeModeChanged: widget.onThemeModeChanged,
+                      commands: [
+                        Command(
+                          title: l10n.voiceToNote,
+                          action: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const VoiceToNoteScreen(),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
+                        Command(
+                          title: l10n.settings,
+                          action: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => SettingsScreen(
+                                onThemeChanged: widget.onThemeChanged,
+                                onFontScaleChanged: widget.onFontScaleChanged,
+                                onThemeModeChanged: widget.onThemeModeChanged,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  } else if (value == 'teachAi') {
+                    await TeachAiModal.show(context);
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'backup',
+                    child: Text(AppLocalizations.of(context)!.backupNow),
                   ),
-                ]);
-              } else if (value == 'teachAi') {
-                await TeachAiModal.show(context);
-              }
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'backup',
-                child: Text(AppLocalizations.of(context)!.backupNow),
-              ),
-              PopupMenuItem(
-                value: 'palette',
-                child: Text(AppLocalizations.of(context)!.palette),
-              ),
-              PopupMenuItem(
-                value: 'teachAi',
-                child: Text(AppLocalizations.of(context)!.teachAi),
+                  PopupMenuItem(
+                    value: 'palette',
+                    child: Text(AppLocalizations.of(context)!.palette),
+                  ),
+                  PopupMenuItem(
+                    value: 'teachAi',
+                    child: Text(AppLocalizations.of(context)!.teachAi),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
-      body: Column(
-        children: [
-          const SizedBox(height: 8),
-          SizedBox(
-            width: 140,
-            height: 140,
-            child: FutureBuilder<String>(
-              future: _mascotFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState != ConnectionState.done ||
-                    !snapshot.hasData) {
-                  return const SizedBox.shrink();
-                }
-                final path = snapshot.data!;
-                if (!path.endsWith('.json')) {
-                  return Image.asset(path);
-                }
-                return RepaintBoundary(child: Lottie.asset(path));
-              },
-            ),
+          body: Column(
+            children: [
+              const SizedBox(height: 8),
+              SizedBox(
+                width: 140,
+                height: 140,
+                child: FutureBuilder<String>(
+                  future: _mascotFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState != ConnectionState.done ||
+                        !snapshot.hasData) {
+                      return const SizedBox.shrink();
+                    }
+                    final path = snapshot.data!;
+                    if (!path.endsWith('.json')) {
+                      return Image.asset(path);
+                    }
+                    return RepaintBoundary(child: Lottie.asset(path));
+                  },
+                ),
+              ),
+              const SizedBox(height: 8),
+              Expanded(child: TagFilteredNotesList(gridCount: gridCount)),
+            ],
           ),
-          const SizedBox(height: 8),
-          Expanded(child: TagFilteredNotesList(gridCount: gridCount)),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addNote,
-        tooltip: AppLocalizations.of(context)!.addNoteTooltip,
-        child: const Icon(Icons.add),
-      ),
-    );
+          floatingActionButton: FloatingActionButton(
+            onPressed: _addNote,
+            tooltip: AppLocalizations.of(context)!.addNoteTooltip,
+            child: const Icon(Icons.add),
+          ),
+        );
       },
     );
   }
