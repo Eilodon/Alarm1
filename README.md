@@ -2,6 +2,8 @@
 
 A Flutter application to manage notes, schedule reminders, transcribe speech, play text aloud, and chat with Gemini AI.
 
+For an overview of how the app is structured, see the [architecture documentation](docs/ARCHITECTURE.md).
+
 ## Features
 
 * Create, edit, and organize notes backed by Firebase.
