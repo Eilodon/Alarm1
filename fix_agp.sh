@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
-REQUIRED_AGP="8.1.1"
-REQUIRED_GRADLE="8.1"
-REQUIRED_KOTLIN="1.9.23"
+REQUIRED_AGP="8.6.0"
+REQUIRED_GRADLE="8.7"
+REQUIRED_KOTLIN="2.1.0"
 
 # Đọc phiên bản AGP đang dùng
 CURRENT_AGP=$(grep 'com.android.application' -n android/settings.gradle.kts \
@@ -13,8 +13,7 @@ echo "Current AGP version: ${CURRENT_AGP:-not found}"
 # Cập nhật AGP nếu cần
 if [ -z "$CURRENT_AGP" ] || [ "$(printf '%s\n' "$CURRENT_AGP" "$REQUIRED_AGP" | sort -V | head -n1)" != "$REQUIRED_AGP" ]; then
   echo "Updating Android Gradle Plugin to $REQUIRED_AGP"
-  sed -i \
-    's/id("com.android.application") version "[^"]\+"/id("com.android.application") version "'$REQUIRED_AGP'" apply false/' \
+  sed -i -e "s/id(\"com.android.application\").*/id(\"com.android.application\") version \"$REQUIRED_AGP\" apply false/" \
     android/settings.gradle.kts
 else
   echo "AGP already ≥ $REQUIRED_AGP"
@@ -28,8 +27,7 @@ echo "Current Kotlin version: ${CURRENT_KOTLIN:-not found}"
 # Cập nhật Kotlin plugin nếu cần
 if [ -z "$CURRENT_KOTLIN" ] || [ "$(printf '%s\n' "$CURRENT_KOTLIN" "$REQUIRED_KOTLIN" | sort -V | head -n1)" != "$REQUIRED_KOTLIN" ]; then
   echo "Updating Kotlin plugin to $REQUIRED_KOTLIN"
-  sed -i \
-    's/id("org.jetbrains.kotlin.android") version "[^"]\+"/id("org.jetbrains.kotlin.android") version "'$REQUIRED_KOTLIN'" apply false/' \
+  sed -i -e "s/id(\"org.jetbrains.kotlin.android\").*/id(\"org.jetbrains.kotlin.android\") version \"$REQUIRED_KOTLIN\" apply false/" \
     android/settings.gradle.kts
 else
   echo "Kotlin plugin already ≥ $REQUIRED_KOTLIN"
