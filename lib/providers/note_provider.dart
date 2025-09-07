@@ -50,7 +50,7 @@ class NoteProvider extends ChangeNotifier {
         _notificationService = notificationService ?? NotificationService(),
         _homeWidgetService = homeWidgetService ?? const HomeWidgetService(),
         _syncService = syncService ?? NoteSyncService(repository: repository) {
-    _init();
+    unawaited(_init().catchError((e) { /* log or set error state */ }));
   }
 
   List<Note> get notes => List.unmodifiable(_notes);
