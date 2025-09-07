@@ -19,6 +19,8 @@ dependencies:
 
   flutter_colorpicker: ^1.1.0
 
+  flutter_slidable: ^4.0.1
+
   shared_preferences: ^2.5.3
   audioplayers: ^6.5.0
   intl: ^0.20.2
@@ -41,6 +43,8 @@ dependencies:
   file_picker: ^6.2.1
   pdf: ^3.11.3
 
+  image_picker: ^1.2.0
+
   path_provider: ^2.1.5
 
   json_annotation: ^4.9.0
@@ -52,6 +56,7 @@ dependencies:
   firebase_crashlytics: ^5.0.1
   firebase_analytics: ^12.0.1
 
+  googleapis: ^14.0.0
   google_sign_in: ^6.3.0
   uuid: ^4.5.1
   google_fonts: ^6.2.1
