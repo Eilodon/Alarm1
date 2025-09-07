@@ -8,7 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:alarm_domain/alarm_domain.dart';
-import 'package:notes_reminder_app/providers/note_provider.dart';
+import 'package:notes_reminder_app/features/note/presentation/note_provider.dart';
 import 'package:notes_reminder_app/services/calendar_service.dart';
 import 'package:alarm_data/alarm_data.dart';
 import 'package:notes_reminder_app/services/notification_service.dart';
@@ -32,42 +32,43 @@ class FakeConnectivityPlatform extends Fake implements ConnectivityPlatform {
 void setupFirebase() {
   const MethodChannel core = MethodChannel('plugins.flutter.io/firebase_core');
   const MethodChannel auth = MethodChannel('plugins.flutter.io/firebase_auth');
-  const MethodChannel firestore =
-      MethodChannel('plugins.flutter.io/firebase_firestore');
+  const MethodChannel firestore = MethodChannel(
+    'plugins.flutter.io/firebase_firestore',
+  );
 
   TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
       .setMockMethodCallHandler(core, (call) async {
-    if (call.method == 'Firebase#initializeCore') {
-      return [
-        {
-          'name': call.arguments['appName'] ?? 'app',
-          'options': call.arguments['options'] ?? {}
+        if (call.method == 'Firebase#initializeCore') {
+          return [
+            {
+              'name': call.arguments['appName'] ?? 'app',
+              'options': call.arguments['options'] ?? {},
+            },
+          ];
         }
-      ];
-    }
-    if (call.method == 'Firebase#initializeApp') {
-      return {
-        'name': call.arguments['appName'] ?? 'app',
-        'options': call.arguments['options'] ?? {}
-      };
-    }
-    return null;
-  });
+        if (call.method == 'Firebase#initializeApp') {
+          return {
+            'name': call.arguments['appName'] ?? 'app',
+            'options': call.arguments['options'] ?? {},
+          };
+        }
+        return null;
+      });
 
   TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
       .setMockMethodCallHandler(auth, (call) async {
-    if (call.method == 'signInAnonymously') {
-      return {
-        'user': {'uid': 'uid'}
-      };
-    }
-    return null;
-  });
+        if (call.method == 'signInAnonymously') {
+          return {
+            'user': {'uid': 'uid'},
+          };
+        }
+        return null;
+      });
 
   TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
       .setMockMethodCallHandler(firestore, (call) async {
-    return null;
-  });
+        return null;
+      });
 }
 
 void main() {
@@ -77,8 +78,9 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  testWidgets('syncUnsyncedNotes triggered when connectivity restored',
-      (tester) async {
+  testWidgets('syncUnsyncedNotes triggered when connectivity restored', (
+    tester,
+  ) async {
     setupFirebase();
     await Firebase.initializeApp();
 
@@ -100,11 +102,12 @@ void main() {
 
     when(() => repo.getNotes()).thenAnswer((_) async => [note]);
     when(() => repo.saveNotes(any())).thenAnswer((_) async {});
-    when(() => repo.encryptNote(any()))
-        .thenAnswer((_) async => {'title': 't', 'content': 'c'});
+    when(
+      () => repo.encryptNote(any()),
+    ).thenAnswer((_) async => {'title': 't', 'content': 'c'});
 
     SharedPreferences.setMockInitialValues({
-      'unsyncedNoteIds': ['1']
+      'unsyncedNoteIds': ['1'],
     });
 
     final provider = NoteProvider(
@@ -129,9 +132,9 @@ void main() {
     final calls = <MethodCall>[];
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(channel, (call) async {
-      calls.add(call);
-      return null;
-    });
+          calls.add(call);
+          return null;
+        });
 
     final l10n = await AppLocalizations.delegate.load(const Locale('en'));
     tzdata.initializeTimeZones();

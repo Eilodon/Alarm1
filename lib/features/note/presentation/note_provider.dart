@@ -8,17 +8,18 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart'
 
 import 'package:alarm_domain/alarm_domain.dart';
 import 'package:alarm_data/alarm_data.dart';
-import '../services/calendar_service.dart';
-import '../services/notification_service.dart';
-import '../services/home_widget_service.dart';
-import '../services/note_sync_service.dart';
+import '../../../services/calendar_service.dart';
+import '../../../services/notification_service.dart';
+import '../../../services/home_widget_service.dart';
+import '../../../services/note_sync_service.dart';
 
 int _noteComparator(Note a, Note b) {
   if (a.pinned != b.pinned) {
     return a.pinned ? -1 : 1;
   }
-  return (b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0))
-      .compareTo(a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0));
+  return (b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0)).compareTo(
+    a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
+  );
 }
 
 class NoteProvider extends ChangeNotifier {
@@ -42,13 +43,18 @@ class NoteProvider extends ChangeNotifier {
     NotificationService? notificationService,
     HomeWidgetService? homeWidgetService,
     NoteSyncService? syncService,
-  })  : _repository = repository ?? NoteRepositoryImpl(),
-        _calendarService = calendarService ?? CalendarService.instance,
-        _notificationService = notificationService ?? NotificationService(),
-        _homeWidgetService = homeWidgetService ?? const HomeWidgetService(),
-        _syncService = syncService ??
-            NoteSyncService(repository: repository ?? NoteRepositoryImpl()) {
-    unawaited(_init().catchError((e) {/* log or set error state */}));
+  }) : _repository = repository ?? NoteRepositoryImpl(),
+       _calendarService = calendarService ?? CalendarService.instance,
+       _notificationService = notificationService ?? NotificationService(),
+       _homeWidgetService = homeWidgetService ?? const HomeWidgetService(),
+       _syncService =
+           syncService ??
+           NoteSyncService(repository: repository ?? NoteRepositoryImpl()) {
+    unawaited(
+      _init().catchError((e) {
+        /* log or set error state */
+      }),
+    );
   }
 
   List<Note> get notes => List.unmodifiable(_notes);
@@ -80,8 +86,9 @@ class NoteProvider extends ChangeNotifier {
     final success = await _syncService.loadFromRemote(_notes);
     await _homeWidgetService.update(_notes.toList());
     notifyListeners();
-    _syncService.syncStatus.value =
-        success ? SyncStatus.idle : SyncStatus.error;
+    _syncService.syncStatus.value = success
+        ? SyncStatus.idle
+        : SyncStatus.error;
     return success;
   }
 
@@ -125,8 +132,9 @@ class NoteProvider extends ChangeNotifier {
       int? notificationId;
       String? eventId;
       if (alarmTime != null) {
-        notificationId =
-            DateTime.now().millisecondsSinceEpoch.remainder(1 << 31);
+        notificationId = DateTime.now().millisecondsSinceEpoch.remainder(
+          1 << 31,
+        );
         if (repeatInterval != null) {
           await _notificationService.scheduleRecurring(
             id: notificationId,
@@ -233,7 +241,8 @@ class NoteProvider extends ChangeNotifier {
       }
 
       if (note.alarmTime != null) {
-        final nid = note.notificationId ??
+        final nid =
+            note.notificationId ??
             DateTime.now().millisecondsSinceEpoch.remainder(1 << 31);
         if (note.repeatInterval != null) {
           await _notificationService.scheduleRecurring(

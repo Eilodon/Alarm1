@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:notes_reminder_app/providers/note_provider.dart';
+import 'package:notes_reminder_app/features/note/presentation/note_provider.dart';
 import 'package:notes_reminder_app/widgets/tag_filtered_notes_list.dart';
 import 'package:alarm_domain/alarm_domain.dart';
 
@@ -57,8 +57,9 @@ void main() {
     expect(find.text('n2'), findsNothing);
   });
 
-  testWidgets('uses theme colors for day indicators in light theme',
-      (tester) async {
+  testWidgets('uses theme colors for day indicators in light theme', (
+    tester,
+  ) async {
     final provider = NoteProvider();
     final now = DateTime.now();
     await tester.pumpWidget(
@@ -102,8 +103,9 @@ void main() {
     expect(nextDayBox.color, colorScheme.surface);
   });
 
-  testWidgets('uses theme colors for day indicators in dark theme',
-      (tester) async {
+  testWidgets('uses theme colors for day indicators in dark theme', (
+    tester,
+  ) async {
     final provider = NoteProvider();
     final now = DateTime.now();
     await tester.pumpWidget(
