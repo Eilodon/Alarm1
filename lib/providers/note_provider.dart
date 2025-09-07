@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'dart:collection';
 
@@ -8,12 +7,11 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     show Time;
 
 import 'package:alarm_domain/alarm_domain.dart';
-import '../services/note_repository_impl.dart';
+import 'package:alarm_data/alarm_data.dart';
 import '../services/calendar_service.dart';
 import '../services/notification_service.dart';
 import '../services/home_widget_service.dart';
 import '../services/note_sync_service.dart';
-
 
 int _noteComparator(Note a, Note b) {
   if (a.pinned != b.pinned) {
@@ -22,8 +20,6 @@ int _noteComparator(Note a, Note b) {
   return (b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0))
       .compareTo(a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0));
 }
-
-
 
 class NoteProvider extends ChangeNotifier {
   final NoteRepository _repository;
@@ -50,9 +46,9 @@ class NoteProvider extends ChangeNotifier {
         _calendarService = calendarService ?? CalendarService.instance,
         _notificationService = notificationService ?? NotificationService(),
         _homeWidgetService = homeWidgetService ?? const HomeWidgetService(),
-        _syncService =
-            syncService ?? NoteSyncService(repository: repository ?? NoteRepositoryImpl()) {
-    unawaited(_init().catchError((e) { /* log or set error state */ }));
+        _syncService = syncService ??
+            NoteSyncService(repository: repository ?? NoteRepositoryImpl()) {
+    unawaited(_init().catchError((e) {/* log or set error state */}));
   }
 
   List<Note> get notes => List.unmodifiable(_notes);
@@ -76,7 +72,6 @@ class NoteProvider extends ChangeNotifier {
     unawaited(_repository.autoBackup());
     super.dispose();
   }
-
 
   Future<bool> loadNotes() async {
     _syncService.syncStatus.value = SyncStatus.syncing;
@@ -102,8 +97,7 @@ class NoteProvider extends ChangeNotifier {
     final result = <Note>[];
     for (final n in _notes) {
       if (startAfter != null) {
-        final updated =
-            n.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final updated = n.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
         if (!updated.isBefore(startAfter)) continue;
       }
       result.add(n);
@@ -112,7 +106,6 @@ class NoteProvider extends ChangeNotifier {
     notifyListeners();
     return result;
   }
-
 
   Future<bool> createNote({
     required String title,
@@ -192,7 +185,6 @@ class NoteProvider extends ChangeNotifier {
     }
   }
 
-
   Future<void> addNote(Note note) async {
     _notes.add(note);
     await _repository.saveNotes(_notes.toList());
@@ -235,7 +227,8 @@ class NoteProvider extends ChangeNotifier {
 
       // Handle notifications
       if (old.notificationId != null &&
-          (note.alarmTime == null || old.notificationId != note.notificationId)) {
+          (note.alarmTime == null ||
+              old.notificationId != note.notificationId)) {
         await _notificationService.cancel(old.notificationId!);
       }
 
@@ -327,4 +320,3 @@ class NoteProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
-

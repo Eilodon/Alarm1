@@ -2,16 +2,20 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:alarm_domain/alarm_domain.dart';
 import 'package:notes_reminder_app/providers/note_provider.dart';
-import 'package:notes_reminder_app/services/note_repository_impl.dart';
+import 'package:alarm_data/alarm_data.dart';
 import 'package:notes_reminder_app/services/calendar_service.dart';
 import 'package:notes_reminder_app/services/notification_service.dart';
 import 'package:notes_reminder_app/services/note_sync_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MockRepo extends Mock implements NoteRepository {}
+
 class MockCalendar extends Mock implements CalendarService {}
+
 class MockNotification extends Mock implements NotificationService {}
+
 class MockSyncService extends Mock implements NoteSyncService {}
+
 class FakeL10n extends Fake implements AppLocalizations {}
 
 void main() {
@@ -135,7 +139,8 @@ void main() {
     expect(captured.first > 0, isTrue);
   });
 
-  test('createNote with repeat interval schedules recurring notification', () async {
+  test('createNote with repeat interval schedules recurring notification',
+      () async {
     final repo = MockRepo();
     final calendar = MockCalendar();
     final notification = MockNotification();
@@ -189,9 +194,21 @@ void main() {
     final repo = MockRepo();
     final sync = MockSyncService();
     when(() => repo.getNotes()).thenAnswer((_) async => [
-          Note(id: '1', title: 'a', content: 'c', updatedAt: DateTime(2023, 1, 1)),
-          Note(id: '2', title: 'b', content: 'c', updatedAt: DateTime(2024, 1, 1)),
-          Note(id: '3', title: 'c', content: 'c', updatedAt: DateTime(2022, 1, 1)),
+          Note(
+              id: '1',
+              title: 'a',
+              content: 'c',
+              updatedAt: DateTime(2023, 1, 1)),
+          Note(
+              id: '2',
+              title: 'b',
+              content: 'c',
+              updatedAt: DateTime(2024, 1, 1)),
+          Note(
+              id: '3',
+              title: 'c',
+              content: 'c',
+              updatedAt: DateTime(2022, 1, 1)),
         ]);
     when(() => repo.saveNotes(any())).thenAnswer((_) async {});
     when(() => sync.init(any())).thenAnswer((_) async {});
