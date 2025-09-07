@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 
 import '../features/note/presentation/note_provider.dart';
 import '../features/settings/data/settings_service.dart';
-import '../features/backup/data/backup_service.dart';
 
 import '../features/note/presentation/note_search_delegate.dart';
 import '../features/note/presentation/voice_to_note_screen.dart';
@@ -55,8 +54,7 @@ class _NotesTabState extends State<NotesTab> {
     });
   }
 
-  Future<String> _loadMascot() =>
-      SettingsServiceImpl(backupService: BackupServiceImpl()).loadMascotPath();
+  Future<String> _loadMascot() => SettingsServiceImpl().loadMascotPath();
 
   void _addNote() {
     showDialog(context: context, builder: (_) => const AddNoteDialog());
@@ -129,8 +127,7 @@ class _NotesTabState extends State<NotesTab> {
                         onThemeChanged: widget.onThemeChanged,
                         onFontScaleChanged: widget.onFontScaleChanged,
                         onThemeModeChanged: widget.onThemeModeChanged,
-                        settingsService: SettingsServiceImpl(
-                            backupService: BackupServiceImpl()),
+                        settingsService: SettingsServiceImpl(),
                       ),
                     ),
                   );
@@ -174,8 +171,7 @@ class _NotesTabState extends State<NotesTab> {
                                 onThemeChanged: widget.onThemeChanged,
                                 onFontScaleChanged: widget.onFontScaleChanged,
                                 onThemeModeChanged: widget.onThemeModeChanged,
-                                settingsService: SettingsServiceImpl(
-                                    backupService: BackupServiceImpl()),
+                                settingsService: SettingsServiceImpl(),
                               ),
                             ),
                           ),
