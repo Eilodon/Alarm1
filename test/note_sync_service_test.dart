@@ -7,11 +7,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class DummyRepo extends Fake implements NoteRepository {}
 
-  class FakeConnectivity extends Connectivity {
-    @override
-    Stream<List<ConnectivityResult>> get onConnectivityChanged =>
-        const Stream.empty();
-  }
+class FakeConnectivity extends Connectivity {
+  @override
+  Stream<List<ConnectivityResult>> get onConnectivityChanged =>
+      const Stream.empty();
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
