@@ -7,6 +7,7 @@ import 'dart:math' as math;
 
 import '../domain/settings_service.dart';
 
+import 'package:alarm_data/alarm_data.dart';
 import 'package:alarm_domain/alarm_domain.dart';
 
 import 'package:provider/provider.dart';
