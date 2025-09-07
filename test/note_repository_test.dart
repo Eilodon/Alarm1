@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:alarm_domain/alarm_domain.dart';
+import 'package:alarm_domain/alarm_domain.dart' as domain;
 import 'package:alarm_data/alarm_data.dart';
 import 'package:uuid/uuid.dart';
 
@@ -25,7 +25,7 @@ void main() {
     test('saveNotes and getNotes persist data', () async {
       final repo = NoteRepositoryImpl();
       final id = const Uuid().v4();
-      final note = Note(
+      final note = domain.Note(
         id: id,
         title: 't',
         content: 'c',
@@ -56,7 +56,7 @@ void main() {
     test('updateNote persists changes', () async {
       final repo = NoteRepositoryImpl();
       final id = const Uuid().v4();
-      final note = Note(
+      final note = domain.Note(
         id: id,
         title: 't',
         content: 'c',
@@ -67,7 +67,7 @@ void main() {
         snoozeMinutes: 5,
       );
       await repo.saveNotes([note]);
-      final updated = Note(
+      final updated = domain.Note(
         id: id,
         title: 't2',
         content: 'c2',

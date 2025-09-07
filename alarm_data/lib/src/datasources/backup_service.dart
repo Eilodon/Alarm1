@@ -9,21 +9,20 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
-import 'package:alarm_domain/alarm_domain.dart';
+import 'package:alarm_domain/alarm_domain.dart' as domain;
 import 'db_service.dart';
 
-enum BackupFormat { json, pdf, md }
-
-class BackupService {
+class BackupService implements domain.BackupService {
   final DbService _dbService;
 
   BackupService({DbService? dbService}) : _dbService = dbService ?? DbService();
 
+  @override
   Future<bool> exportNotes(
-    List<Note> notes,
-    AppLocalizations l10n, {
+    List<domain.Note> notes,
+    dynamic l10n, {
     String? password,
-    BackupFormat format = BackupFormat.json,
+    domain.BackupFormat format = domain.BackupFormat.json,
   }) async {
     String? path;
     try {
@@ -40,7 +39,7 @@ class BackupService {
     if (path == null) return false;
     final file = File(path);
     switch (format) {
-      case BackupFormat.json:
+      case domain.BackupFormat.json:
         final list = <Map<String, dynamic>>[];
         for (final n in notes) {
           list.add(await _dbService.encryptNote(n, password: password));
@@ -53,7 +52,7 @@ class BackupService {
           debugPrint(l10n.errorWithMessage(e.toString()));
           return false;
         }
-      case BackupFormat.pdf:
+      case domain.BackupFormat.pdf:
         final pdf = pw.Document();
         pdf.addPage(
           pw.MultiPage(
@@ -78,7 +77,7 @@ class BackupService {
           debugPrint(l10n.errorWithMessage(e.toString()));
           return false;
         }
-      case BackupFormat.md:
+      case domain.BackupFormat.md:
         final buffer = StringBuffer();
         for (final n in notes) {
           buffer.writeln('# ${n.title}\n${n.content}\n');
@@ -93,10 +92,11 @@ class BackupService {
     }
   }
 
-  Future<List<Note>> importNotes(
-    AppLocalizations l10n, {
+  @override
+  Future<List<domain.Note>> importNotes(
+    dynamic l10n, {
     String? password,
-    BackupFormat format = BackupFormat.json,
+    domain.BackupFormat format = domain.BackupFormat.json,
   }) async {
     FilePickerResult? result;
     try {
@@ -119,10 +119,10 @@ class BackupService {
       return [];
     }
     switch (format) {
-      case BackupFormat.json:
+      case domain.BackupFormat.json:
         try {
           final list = jsonDecode(content) as List<dynamic>;
-          final notes = <Note>[];
+          final notes = <domain.Note>[];
           for (final m in list) {
             try {
               notes.add(await _dbService.decryptNote(
@@ -138,11 +138,11 @@ class BackupService {
           debugPrint(l10n.errorWithMessage(e.toString()));
           return [];
         }
-      case BackupFormat.pdf:
+      case domain.BackupFormat.pdf:
         // Importing from PDF is not supported
         return [];
-      case BackupFormat.md:
-        final notes = <Note>[];
+      case domain.BackupFormat.md:
+        final notes = <domain.Note>[];
         final lines = content.split('\n');
         String? title;
         final buffer = StringBuffer();
@@ -151,7 +151,7 @@ class BackupService {
           if (line.startsWith('# ')) {
             if (title != null) {
               notes.add(
-                Note(
+                domain.Note(
                     id: uuid.v4(),
                     title: title!,
                     content: buffer.toString().trim()),
@@ -165,7 +165,7 @@ class BackupService {
         }
         if (title != null) {
           notes.add(
-            Note(
+            domain.Note(
                 id: uuid.v4(),
                 title: title!,
                 content: buffer.toString().trim()),
@@ -175,7 +175,8 @@ class BackupService {
     }
   }
 
-  Future<bool> autoBackup(List<Note> notes,
+  @override
+  Future<bool> autoBackup(List<domain.Note> notes,
       {String fileName = 'notes_autobackup.json'}) async {
     try {
       final dir = await getApplicationDocumentsDirectory();

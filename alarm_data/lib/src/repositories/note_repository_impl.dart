@@ -1,6 +1,6 @@
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import 'package:alarm_domain/alarm_domain.dart';
+import 'package:alarm_domain/alarm_domain.dart' hide BackupService;
 import '../datasources/db_service.dart';
 import '../datasources/backup_service.dart';
 

@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:alarm_domain/alarm_domain.dart';
+import 'package:alarm_domain/alarm_domain.dart' as domain;
 import 'package:alarm_data/alarm_data.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -97,7 +97,7 @@ void main() {
         (call) async => call.method == 'saveFile' ? path : null,
       );
       final l10n = await AppLocalizations.delegate.load(const Locale('en'));
-      const note = Note(id: '1', title: 't', content: 'c');
+      const note = domain.Note(id: '1', title: 't', content: 'c');
       final ok = await BackupService().exportNotes([note], l10n);
       expect(ok, true);
       final data = jsonDecode(await File(path).readAsString()) as List<dynamic>;
@@ -113,7 +113,7 @@ void main() {
         (call) async => call.method == 'saveFile' ? path : null,
       );
       final l10n = await AppLocalizations.delegate.load(const Locale('en'));
-      const note = Note(id: '1', title: 't', content: 'c');
+      const note = domain.Note(id: '1', title: 't', content: 'c');
       final ok = await BackupService().exportNotes(
         [note],
         l10n,
@@ -129,7 +129,7 @@ void main() {
 
     test('importNotes reads back data with password', () async {
       final db = DbService();
-      const note = Note(id: '1', title: 't', content: 'c');
+      const note = domain.Note(id: '1', title: 't', content: 'c');
       final enc = await db.encryptNote(note, password: 'pw');
       final path = '${tempDir.path}/notes.json';
       await File(path).writeAsString(jsonEncode([enc]));
@@ -158,7 +158,7 @@ void main() {
 
     test('importNotes returns empty on wrong password', () async {
       final db = DbService();
-      const note = Note(id: '1', title: 't', content: 'c');
+      const note = domain.Note(id: '1', title: 't', content: 'c');
       final enc = await db.encryptNote(note, password: 'pw');
       final path = '${tempDir.path}/notes.json';
       await File(path).writeAsString(jsonEncode([enc]));
@@ -213,11 +213,11 @@ void main() {
         (call) async => call.method == 'saveFile' ? path : null,
       );
       final l10n = await AppLocalizations.delegate.load(const Locale('en'));
-      const note = Note(id: '1', title: 't', content: 'c');
+      const note = domain.Note(id: '1', title: 't', content: 'c');
       final ok = await BackupService().exportNotes(
         [note],
         l10n,
-        format: BackupFormat.md,
+        format: domain.BackupFormat.md,
       );
       expect(ok, true);
       final data = await File(path).readAsString();
@@ -246,7 +246,7 @@ void main() {
       final l10n = await AppLocalizations.delegate.load(const Locale('en'));
       final notes = await BackupService().importNotes(
         l10n,
-        format: BackupFormat.md,
+        format: domain.BackupFormat.md,
       );
       expect(notes.length, 1);
       expect(notes.first.title, 't');
@@ -259,11 +259,11 @@ void main() {
         (call) async => call.method == 'saveFile' ? path : null,
       );
       final l10n = await AppLocalizations.delegate.load(const Locale('en'));
-      const note = Note(id: '1', title: 't', content: 'c');
+      const note = domain.Note(id: '1', title: 't', content: 'c');
       final ok = await BackupService().exportNotes(
         [note],
         l10n,
-        format: BackupFormat.pdf,
+        format: domain.BackupFormat.pdf,
       );
       expect(ok, true);
       final bytes = await File(path).readAsBytes();

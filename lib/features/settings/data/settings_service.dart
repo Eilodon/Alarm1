@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../../theme/tokens.dart';
-import 'package:alarm_data/alarm_data.dart';
+import 'package:alarm_domain/alarm_domain.dart';
 import '../domain/settings_service.dart';
 
 class SettingsServiceImpl implements SettingsService {
-  SettingsServiceImpl({SharedPreferences? sharedPreferences})
-      : _preferences = sharedPreferences;
+  SettingsServiceImpl({
+    SharedPreferences? sharedPreferences,
+    required BackupService backupService,
+  })  : _preferences = sharedPreferences,
+        _backupService = backupService;
 
   static const _kThemeColor = 'theme_color';
   static const _kMascotPath = 'mascot_path';
@@ -18,6 +22,7 @@ class SettingsServiceImpl implements SettingsService {
   static const _kHasSeenOnboarding = 'has_seen_onboarding';
 
   SharedPreferences? _preferences;
+  final BackupService _backupService; // ignore: unused_field
 
   Future<SharedPreferences> get _sp async {
     _preferences ??= await SharedPreferences.getInstance();

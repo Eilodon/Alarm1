@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:alarm_domain/alarm_domain.dart';
+import 'package:alarm_domain/alarm_domain.dart' as domain;
 import 'package:alarm_data/alarm_data.dart';
 
 void main() {
@@ -17,8 +17,8 @@ void main() {
   test('getNotes reports corrupted entries', () async {
     final db = DbService();
     final notes = const [
-      Note(id: 'good', title: 't', content: 'c'),
-      Note(id: 'bad', title: 't2', content: 'c2'),
+      domain.Note(id: 'good', title: 't', content: 'c'),
+      domain.Note(id: 'bad', title: 't2', content: 'c2'),
     ];
     await db.saveNotes(notes);
 
