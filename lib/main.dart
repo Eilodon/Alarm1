@@ -3,22 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
-import 'package:google_fonts/google_fonts.dart';
-
-import 'screens/home_screen.dart';
-import 'screens/onboarding_screen.dart';
-import 'services/notification_service.dart';
-import 'services/settings_service.dart';
-import 'services/auth_service.dart';
-
 import 'package:provider/provider.dart';
 
+import 'app.dart';
 import 'models/note.dart';
-
-import 'firebase_options.dart';
-import 'theme/tokens.dart';
-
+import 'providers/note_provider.dart';
+import 'services/app_initializer.dart';
+import 'services/connectivity_service.dart';
 
 late final NoteProvider noteProvider;
 
@@ -44,165 +35,33 @@ Future<void> _onNotificationResponse(NotificationResponse response) async {
   }
 }
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
   noteProvider = NoteProvider();
 
-  final startupResult = await StartupService().initialize(
-    onDidReceiveNotificationResponse: _onNotificationResponse,
-  );
-
-  final settings = SettingsService();
-  final requireAuth = await settings.loadRequireAuth();
-  if (requireAuth) {
-    final locale = WidgetsBinding.instance.platformDispatcher.locale;
-    final l10n = await AppLocalizations.delegate.load(locale);
-    final ok = await AuthService().authenticate(l10n);
-    if (!ok) {
-      return;
-    }
-  }
-  final themeColor = await settings.loadThemeColor();
-  final fontScale = await settings.loadFontScale();
-  final themeMode = await settings.loadThemeMode();
-  final hasSeenOnboarding = await settings.loadHasSeenOnboarding();
-
   runApp(
-    ChangeNotifierProvider.value(
-      value: noteProvider,
-      child: MyApp(
-        themeColor: themeColor,
-        fontScale: fontScale,
-        themeMode: themeMode,
-        hasSeenOnboarding: hasSeenOnboarding,
-        authFailed: startupResult.authFailed,
-        notificationFailed: startupResult.notificationFailed,
+    FutureBuilder<AppInitializationData?>(
+      future: AppInitializer().initialize(
+        onDidReceiveNotificationResponse: _onNotificationResponse,
       ),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const SizedBox.shrink();
+        }
+        final data = snapshot.data!;
+        return ChangeNotifierProvider.value(
+          value: noteProvider,
+          child: MyApp(
+            themeColor: data.themeColor,
+            fontScale: data.fontScale,
+            themeMode: data.themeMode,
+            hasSeenOnboarding: data.hasSeenOnboarding,
+            authFailed: data.authFailed,
+            notificationFailed: data.notificationFailed,
+            connectivityService: ConnectivityService(),
+          ),
+        );
+      },
     ),
   );
 }
-
-
-class _MyAppState extends State<MyApp> {
-  Color _themeColor = Colors.blue;
-  double _fontScale = 1.0;
-  ThemeMode _themeMode = ThemeMode.system;
-  StreamSubscription<ConnectivityResult>? _connSub;
-  bool _hasSeenOnboarding = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _themeColor = widget.themeColor;
-    _fontScale = widget.fontScale;
-
-    _hasSeenOnboarding = widget.hasSeenOnboarding;
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final l10n = AppLocalizations.of(context)!;
-      if (widget.authFailed) {
-        messengerKey.currentState?.showSnackBar(
-          SnackBar(
-            content: Text(l10n.authFailedMessage),
-          ),
-        );
-      }
-      if (widget.notificationFailed) {
-        messengerKey.currentState?.showSnackBar(
-          SnackBar(
-            content: Text(l10n.notificationFailedMessage),
-          ),
-        );
-      }
-    });
-    try {
-      _connSub = Connectivity().onConnectivityChanged.listen((result) {
-        if (result == ConnectivityResult.none) {
-          final l10n = AppLocalizations.of(context)!;
-          messengerKey.currentState?.showSnackBar(
-            SnackBar(
-              content: Text(l10n.noInternetConnection),
-            ),
-          );
-        }
-      });
-    } on MissingPluginException {
-      // Ignore if connectivity plugin is not available (e.g., tests)
-    }
-  }
-
-  void updateTheme(Color newColor) async {
-    setState(() => _themeColor = newColor);
-    await SettingsService().saveThemeColor(newColor);
-  }
-
-  void updateFontScale(double newScale) async {
-    setState(() => _fontScale = newScale);
-    await SettingsService().saveFontScale(newScale);
-  }
-
-
-  void _completeOnboarding() {
-    setState(() => _hasSeenOnboarding = true);
-
-  }
-
-  @override
-  void dispose() {
-    _connSub?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      scaffoldMessengerKey: messengerKey,
-      onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en'), Locale('vi')],
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Tokens.light.colors.primary,
-          background: Tokens.light.colors.background,
-          surface: Tokens.light.colors.surface,
-        ),
-        textTheme: GoogleFonts.interTextTheme(),
-        useMaterial3: true,
-        extensions: const [Tokens.light],
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Tokens.dark.colors.primary,
-          background: Tokens.dark.colors.background,
-          surface: Tokens.dark.colors.surface,
-          brightness: Brightness.dark,
-        ),
-        textTheme: GoogleFonts.interTextTheme(
-          ThemeData.dark().textTheme,
-        ),
-        useMaterial3: true,
-        extensions: const [Tokens.dark],
-      ),
-      themeMode: _themeMode,
-      builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context).copyWith(textScaleFactor: _fontScale),
-        child: child!,
-      ),
-
-      home: _hasSeenOnboarding
-          ? HomeScreen(
-              onThemeChanged: updateTheme,
-              onFontScaleChanged: updateFontScale,
-            )
-          : OnboardingScreen(onFinished: _completeOnboarding),
-
-
-    );
-  }
-}
-
