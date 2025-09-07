@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'package:alarm_domain/alarm_domain.dart';
-import '../providers/note_provider.dart';
+import '../features/note/presentation/note_provider.dart';
 import '../screens/note_list_for_day_screen.dart';
 import 'notes_list.dart';
 import 'tag_filter_menu.dart';
@@ -70,9 +70,7 @@ class _TagFilteredNotesListState extends State<TagFilteredNotesList> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    buildSlideFadeRoute(
-                      NoteListForDayScreen(date: d),
-                    ),
+                    buildSlideFadeRoute(NoteListForDayScreen(date: d)),
                   );
                 },
                 child: Container(
@@ -94,10 +92,7 @@ class _TagFilteredNotesListState extends State<TagFilteredNotesList> {
                         ).format(d),
                         style: TextStyle(color: textColor),
                       ),
-                      Text(
-                        '${d.day}',
-                        style: TextStyle(color: textColor),
-                      ),
+                      Text('${d.day}', style: TextStyle(color: textColor)),
                     ],
                   ),
                 ),
@@ -107,10 +102,7 @@ class _TagFilteredNotesListState extends State<TagFilteredNotesList> {
         ),
         const SizedBox(height: 8),
         Expanded(
-          child: NotesList(
-            notes: filteredNotes,
-            gridCount: widget.gridCount,
-          ),
+          child: NotesList(notes: filteredNotes, gridCount: widget.gridCount),
         ),
       ],
     );

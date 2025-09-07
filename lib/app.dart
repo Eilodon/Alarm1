@@ -4,7 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'screens/home_screen.dart';
 import 'screens/onboarding_screen.dart';
-import 'services/settings_service.dart';
+import 'features/settings/data/settings_service.dart';
 import 'services/connectivity_service.dart';
 import 'theme/tokens.dart';
 import 'widgets/route_transitions.dart';
