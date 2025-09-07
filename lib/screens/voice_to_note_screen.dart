@@ -24,6 +24,8 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
   String _recognized = '';
   bool _isListening = false;
   bool _isProcessing = false;
+  double _level = 0;
+  double _maxLevel = 1;
 
   @override
   void initState() {
@@ -39,10 +41,22 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
     if (!_isListening) {
       final available = await widget.speech.initialize();
       if (available) {
-        setState(() => _isListening = true);
-        widget.speech.listen(onResult: (res) {
-          setState(() => _recognized = res.recognizedWords);
+        setState(() {
+          _isListening = true;
+          _level = 0;
+          _maxLevel = 1;
         });
+        widget.speech.listen(
+          onResult: (res) {
+            setState(() => _recognized = res.recognizedWords);
+          },
+          onSoundLevelChange: (level) {
+            setState(() {
+              _level = level;
+              if (level > _maxLevel) _maxLevel = level;
+            });
+          },
+        );
       } else {
         if (!mounted) return;
         final l10n = AppLocalizations.of(context)!;
@@ -54,7 +68,10 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
       }
     } else {
       await widget.speech.stop();
-      setState(() => _isListening = false);
+      setState(() {
+        _isListening = false;
+        _level = 0;
+      });
       if (_recognized.isEmpty) {
         if (!mounted) return;
         final l10n = AppLocalizations.of(context)!;
@@ -100,22 +117,38 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
             ),
             if (_isProcessing) const CircularProgressIndicator(),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ElevatedButton.icon(
-                  onPressed: _toggleListening,
-                  icon: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 300),
-                    child: Icon(
-                      _isListening ? Icons.mic : Icons.mic_none,
-                      key: ValueKey(_isListening),
-                      color: _isListening
-                          ? Theme.of(context).colorScheme.error
-                          : null,
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: _toggleListening,
+                      icon: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        child: Icon(
+                          _isListening ? Icons.mic : Icons.mic_none,
+                          key: ValueKey(_isListening),
+                          color: _isListening
+                              ? Theme.of(context).colorScheme.error
+                              : null,
+                        ),
+                      ),
+                      label: Text(_isListening
+                          ? AppLocalizations.of(context)!.stop
+                          : AppLocalizations.of(context)!.speak),
                     ),
-                  ),
-                  label: Text(_isListening
-                      ? AppLocalizations.of(context)!.stop
-                      : AppLocalizations.of(context)!.speak),
+                    if (_isListening)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: SizedBox(
+                          width: 120,
+                          child: LinearProgressIndicator(
+                            value: _maxLevel > 0 ? _level / _maxLevel : 0,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(
