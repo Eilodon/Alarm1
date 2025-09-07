@@ -21,10 +21,30 @@ jobs:
         run: |
           flutter pub outdated --exit-code > outdated.log
         continue-on-error: true
+      - name: Check for outdated packages in sub-packages
+        id: outdated_packages
+        run: |
+          status=0
+          for dir in alarm_data alarm_domain; do
+            echo "Checking $dir"
+            (cd $dir && flutter pub outdated --exit-code > outdated.log) || status=1
+          done
+          exit $status
+        continue-on-error: true
       - name: Dry-run major version upgrades
         id: upgrade
         run: |
           flutter pub upgrade --major-versions --dry-run > upgrade.log
+        continue-on-error: true
+      - name: Dry-run major version upgrades in sub-packages
+        id: upgrade_packages
+        run: |
+          status=0
+          for dir in alarm_data alarm_domain; do
+            echo "Upgrading $dir"
+            (cd $dir && flutter pub upgrade --major-versions --dry-run > upgrade.log) || status=1
+          done
+          exit $status
         continue-on-error: true
       - name: Upload reports
         if: always()
@@ -34,8 +54,12 @@ jobs:
           path: |
             outdated.log
             upgrade.log
+            alarm_data/outdated.log
+            alarm_data/upgrade.log
+            alarm_domain/outdated.log
+            alarm_domain/upgrade.log
       - name: Fail if updates or conflicts found
-        if: steps.outdated.outcome == 'failure' || steps.upgrade.outcome == 'failure'
+        if: steps.outdated.outcome == 'failure' || steps.outdated_packages.outcome == 'failure' || steps.upgrade.outcome == 'failure' || steps.upgrade_packages.outcome == 'failure'
         run: |
           echo "Dependency updates or conflicts detected."
           exit 1
