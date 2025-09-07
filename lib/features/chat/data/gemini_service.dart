@@ -6,12 +6,15 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class GeminiService {
+import '../domain/chat_service.dart';
+import '../domain/note_analysis.dart';
+
+class GeminiServiceImpl implements ChatService {
   final http.Client _client;
   final String _model;
   final String _apiKey;
 
-  GeminiService({
+  GeminiServiceImpl({
     http.Client? client,
     String model = 'gemini-1.5-flash-latest',
     String? apiKey,
@@ -20,6 +23,7 @@ class GeminiService {
         _apiKey =
             apiKey ?? const String.fromEnvironment('GEMINI_API_KEY', defaultValue: '');
 
+  @override
   Future<String> chat(String userText, AppLocalizations l10n) async {
     if (_apiKey.isEmpty) return l10n.geminiApiKeyNotConfigured;
 
@@ -66,6 +70,7 @@ class GeminiService {
     }
   }
 
+  @override
   Future<NoteAnalysis?> analyzeNote(String content) async {
     if (_apiKey.isEmpty) return null;
 
@@ -119,33 +124,17 @@ class GeminiService {
           .map((e) => DateTime.tryParse(e as String))
           .whereType<DateTime>()
           .toList();
-        return NoteAnalysis(
-          summary: map['summary'] as String? ?? '',
-          actionItems: (map['actionItems'] as List<dynamic>? ?? []).cast<String>(),
-          suggestedTags:
-              (map['suggestedTags'] as List<dynamic>? ?? []).cast<String>(),
-          suggestedTitle: map['suggestedTitle'] as String?,
-          dates: dates,
-        );
+      return NoteAnalysis(
+        summary: map['summary'] as String? ?? '',
+        actionItems: (map['actionItems'] as List<dynamic>? ?? []).cast<String>(),
+        suggestedTags:
+            (map['suggestedTags'] as List<dynamic>? ?? []).cast<String>(),
+        suggestedTitle: map['suggestedTitle'] as String?,
+        dates: dates,
+      );
     } catch (e, st) {
       debugPrint('analyzeNote parse error: $e\n$st');
       return null;
     }
   }
-}
-
-class NoteAnalysis {
-  final String summary;
-  final List<String> actionItems;
-  final List<String> suggestedTags;
-  final String? suggestedTitle;
-  final List<DateTime> dates;
-
-  NoteAnalysis({
-    required this.summary,
-    required this.actionItems,
-    required this.suggestedTags,
-    required this.dates,
-    this.suggestedTitle,
-  });
 }

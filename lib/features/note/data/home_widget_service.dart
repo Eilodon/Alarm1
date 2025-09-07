@@ -3,12 +3,13 @@ import 'package:home_widget/home_widget.dart';
 import 'package:alarm_domain/alarm_domain.dart';
 
 /// Service to update the native home screen widget with the next upcoming note.
-class HomeWidgetService {
+class HomeWidgetServiceImpl implements HomeWidgetService {
   static const _noteKey = 'note';
 
-  const HomeWidgetService();
+  const HomeWidgetServiceImpl();
 
   /// Save note data and trigger a widget update.
+  @override
   Future<void> update(List<Note> notes) async {
     final upcoming = _nextNote(notes);
     if (upcoming == null) {

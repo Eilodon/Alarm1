@@ -1,23 +1,24 @@
-import 'package:flutter_local_notifications/flutter_local_notifications.dart'
-    as fln;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart' as fln;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/foundation.dart';
+
 import 'package:alarm_domain/alarm_domain.dart';
 
-class NotificationService {
-  static final NotificationService _instance = NotificationService._internal();
-  factory NotificationService() => _instance;
-  NotificationService._internal();
+class NotificationServiceImpl implements NotificationService {
+  static final NotificationServiceImpl _instance =
+      NotificationServiceImpl._internal();
+  factory NotificationServiceImpl() => _instance;
+  NotificationServiceImpl._internal();
 
   final fln.FlutterLocalNotificationsPlugin _fln =
       fln.FlutterLocalNotificationsPlugin();
 
+  @override
   Future<void> init({
-    Future<void> Function(fln.NotificationResponse)?
-        onDidReceiveNotificationResponse,
+    Future<void> Function(dynamic response)? onDidReceiveNotificationResponse,
   }) async {
     tzdata.initializeTimeZones();
     final tzName = await FlutterNativeTimezone.getLocalTimezone();
@@ -34,7 +35,8 @@ class NotificationService {
 
     await _fln.initialize(
       settings,
-      onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
+      onDidReceiveNotificationResponse:
+          onDidReceiveNotificationResponse as Future<void> Function(fln.NotificationResponse)?,
     );
 
     final androidImpl = _fln
@@ -50,34 +52,36 @@ class NotificationService {
         ?.requestPermissions(alert: true, badge: true, sound: true);
   }
 
+  @override
   Future<void> scheduleNotification({
     required int id,
     required String title,
     required String body,
     required DateTime scheduledDate,
-    required AppLocalizations l10n,
+    required dynamic l10n,
     required String payload,
   }) async {
+    final loc = l10n as AppLocalizations;
     if (scheduledDate.isBefore(DateTime.now())) {
       throw ArgumentError('scheduledDate must be in the future');
     }
 
     final androidDetails = fln.AndroidNotificationDetails(
       'scheduled_channel',
-      l10n.scheduled,
-      channelDescription: l10n.scheduledDesc,
+      loc.scheduled,
+      channelDescription: loc.scheduledDesc,
       importance: Importance.max,
       priority: Priority.high,
       actions: [
         fln.AndroidNotificationAction(
           'done',
-          l10n.done,
+          loc.done,
           showsUserInterface: false,
           cancelNotification: true,
         ),
         fln.AndroidNotificationAction(
           'snooze',
-          l10n.snooze,
+          loc.snooze,
           showsUserInterface: false,
           cancelNotification: true,
         ),
@@ -94,8 +98,7 @@ class NotificationService {
         tz.TZDateTime.from(scheduledDate, tz.local),
         details,
         androidScheduleMode: fln.AndroidScheduleMode.exactAllowWhileIdle,
-        matchDateTimeComponents:
-            null, // Không còn dùng uiLocalNotificationDateInterpretation
+        matchDateTimeComponents: null,
         payload: payload,
       );
     } catch (e) {
@@ -103,17 +106,19 @@ class NotificationService {
     }
   }
 
+  @override
   Future<void> scheduleRecurring({
     required int id,
     required String title,
     required String body,
     required RepeatInterval repeatInterval,
-    required AppLocalizations l10n,
+    required dynamic l10n,
   }) async {
+    final loc = l10n as AppLocalizations;
     final androidDetails = fln.AndroidNotificationDetails(
       'recurring_channel',
-      l10n.recurring,
-      channelDescription: l10n.recurringDesc,
+      loc.recurring,
+      channelDescription: loc.recurringDesc,
       importance: Importance.max,
       priority: Priority.high,
     );
@@ -138,17 +143,20 @@ class NotificationService {
     }
   }
 
+  @override
   Future<void> scheduleDailyAtTime({
     required int id,
     required String title,
     required String body,
-    required fln.Time time,
-    required AppLocalizations l10n,
+    required dynamic time,
+    required dynamic l10n,
   }) async {
+    final t = time as fln.Time;
+    final loc = l10n as AppLocalizations;
     final androidDetails = fln.AndroidNotificationDetails(
       'daily_channel',
-      l10n.daily,
-      channelDescription: l10n.dailyDesc,
+      loc.daily,
+      channelDescription: loc.dailyDesc,
       importance: Importance.max,
       priority: Priority.high,
     );
@@ -159,7 +167,7 @@ class NotificationService {
       iOS: iosDetails,
     );
 
-    final scheduledDate = _nextInstanceOfTime(time);
+    final scheduledDate = _nextInstanceOfTime(t);
     if (scheduledDate.isBefore(DateTime.now())) {
       throw ArgumentError('scheduledDate must be in the future');
     }
@@ -179,7 +187,32 @@ class NotificationService {
     }
   }
 
-  /// Finds the next instance of [time] in the local timezone.
+  @override
+  Future<void> cancel(int id) async {
+    await _fln.cancel(id);
+  }
+
+  @override
+  Future<void> snoozeNotification({
+    required int id,
+    required String title,
+    required String body,
+    required int minutes,
+    required dynamic l10n,
+    required String payload,
+  }) async {
+    final loc = l10n as AppLocalizations;
+    final scheduledDate = DateTime.now().add(Duration(minutes: minutes));
+    await scheduleNotification(
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: scheduledDate,
+      l10n: loc,
+      payload: payload,
+    );
+  }
+
   tz.TZDateTime _nextInstanceOfTime(fln.Time time) {
     final now = tz.TZDateTime.now(tz.local);
     var scheduledDate = tz.TZDateTime(
@@ -201,68 +234,14 @@ class NotificationService {
 
   fln.RepeatInterval _mapRepeatInterval(RepeatInterval interval) {
     switch (interval) {
-      case RepeatInterval.everyMinute:
-        return fln.RepeatInterval.everyMinute;
       case RepeatInterval.hourly:
         return fln.RepeatInterval.hourly;
       case RepeatInterval.daily:
         return fln.RepeatInterval.daily;
       case RepeatInterval.weekly:
         return fln.RepeatInterval.weekly;
+      case RepeatInterval.monthly:
+        return fln.RepeatInterval.everyMinute; // closest
     }
-  }
-
-  Future<void> snoozeNotification({
-    required int id,
-    required String title,
-    required String body,
-    required int minutes,
-    required AppLocalizations l10n,
-    required String payload,
-  }) async {
-    await _fln.cancel(id);
-
-    final scheduledDate = tz.TZDateTime.now(
-      tz.local,
-    ).add(Duration(minutes: minutes));
-
-    final androidDetails = fln.AndroidNotificationDetails(
-      'snooze_channel',
-      l10n.snooze,
-      channelDescription: l10n.snoozeDesc,
-      importance: Importance.max,
-      priority: Priority.high,
-      actions: [
-        fln.AndroidNotificationAction(
-          'done',
-          l10n.done,
-          showsUserInterface: false,
-          cancelNotification: true,
-        ),
-        fln.AndroidNotificationAction(
-          'snooze',
-          l10n.snooze,
-          showsUserInterface: false,
-          cancelNotification: true,
-        ),
-      ],
-    );
-
-    final details = fln.NotificationDetails(android: androidDetails);
-
-    await _fln.zonedSchedule(
-      id,
-      title,
-      body,
-      scheduledDate,
-      details,
-      androidScheduleMode: fln.AndroidScheduleMode.exactAllowWhileIdle,
-      matchDateTimeComponents: null,
-      payload: payload,
-    );
-  }
-
-  Future<void> cancel(int id) {
-    return _fln.cancel(id);
   }
 }

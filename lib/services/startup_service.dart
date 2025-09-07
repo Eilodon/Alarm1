@@ -6,7 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     as fln;
 
 import '../firebase_options.dart';
-import 'notification_service.dart';
+import '../features/note/data/notification_service.dart';
 
 class StartupResult {
   final bool authFailed;
@@ -38,7 +38,7 @@ class StartupService {
     }
 
     try {
-      await NotificationService().init(
+      await NotificationServiceImpl().init(
         onDidReceiveNotificationResponse: onDidReceiveNotificationResponse,
       );
     } catch (_) {

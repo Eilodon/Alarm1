@@ -1,3 +1,5 @@
 library settings_feature;
 
-export '../../services/settings_service.dart';
+export 'domain/settings_service.dart';
+export 'data/settings_service.dart';
+export 'presentation/settings_screen.dart';

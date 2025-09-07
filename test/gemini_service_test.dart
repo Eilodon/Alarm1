@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:notes_reminder_app/services/gemini_service.dart';
+import 'package:notes_reminder_app/features/chat/data/gemini_service.dart';
 
 class MockL10n extends Mock implements AppLocalizations {}
 
@@ -37,7 +37,7 @@ void main() {
             headers: {'content-type': 'application/json'});
       });
 
-      final service = GeminiService(client: client, apiKey: 'test');
+      final service = GeminiServiceImpl(client: client, apiKey: 'test');
       final result = await service.analyzeNote('test note');
 
       expect(result, isNotNull);
@@ -49,7 +49,7 @@ void main() {
 
     test('returns null on http error', () async {
       final client = MockClient((_) async => http.Response('err', 500));
-      final service = GeminiService(client: client, apiKey: 'test');
+      final service = GeminiServiceImpl(client: client, apiKey: 'test');
 
       final result = await service.analyzeNote('note');
       expect(result, isNull);
@@ -57,7 +57,7 @@ void main() {
 
     test('returns null on network error', () async {
       final client = MockClient((_) async => throw SocketException('no net'));
-      final service = GeminiService(client: client, apiKey: 'test');
+      final service = GeminiServiceImpl(client: client, apiKey: 'test');
 
       final result = await service.analyzeNote('note');
       expect(result, isNull);
@@ -79,7 +79,7 @@ void main() {
 
     test('returns error on invalid api key', () async {
       final client = MockClient((_) async => http.Response('denied', 401));
-      final service = GeminiService(client: client, apiKey: 'test');
+      final service = GeminiServiceImpl(client: client, apiKey: 'test');
 
       final result = await service.chat('hi', l10n);
       expect(result, 'error: Invalid API key');
@@ -88,7 +88,7 @@ void main() {
     test('returns error on server issue', () async {
       final client =
           MockClient((_) async => http.Response('boom', 500, reasonPhrase: 'ERR'));
-      final service = GeminiService(client: client, apiKey: 'test');
+      final service = GeminiServiceImpl(client: client, apiKey: 'test');
 
       final result = await service.chat('hi', l10n);
       expect(result, 'error: 500 ERR');
@@ -96,7 +96,7 @@ void main() {
 
     test('returns no internet on socket exception', () async {
       final client = MockClient((_) async => throw SocketException('x'));
-      final service = GeminiService(client: client, apiKey: 'test');
+      final service = GeminiServiceImpl(client: client, apiKey: 'test');
 
       final result = await service.chat('hi', l10n);
       expect(result, 'no internet');

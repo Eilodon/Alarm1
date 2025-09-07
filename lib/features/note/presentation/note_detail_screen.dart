@@ -6,16 +6,17 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'package:alarm_domain/alarm_domain.dart';
-import '../features/note/presentation/note_provider.dart';
-import '../services/tts_service.dart';
-import '../widgets/tag_selector.dart';
-import '../l10n/localization_extensions.dart';
-import '../services/gemini_service.dart';
-import '../widgets/attachment_section.dart';
-import '../widgets/reminder_controls.dart';
-import '../widgets/ai_suggestions_dialog.dart';
-import 'chat_screen.dart';
-import '../widgets/route_transitions.dart';
+import 'note_provider.dart';
+import '../../services/tts_service.dart';
+import '../../widgets/tag_selector.dart';
+import '../../l10n/localization_extensions.dart';
+import '../../chat/data/gemini_service.dart';
+import '../../chat/domain/note_analysis.dart';
+import '../../widgets/attachment_section.dart';
+import '../../widgets/reminder_controls.dart';
+import '../../widgets/ai_suggestions_dialog.dart';
+import '../../chat/presentation/chat_screen.dart';
+import '../../widgets/route_transitions.dart';
 
 class NoteDetailScreen extends StatefulWidget {
   final Note note;
@@ -91,7 +92,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
       return;
     }
     _debounce = Timer(const Duration(seconds: 1), () async {
-      final analysis = await GeminiService().analyzeNote(_contentCtrl.text);
+      final analysis =
+          await GeminiServiceImpl().analyzeNote(_contentCtrl.text);
       if (!mounted) return;
       setState(() {
         _analysis = analysis;
@@ -218,7 +220,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                 Navigator.push(
                   context,
                   buildSlideFadeRoute(
-                    ChatScreen(initialMessage: _contentCtrl.text),
+                    ChatScreen(
+                      initialMessage: _contentCtrl.text,
+                      service: GeminiServiceImpl(),
+                    ),
                   ),
                 );
               },
@@ -235,7 +240,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     final analysis =
-        _analysis ?? await GeminiService().analyzeNote(_contentCtrl.text);
+        _analysis ?? await GeminiServiceImpl().analyzeNote(_contentCtrl.text);
     String summary = widget.note.summary;
     List<String> actionItems = List.from(widget.note.actionItems);
     List<DateTime> dates = List.from(widget.note.dates);

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import '../services/gemini_service.dart';
+import '../domain/chat_service.dart';
 
 class ChatScreen extends StatefulWidget {
   final String initialMessage;
-  const ChatScreen({super.key, required this.initialMessage});
+  final ChatService service;
+  const ChatScreen({super.key, required this.initialMessage, required this.service});
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -19,12 +20,13 @@ class Message {
 class _ChatScreenState extends State<ChatScreen> {
   final List<Message> _messages = [];
   final TextEditingController _controller = TextEditingController();
-  final GeminiService _geminiService = GeminiService();
+  late final ChatService _geminiService;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
+    _geminiService = widget.service;
     if (widget.initialMessage.isNotEmpty) {
       _messages.insert(0, Message(widget.initialMessage, true));
       _sendToGemini(widget.initialMessage);

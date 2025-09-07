@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../theme/tokens.dart';
 import 'package:alarm_data/alarm_data.dart';
+import '../domain/settings_service.dart';
 
-class SettingsService {
-  SettingsService({SharedPreferences? sharedPreferences})
+class SettingsServiceImpl implements SettingsService {
+  SettingsServiceImpl({SharedPreferences? sharedPreferences})
       : _preferences = sharedPreferences;
 
   static const _kThemeColor = 'theme_color';

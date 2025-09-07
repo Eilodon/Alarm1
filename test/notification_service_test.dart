@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:ui';
-import 'package:notes_reminder_app/services/notification_service.dart';
+import 'package:notes_reminder_app/features/note/data/notification_service.dart';
 import 'package:alarm_domain/alarm_domain.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
@@ -34,7 +34,7 @@ void main() {
   });
 
   test('init initializes plugin', () async {
-    await NotificationService().init();
+    await NotificationServiceImpl().init();
     expect(log.any((c) => c.method == 'initialize'), isTrue);
   });
 
@@ -42,7 +42,7 @@ void main() {
     final l10n = await AppLocalizations.delegate.load(const Locale('en'));
     tzdata.initializeTimeZones();
     tz.setLocalLocation(tz.getLocation('America/Detroit'));
-    final service = NotificationService();
+    final service = NotificationServiceImpl();
     await service.scheduleNotification(
       id: 1,
       title: 't',
@@ -58,7 +58,7 @@ void main() {
 
   test('scheduleNotification throws if scheduledDate in the past', () async {
     final l10n = await AppLocalizations.delegate.load(const Locale('en'));
-    final service = NotificationService();
+    final service = NotificationServiceImpl();
     expect(
       () => service.scheduleNotification(
         id: 10,
@@ -83,7 +83,7 @@ void main() {
       }
       return null;
     });
-    await NotificationService().scheduleNotification(
+    await NotificationServiceImpl().scheduleNotification(
       id: 11,
       title: 't',
       body: 'b',
@@ -104,7 +104,7 @@ void main() {
     final l10n = await AppLocalizations.delegate.load(const Locale('en'));
     tzdata.initializeTimeZones();
     tz.setLocalLocation(tz.getLocation('America/Detroit'));
-    final service = NotificationService();
+    final service = NotificationServiceImpl();
     await service.scheduleDailyAtTime(
       id: 2,
       title: 't',
@@ -122,7 +122,7 @@ void main() {
 
   test('scheduleRecurring uses localizations', () async {
     final l10n = await AppLocalizations.delegate.load(const Locale('en'));
-    final service = NotificationService();
+    final service = NotificationServiceImpl();
     await service.scheduleRecurring(
       id: 3,
       title: 't',
@@ -148,7 +148,7 @@ void main() {
       }
       return null;
     });
-    await NotificationService().scheduleRecurring(
+    await NotificationServiceImpl().scheduleRecurring(
       id: 12,
       title: 't',
       body: 'b',
@@ -173,7 +173,7 @@ void main() {
       first = false;
       return null;
     });
-    final service = NotificationService();
+    final service = NotificationServiceImpl();
     await service.scheduleRecurring(
       id: 13,
       title: 't',
@@ -200,7 +200,7 @@ void main() {
     final l10n = await AppLocalizations.delegate.load(const Locale('en'));
     tzdata.initializeTimeZones();
     tz.setLocalLocation(tz.getLocation('America/Detroit'));
-    final service = NotificationService();
+    final service = NotificationServiceImpl();
     await service.snoozeNotification(
       id: 14,
       title: 't',
@@ -227,7 +227,7 @@ void main() {
       }
       return null;
     });
-    final service = NotificationService();
+    final service = NotificationServiceImpl();
     expect(
       () => service.snoozeNotification(
         id: 15,
@@ -253,7 +253,7 @@ void main() {
       return null;
     });
     expect(
-      () => NotificationService().cancel(99),
+      () => NotificationServiceImpl().cancel(99),
       throwsA(isA<PlatformException>()),
     );
     expect(log.single.method, 'cancel');

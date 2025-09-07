@@ -4,12 +4,12 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'package:alarm_domain/alarm_domain.dart';
-import '../features/note/presentation/note_provider.dart';
-import '../services/auth_service.dart';
+import 'note_provider.dart';
+import '../../services/auth_service.dart';
 import 'note_detail_screen.dart';
-import '../pandora_ui/hint_chip.dart';
-import '../widgets/note_card.dart';
-import '../widgets/route_transitions.dart';
+import '../../pandora_ui/hint_chip.dart';
+import '../../widgets/note_card.dart';
+import '../../widgets/route_transitions.dart';
 
 class NoteListForDayScreen extends StatelessWidget {
   final DateTime date;
