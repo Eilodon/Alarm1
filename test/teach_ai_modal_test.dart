@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:notes_reminder_app/models/security_cue.dart';
 import 'package:notes_reminder_app/pandora_ui/teach_ai_modal.dart';
 
@@ -21,6 +22,9 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
+        locale: const Locale('en'),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: Builder(
           builder: (context) {
             return ElevatedButton(
@@ -41,7 +45,8 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.enterText(find.byType(TextField), 'foo');
-    await tester.tap(find.text('Send'));
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    await tester.tap(find.text(l10n.send));
     await tester.pumpAndSettle();
 
     expect(result, 'foo');
