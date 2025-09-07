@@ -60,6 +60,16 @@ dependencies:
   alarm_data:
     path: alarm_data
 
+dependency_overrides:
+  file_picker: 6.2.1
+  pdf: 3.11.3
+  path_provider: 2.1.5
+  uuid: 4.5.1
+  encrypt: 5.0.3
+  cryptography: 2.7.0
+  flutter_secure_storage: 9.2.4
+  shared_preferences: 2.5.3
+
 
 dev_dependencies:
   flutter_test:
