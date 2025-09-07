@@ -6,6 +6,9 @@ import 'chat_screen.dart';
 import 'note_list_for_day_screen.dart';
 import 'settings_screen.dart';
 import 'voice_to_note_screen.dart';
+import '../models/command.dart';
+import '../pandora_ui/palette_bottom_sheet.dart';
+import '../pandora_ui/teach_ai_modal.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -117,67 +120,76 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         }
 
-        // Mobile layout with toolbar buttons at the bottom.
+        // Mobile layout with a bottom navigation bar.
         return Scaffold(
-          body: Stack(
-            children: [
-              IndexedStack(index: _currentIndex, children: _screens),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: SafeArea(
-                  child: Padding(
-                    padding: EdgeInsets.all(tokens.spacing.s),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ToolbarButton(
-                            icon: const Icon(Icons.note),
-                            label: l10n.notes,
-                            onPressed: () => setState(() => _currentIndex = 0),
-                          ),
-                          ToolbarButton(
-                            icon: const Icon(Icons.alarm),
-                            label: l10n.reminders,
-                            onPressed: () => setState(() => _currentIndex = 1),
-                          ),
-                          ToolbarButton(
-                            icon: const Icon(Icons.mic),
-                            label: l10n.voiceToNote,
-                            onPressed: () => setState(() => _currentIndex = 2),
-                          ),
-                          ToolbarButton(
-                            icon: const Icon(Icons.smart_toy),
-                            label: l10n.chatAI,
-                            onPressed: () => setState(() => _currentIndex = 3),
-                          ),
-                          ToolbarButton(
-                            icon: const Icon(Icons.settings),
-                            label: l10n.settings,
-                            onPressed: () => setState(() => _currentIndex = 4),
-                          ),
-                          ToolbarButton(
-                            icon: const Icon(Icons.palette),
-                            label: l10n.palette,
-                            onPressed: _showPalette,
-                          ),
-                          ToolbarButton(
-                            icon: const Icon(Icons.school),
-                            label: l10n.teachAi,
-                            onPressed: _openTeachAi,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-
+          body: IndexedStack(index: _currentIndex, children: _screens),
+          bottomNavigationBar: NavigationBar(
+            selectedIndex: _currentIndex,
+            onDestinationSelected: (index) {
+              if (index < _screens.length) {
+                setState(() => _currentIndex = index);
+              } else if (index == _screens.length) {
+                _showPalette();
+                setState(() {});
+              } else if (index == _screens.length + 1) {
+                _openTeachAi();
+                setState(() {});
+              }
+            },
+            destinations: [
+              NavigationDestination(
+                icon: const Icon(Icons.note),
+                label: l10n.notes,
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.alarm),
+                label: l10n.reminders,
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.mic),
+                label: l10n.voiceToNote,
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.smart_toy),
+                label: l10n.chatAI,
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.settings),
+                label: l10n.settings,
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.palette),
+                label: l10n.palette,
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.school),
+                label: l10n.teachAi,
               ),
             ],
           ),
         );
       },
     );
+  }
+
+  Future<void> _showPalette() async {
+    final l10n = AppLocalizations.of(context)!;
+    await showPaletteBottomSheet(
+      context,
+      commands: [
+        Command(
+          title: l10n.voiceToNote,
+          action: () => setState(() => _currentIndex = 2),
+        ),
+        Command(
+          title: l10n.settings,
+          action: () => setState(() => _currentIndex = 4),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _openTeachAi() {
+    return TeachAiModal.show(context);
   }
 }
