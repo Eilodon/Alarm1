@@ -40,11 +40,48 @@ void main() {
       );
 
       final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+
+      final convertButtonBefore = tester.widget<ElevatedButton>(
+        find.widgetWithText(ElevatedButton, l10n.convertToNote),
+      );
+      expect(convertButtonBefore.onPressed, isNull);
+
       await tester.tap(find.text(l10n.speak));
       await tester.pump();
 
       expect(find.text('hello'), findsOneWidget);
+
+      final convertButtonAfter = tester.widget<ElevatedButton>(
+        find.widgetWithText(ElevatedButton, l10n.convertToNote),
+      );
+      expect(convertButtonAfter.onPressed, isNotNull);
+
       verify(() => speech.listen(onResult: any(named: 'onResult'))).called(1);
+    });
+
+    testWidgets('shows snackbar when no speech recognized', (tester) async {
+      final speech = MockSpeechToText();
+      when(() => speech.initialize()).thenAnswer((_) async => true);
+      when(() => speech.listen(onResult: any(named: 'onResult')))
+          .thenAnswer((_) async {});
+      when(() => speech.stop()).thenAnswer((_) async {});
+
+      await tester.pumpWidget(
+        MaterialApp(
+          locale: const Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: VoiceToNoteScreen(speech: speech),
+        ),
+      );
+
+      final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+      await tester.tap(find.text(l10n.speak));
+      await tester.pump();
+      await tester.tap(find.text(l10n.stop));
+      await tester.pump();
+
+      expect(find.text(l10n.speechNotRecognizedMessage), findsOneWidget);
     });
 
     testWidgets('shows snackbar when permission denied', (tester) async {

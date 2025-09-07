@@ -55,6 +55,15 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
     } else {
       await widget.speech.stop();
       setState(() => _isListening = false);
+      if (_recognized.isEmpty) {
+        if (!mounted) return;
+        final l10n = AppLocalizations.of(context)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.speechNotRecognizedMessage),
+          ),
+        );
+      }
     }
   }
 
@@ -92,15 +101,25 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
             if (_isProcessing) const CircularProgressIndicator(),
             Row(
               children: [
-                ElevatedButton(
+                ElevatedButton.icon(
                   onPressed: _toggleListening,
-                  child: Text(_isListening
+                  icon: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: Icon(
+                      _isListening ? Icons.mic : Icons.mic_none,
+                      key: ValueKey(_isListening),
+                      color: _isListening ? Colors.red : null,
+                    ),
+                  ),
+                  label: Text(_isListening
                       ? AppLocalizations.of(context)!.stop
                       : AppLocalizations.of(context)!.speak),
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(
-                  onPressed: _isProcessing ? null : _convertToNote,
+                  onPressed: _isProcessing || _recognized.isEmpty
+                      ? null
+                      : _convertToNote,
                   child: Text(AppLocalizations.of(context)!.convertToNote),
                 ),
               ],

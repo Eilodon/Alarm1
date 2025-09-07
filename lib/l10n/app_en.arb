@@ -10,6 +10,7 @@
   "noNotes": "No notes",
   "settings": "Settings",
   "chooseThemeColor": "Choose theme color",
+  "lowContrastWarning": "Selected color has low contrast with text",
   "changeThemeColor": "Change theme color",
   "chooseMascot": "Choose mascot",
   "changeMascot": "Change mascot",
@@ -38,6 +39,7 @@
   "networkError": "Network error. Please try again.",
   "noInternetConnection": "No internet connection.",
   "microphonePermissionMessage": "Microphone permission is required. Please enable it in Settings.",
+  "speechNotRecognizedMessage": "No speech detected. Please try again.",
   "readNote": "Read Note",
   "scheduleForDate": "Schedule for {date}",
   "@scheduleForDate": {
@@ -144,5 +146,13 @@
   "themeUpdated": "Theme updated",
   "notes": "Notes",
   "reminders": "Reminders",
-  "palette": "Palette"
+  "palette": "Palette",
+  "onboardingTakeNotes": "Take Notes",
+  "onboardingTakeNotesDesc": "Write down your thoughts and ideas.",
+  "onboardingSetReminders": "Set Reminders",
+  "onboardingSetRemindersDesc": "Schedule alarms for important tasks.",
+  "onboardingCustomize": "Customize",
+  "onboardingCustomizeDesc": "Adjust themes and font sizes to your liking.",
+  "onboardingSkip": "Skip",
+  "onboardingGetStarted": "Get Started"
 }
