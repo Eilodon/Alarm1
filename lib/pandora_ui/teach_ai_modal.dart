@@ -32,6 +32,26 @@ class _TeachAiModalState extends State<TeachAiModal> {
   final TextEditingController _controller = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    _controller.addListener(() => setState(() {}));
+  }
+
+  void _handleSubmit() {
+    final text = _controller.text.trim();
+    if (text.isEmpty) {
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.fieldRequired)),
+      );
+      return;
+    }
+    widget.securityCue.triggerHaptic(hapticFeedbackDriver);
+    widget.onSubmit?.call(text);
+    Navigator.of(context).pop();
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
@@ -46,6 +66,7 @@ class _TeachAiModalState extends State<TeachAiModal> {
       title: Text(l10n.teachAi),
       content: TextField(
         controller: _controller,
+        onSubmitted: (_) => _handleSubmit(),
         maxLines: 5,
         decoration: InputDecoration(
           hintText: l10n.teachAiHint,
@@ -61,11 +82,7 @@ class _TeachAiModalState extends State<TeachAiModal> {
           child: Text(l10n.cancel),
         ),
         ElevatedButton(
-          onPressed: () {
-            widget.securityCue.triggerHaptic(hapticFeedbackDriver);
-            widget.onSubmit?.call(_controller.text);
-            Navigator.of(context).pop();
-          },
+          onPressed: _controller.text.trim().isEmpty ? null : _handleSubmit,
           child: Text(l10n.submit),
         ),
       ],
