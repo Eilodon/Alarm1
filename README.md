@@ -4,6 +4,16 @@ A Flutter application to manage notes, schedule reminders, transcribe speech, pl
 
 For an overview of how the app is structured, see the architecture documentation in [Vietnamese](docs/ARCHITECTURE.md) or [English](docs/ARCHITECTURE_en.md), including the AuthService flow and ConnectivityService strategy.
 
+## Quick Setup
+
+1. Copy `.env.example` to `.env` and add your API keys.
+2. Run `flutterfire configure` to generate `lib/firebase_options.dart`.
+3. Launch the app:
+
+   ```bash
+   flutter run --dart-define-from-file=.env
+   ```
+
 ## Features
 
 * Create, edit, and organize notes backed by Firebase.
@@ -18,7 +28,7 @@ For an overview of how the app is structured, see the architecture documentation
 ## Firebase Configuration
 
 1. Create a Firebase project and enable Firestore and Authentication (anonymous sign‑in).
-2. Run `flutterfire configure` and replace the placeholder values in `lib/firebase_options.dart`.
+2. Run `flutterfire configure` to generate `lib/firebase_options.dart`.
 3. Download your `google-services.json` and `GoogleService-Info.plist` files and place them in `android/app/` and `ios/Runner/`.
 4. Rebuild the app so Firebase can initialize with your settings.
 
