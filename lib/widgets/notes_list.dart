@@ -14,16 +14,13 @@ import 'note_card.dart';
 import '../providers/note_provider.dart';
 import '../screens/note_detail_screen.dart';
 import '../services/auth_service.dart';
+import 'route_transitions.dart';
 
 class NotesList extends StatefulWidget {
-
   final List<Note> notes;
   final int gridCount;
 
   const NotesList({super.key, required this.notes, this.gridCount = 1});
-
-
-  final List<Note> notes;
 
   @override
   State<NotesList> createState() => _NotesListState();
@@ -155,26 +152,11 @@ class _NotesListState extends State<NotesList> {
               final ok = await AuthService().authenticate(l10n);
               if (!ok) return;
             }
-            Navigator.push(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (_, __, ___) => NoteDetailScreen(note: note),
-                transitionsBuilder: (_, animation, __, child) {
-                  final offsetAnimation = Tween<Offset>(
-                    begin: const Offset(1, 0),
-                    end: Offset.zero,
-                  ).animate(animation);
-                  return FadeTransition(
-                    opacity: animation,
-                    child: SlideTransition(
-                      position: offsetAnimation,
-                      child: child,
-                    ),
-                  );
-                },
-              ),
-            );
-          },
+              Navigator.push(
+                context,
+                buildSlideFadeRoute(NoteDetailScreen(note: note)),
+              );
+            },
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
