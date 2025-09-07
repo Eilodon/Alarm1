@@ -20,7 +20,7 @@ class NoteSyncService {
   final FirebaseAuth _auth;
   final Connectivity _connectivity;
 
-  StreamSubscription<ConnectivityResult>? _connectivitySubscription;
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
   SharedPreferences? _prefs;
 
   static const _unsyncedKey = 'unsyncedNoteIds';
@@ -54,7 +54,7 @@ class NoteSyncService {
     }
     _connectivitySubscription =
         _connectivity.onConnectivityChanged.listen((result) {
-      if (result != ConnectivityResult.none) {
+      if (!result.contains(ConnectivityResult.none)) {
         syncUnsyncedNotes();
       }
     });
@@ -79,7 +79,8 @@ class NoteSyncService {
       return;
     }
     try {
-      final user = _auth.currentUser ?? await _auth.signInAnonymously();
+      final user =
+          _auth.currentUser ?? (await _auth.signInAnonymously()).user!;
       final data = await _repository.encryptNote(note);
       data['userId'] = user.uid;
       await _firestore.collection('notes').doc(note.id).set(data);
@@ -108,7 +109,8 @@ class NoteSyncService {
     if (_unsyncedNoteIds.isEmpty || Firebase.apps.isEmpty) return;
     syncStatus.value = SyncStatus.syncing;
     try {
-      final user = _auth.currentUser ?? await _auth.signInAnonymously();
+      final user =
+          _auth.currentUser ?? (await _auth.signInAnonymously()).user!;
       final ids = List<String>.from(_unsyncedNoteIds);
       final batch = _firestore.batch();
       for (final id in ids) {
@@ -138,7 +140,8 @@ class NoteSyncService {
     if (Firebase.apps.isNotEmpty) {
       final originalNotes = List<Note>.from(notes);
       try {
-        final user = _auth.currentUser ?? await _auth.signInAnonymously();
+        final user =
+            _auth.currentUser ?? (await _auth.signInAnonymously()).user!;
         final snapshot = await _firestore
             .collection('notes')
             .where('userId', isEqualTo: user.uid)

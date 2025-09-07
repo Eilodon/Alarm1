@@ -2,15 +2,16 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:alarm_domain/alarm_domain.dart';
 import 'package:alarm_data/alarm_data.dart';
-import 'package:notes_reminder_app/services/note_sync_service.dart';
+import 'package:notes_reminder_app/features/note/data/note_sync_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DummyRepo extends Fake implements NoteRepository {}
 
-class FakeConnectivity extends Connectivity {
-  @override
-  Stream<ConnectivityResult> get onConnectivityChanged => const Stream.empty();
-}
+  class FakeConnectivity extends Connectivity {
+    @override
+    Stream<List<ConnectivityResult>> get onConnectivityChanged =>
+        const Stream.empty();
+  }
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

@@ -5,7 +5,7 @@ import 'package:notes_reminder_app/providers/note_provider.dart';
 import 'package:alarm_data/alarm_data.dart';
 import 'package:notes_reminder_app/services/calendar_service.dart';
 import 'package:notes_reminder_app/services/notification_service.dart';
-import 'package:notes_reminder_app/services/note_sync_service.dart';
+import 'package:notes_reminder_app/features/note/data/note_sync_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MockRepo extends Mock implements NoteRepository {}
