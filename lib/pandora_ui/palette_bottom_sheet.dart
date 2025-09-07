@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fuse/fuse.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../models/command.dart';
 
@@ -49,6 +50,7 @@ class _PaletteBottomSheetState extends State<_PaletteBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SafeArea(
       child: Padding(
         padding: EdgeInsets.only(
@@ -62,8 +64,8 @@ class _PaletteBottomSheetState extends State<_PaletteBottomSheet> {
               child: TextField(
                 autofocus: true,
                 onChanged: _onQueryChanged,
-                decoration: const InputDecoration(
-                  hintText: 'Type a command...',
+                decoration: InputDecoration(
+                  hintText: l10n.searchCommandHint,
                 ),
               ),
             ),

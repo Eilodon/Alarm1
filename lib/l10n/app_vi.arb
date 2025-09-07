@@ -148,6 +148,7 @@
   "notes": "Ghi chú",
   "reminders": "Nhắc nhở",
   "palette": "Bảng màu",
+  "searchCommandHint": "Nhập lệnh...",
   "onboardingTakeNotes": "Ghi chú",
   "onboardingTakeNotesDesc": "Ghi lại suy nghĩ và ý tưởng của bạn.",
   "onboardingSetReminders": "Đặt nhắc nhở",
