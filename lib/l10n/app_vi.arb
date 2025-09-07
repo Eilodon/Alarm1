@@ -109,8 +109,7 @@
   "datesLabel": "Ngày",
   "authFailedMessage": "Đăng nhập ẩn danh thất bại. Chức năng bị hạn chế.",
   "notificationFailedMessage": "Thiết lập thông báo thất bại.",
-  "saveNoteFailed": "Lưu ghi chú thất bại"
-,
+  "saveNoteFailed": "Lưu ghi chú thất bại",
   "hintReady": "Sẵn sàng",
   "hintArmed": "Đã gài",
   "hintActive": "Đang hoạt động",
@@ -126,5 +125,14 @@
   "backupNow": "Sao lưu ngay",
   "syncStatusIdle": "Đã đồng bộ",
   "syncStatusSyncing": "Đang đồng bộ...",
-  "syncStatusError": "Lỗi đồng bộ"
+  "syncStatusError": "Lỗi đồng bộ",
+  "showNotes": "Hiển thị Ghi chú",
+  "showVoiceToNote": "Hiển thị Giọng nói thành ghi chú",
+  "openSettings": "Mở cài đặt",
+  "primary": "Màu chính",
+  "secondary": "Màu phụ",
+  "themeUpdated": "Đã cập nhật chủ đề",
+  "notes": "Ghi chú",
+  "reminders": "Nhắc nhở",
+  "palette": "Bảng màu"
 }

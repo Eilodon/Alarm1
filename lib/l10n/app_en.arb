@@ -109,8 +109,7 @@
   "datesLabel": "Dates",
   "authFailedMessage": "Anonymous sign-in failed. Limited functionality.",
   "notificationFailedMessage": "Notification setup failed.",
-  "saveNoteFailed": "Failed to save note"
-,
+  "saveNoteFailed": "Failed to save note",
   "hintReady": "Ready",
   "hintArmed": "Armed",
   "hintActive": "Active",
@@ -126,5 +125,14 @@
   "backupNow": "Backup now",
   "syncStatusIdle": "Synced",
   "syncStatusSyncing": "Syncing...",
-  "syncStatusError": "Sync error"
+  "syncStatusError": "Sync error",
+  "showNotes": "Show Notes",
+  "showVoiceToNote": "Show Voice to Note",
+  "openSettings": "Open Settings",
+  "primary": "Primary",
+  "secondary": "Secondary",
+  "themeUpdated": "Theme updated",
+  "notes": "Notes",
+  "reminders": "Reminders",
+  "palette": "Palette"
 }
