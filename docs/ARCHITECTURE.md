@@ -1,5 +1,7 @@
 # Kiến trúc
 
+[Read this in English](ARCHITECTURE_en.md).
+
 Ứng dụng được chia thành bốn lớp chính.
 
 ## Models
