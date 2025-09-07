@@ -43,7 +43,7 @@ class _OpenPaletteIntent extends Intent {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   late final List<Widget> _screens;
-  late final List<Command> _commands;
+  late List<Command> _commands;
 
 
   @override
@@ -64,17 +64,23 @@ class _HomeScreenState extends State<HomeScreen> {
         onThemeModeChanged: widget.onThemeModeChanged,
       ),
     ];
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final l10n = AppLocalizations.of(context)!;
     _commands = [
       Command(
-        title: 'Show Notes',
+        title: l10n.showNotes,
         action: () => setState(() => _currentIndex = 0),
       ),
       Command(
-        title: 'Show Voice to Note',
+        title: l10n.showVoiceToNote,
         action: () => setState(() => _currentIndex = 2),
       ),
       Command(
-        title: 'Open Settings',
+        title: l10n.openSettings,
         action: () => setState(() => _currentIndex = 4),
       ),
     ];
@@ -89,6 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showPalette() {
+    final l10n = AppLocalizations.of(context)!;
     final tokens = Theme.of(context).extension<Tokens>()!;
     PandoraBottomSheet.show(
       context,
@@ -97,20 +104,20 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           PaletteListItem(
             color: tokens.colors.primary,
-            label: 'Primary',
+            label: l10n.primary,
             onTap: () {
               widget.onThemeChanged(tokens.colors.primary);
               Navigator.pop(context);
-              _showSnackbar('Theme updated');
+              _showSnackbar(l10n.themeUpdated);
             },
           ),
           PaletteListItem(
             color: tokens.colors.secondary,
-            label: 'Secondary',
+            label: l10n.secondary,
             onTap: () {
               widget.onThemeChanged(tokens.colors.secondary);
               Navigator.pop(context);
-              _showSnackbar('Theme updated');
+              _showSnackbar(l10n.themeUpdated);
             },
           ),
         ],
@@ -146,12 +153,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       ToolbarButton(
                         icon: const Icon(Icons.note),
-                        label: 'Notes',
+                        label: l10n.notes,
                         onPressed: () => setState(() => _currentIndex = 0),
                       ),
                       ToolbarButton(
                         icon: const Icon(Icons.alarm),
-                        label: 'Reminders',
+                        label: l10n.reminders,
                         onPressed: () => setState(() => _currentIndex = 1),
                       ),
                       ToolbarButton(
@@ -171,12 +178,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       ToolbarButton(
                         icon: const Icon(Icons.palette),
-                        label: 'Palette',
+                        label: l10n.palette,
                         onPressed: _showPalette,
                       ),
                       ToolbarButton(
                         icon: const Icon(Icons.school),
-                        label: 'Teach AI',
+                        label: l10n.teachAi,
                         onPressed: _openTeachAi,
                       ),
                     ],
