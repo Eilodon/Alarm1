@@ -9,8 +9,6 @@ import 'services/connectivity_service.dart';
 import 'theme/tokens.dart';
 import 'widgets/route_transitions.dart';
 
-final messengerKey = GlobalKey<ScaffoldMessengerState>();
-
 class MyApp extends StatefulWidget {
   final Color themeColor;
   final double fontScale;
@@ -35,6 +33,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final messengerKey = GlobalKey<ScaffoldMessengerState>();
   Color _themeColor = Colors.blue;
   double _fontScale = 1.0;
   ThemeMode _themeMode = ThemeMode.system;

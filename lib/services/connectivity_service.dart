@@ -11,6 +11,7 @@ class ConnectivityService {
   void initialize(BuildContext context, GlobalKey<ScaffoldMessengerState> messengerKey) {
     try {
       _subscription = Connectivity().onConnectivityChanged.listen((result) {
+        if (!context.mounted) return;
         final l10n = AppLocalizations.of(context)!;
         if (result == ConnectivityResult.none) {
           messengerKey.currentState?.showSnackBar(

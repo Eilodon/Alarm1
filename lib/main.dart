@@ -15,11 +15,10 @@ import 'screens/error_screen.dart';
 
 Future<void> _onNotificationResponse(
   NotificationResponse response,
+  BuildContext context,
 ) async {
   final id = response.payload;
-  if (id == null) return;
-  final context = messengerKey.currentContext;
-  if (context == null) return;
+  if (id == null || !context.mounted) return;
   final noteProvider = context.read<NoteProvider>();
   Note? note;
   try {
@@ -46,7 +45,8 @@ void main() {
     AppProviders(
       child: FutureBuilder<AppInitializationData>(
         future: AppInitializer().initialize(
-          onDidReceiveNotificationResponse: _onNotificationResponse,
+          onDidReceiveNotificationResponse: (response) =>
+              _onNotificationResponse(response, context),
         ),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
