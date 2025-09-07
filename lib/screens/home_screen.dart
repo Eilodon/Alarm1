@@ -45,6 +45,23 @@ class _HomeScreenState extends State<HomeScreen> {
   late final List<Widget> _screens;
   late List<Command> _commands;
 
+  List<Command> _buildCommands(AppLocalizations l10n) {
+    return [
+      Command(
+        title: l10n.showNotes,
+        action: () => setState(() => _currentIndex = 0),
+      ),
+      Command(
+        title: l10n.showVoiceToNote,
+        action: () => setState(() => _currentIndex = 2),
+      ),
+      Command(
+        title: l10n.openSettings,
+        action: () => setState(() => _currentIndex = 4),
+      ),
+    ];
+  }
+
 
   @override
   void initState() {
@@ -70,20 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final l10n = AppLocalizations.of(context)!;
-    _commands = [
-      Command(
-        title: l10n.showNotes,
-        action: () => setState(() => _currentIndex = 0),
-      ),
-      Command(
-        title: l10n.showVoiceToNote,
-        action: () => setState(() => _currentIndex = 2),
-      ),
-      Command(
-        title: l10n.openSettings,
-        action: () => setState(() => _currentIndex = 4),
-      ),
-    ];
+    _commands = _buildCommands(l10n);
   }
 
   void _openPalette() {
