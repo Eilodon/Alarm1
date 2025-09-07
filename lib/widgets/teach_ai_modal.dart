@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../models/security_cue.dart';
 
@@ -40,7 +41,7 @@ class _TeachAiModalState extends State<TeachAiModal>
     return ScaleTransition(
       scale: curved,
       child: AlertDialog(
-        title: const Text('Teach AI'),
+        title: Text(AppLocalizations.of(context)!.teachAi),
         content: TextField(controller: _ctrl),
         actions: [
           TextButton(
@@ -48,7 +49,7 @@ class _TeachAiModalState extends State<TeachAiModal>
               widget.securityCue.triggerHaptic();
               Navigator.pop(context, _ctrl.text);
             },
-            child: const Text('Send'),
+            child: Text(AppLocalizations.of(context)!.send),
           ),
         ],
       ),

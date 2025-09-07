@@ -68,6 +68,7 @@ class _PandoraSnackbarState extends State<PandoraSnackbar>
   @override
   Widget build(BuildContext context) {
 
+    final l10n = AppLocalizations.of(context);
     final tokens = Theme.of(context).extension<Tokens>()!;
     Color iconColor;
     if (widget.kind == SnackbarKind.success) {
@@ -103,7 +104,7 @@ class _PandoraSnackbarState extends State<PandoraSnackbar>
               if (widget.onUndo != null)
                 TextButton(
                   onPressed: widget.onUndo,
-                  child: Text(AppLocalizations.of(context)!.undo),
+                  child: Text(l10n?.undo ?? 'Undo'),
                 ),
               IconButton(
                 icon: const Icon(Icons.close),

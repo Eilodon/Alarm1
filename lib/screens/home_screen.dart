@@ -48,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    final l10n = AppLocalizations.of(context)!;
     _screens = [
       NotesTab(
         onThemeChanged: widget.onThemeChanged,
@@ -65,15 +66,15 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
     _commands = [
       Command(
-        title: 'Show Notes',
+        title: l10n.showNotes,
         action: () => setState(() => _currentIndex = 0),
       ),
       Command(
-        title: 'Show Voice to Note',
+        title: l10n.showVoiceToNote,
         action: () => setState(() => _currentIndex = 2),
       ),
       Command(
-        title: 'Open Settings',
+        title: l10n.openSettings,
         action: () => setState(() => _currentIndex = 4),
       ),
     ];
@@ -105,6 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showPalette() {
+    final l10n = AppLocalizations.of(context)!;
     final tokens = Theme.of(context).extension<Tokens>()!;
     PandoraBottomSheet.show(
       context,
@@ -113,20 +115,20 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           PaletteListItem(
             color: tokens.colors.primary,
-            label: 'Primary',
+            label: l10n.primary,
             onTap: () {
               widget.onThemeChanged(tokens.colors.primary);
               Navigator.pop(context);
-              _showSnackbar('Theme updated', SnackbarKind.success);
+              _showSnackbar(l10n.themeUpdated, SnackbarKind.success);
             },
           ),
           PaletteListItem(
             color: tokens.colors.secondary,
-            label: 'Secondary',
+            label: l10n.secondary,
             onTap: () {
               widget.onThemeChanged(tokens.colors.secondary);
               Navigator.pop(context);
-              _showSnackbar('Theme updated', SnackbarKind.success);
+              _showSnackbar(l10n.themeUpdated, SnackbarKind.success);
             },
           ),
         ],
@@ -135,9 +137,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _openTeachAi() {
+    final l10n = AppLocalizations.of(context)!;
     TeachAiModal.show(
       context,
-      onSubmit: (_) => _showSnackbar('Thanks for teaching!', SnackbarKind.success),
+      onSubmit: (_) => _showSnackbar(l10n.thanksForTeaching, SnackbarKind.success),
     );
   }
 
@@ -162,12 +165,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       ToolbarButton(
                         icon: const Icon(Icons.note),
-                        label: 'Notes',
+                        label: l10n.notes,
                         onPressed: () => setState(() => _currentIndex = 0),
                       ),
                       ToolbarButton(
                         icon: const Icon(Icons.alarm),
-                        label: 'Reminders',
+                        label: l10n.reminders,
                         onPressed: () => setState(() => _currentIndex = 1),
                       ),
                       ToolbarButton(
@@ -187,12 +190,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       ToolbarButton(
                         icon: const Icon(Icons.palette),
-                        label: 'Palette',
+                        label: l10n.palette,
                         onPressed: _showPalette,
                       ),
                       ToolbarButton(
                         icon: const Icon(Icons.school),
-                        label: 'Teach AI',
+                        label: l10n.teachAi,
                         onPressed: _openTeachAi,
                       ),
                     ],

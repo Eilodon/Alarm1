@@ -24,20 +24,26 @@
   "geminiApiKeyNotConfigured": "Gemini API key is not configured.",
   "noResponse": "No response.",
   "geminiError": "Gemini error: {error}",
-  "geminiError@placeholders": {
-    "error": {}
+  "@geminiError": {
+    "placeholders": {
+      "error": {}
+    }
   },
   "errorWithMessage": "Error: {error}",
-  "errorWithMessage@placeholders": {
-    "error": {}
+  "@errorWithMessage": {
+    "placeholders": {
+      "error": {}
+    }
   },
   "networkError": "Network error. Please try again.",
   "noInternetConnection": "No internet connection.",
   "microphonePermissionMessage": "Microphone permission is required. Please enable it in Settings.",
   "readNote": "Read Note",
   "scheduleForDate": "Schedule for {date}",
-  "scheduleForDate@placeholders": {
-    "date": {}
+  "@scheduleForDate": {
+    "placeholders": {
+      "date": {}
+    }
   },
   "noNotesForDay": "No notes/reminders for this day",
   "addNoteTooltip": "Add note",
@@ -63,8 +69,10 @@
   "repeatDaily": "Daily",
   "repeatWeekly": "Weekly",
   "snoozeLabel": "Snooze: {minutes} min",
-  "snoozeLabel@placeholders": {
-    "minutes": {}
+  "@snoozeLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
   },
   "imageLabel": "Image",
   "audioLabel": "Audio",
@@ -89,8 +97,10 @@
   "speak": "Speak",
   "convertToNote": "Convert to note",
   "convertSpeechPrompt": "Convert the following speech into a note: {recognized}",
-  "convertSpeechPrompt@placeholders": {
-    "recognized": {}
+  "@convertSpeechPrompt": {
+    "placeholders": {
+      "recognized": {}
+    }
   },
   "offlineMode": "Offline Mode",
 
@@ -126,5 +136,15 @@
   "backupNow": "Backup now",
   "syncStatusIdle": "Synced",
   "syncStatusSyncing": "Syncing...",
-  "syncStatusError": "Sync error"
+  "syncStatusError": "Sync error",
+  "showNotes": "Show Notes",
+  "showVoiceToNote": "Show Voice to Note",
+  "openSettings": "Open Settings",
+  "primary": "Primary",
+  "secondary": "Secondary",
+  "themeUpdated": "Theme updated",
+  "thanksForTeaching": "Thanks for teaching!",
+  "notes": "Notes",
+  "reminders": "Reminders",
+  "palette": "Palette"
 }

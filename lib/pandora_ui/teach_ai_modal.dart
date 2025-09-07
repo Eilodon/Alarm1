@@ -36,7 +36,7 @@ class _TeachAiModalState extends State<TeachAiModal> {
     return AlertDialog(
 
       contentPadding: EdgeInsets.all(tokens.spacing.m),
-      title: const Text('Teach AI'),
+      title: Text(AppLocalizations.of(context)!.teachAi),
 
       content: TextField(
         controller: _controller,
