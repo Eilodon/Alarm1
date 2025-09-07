@@ -10,7 +10,6 @@ import '../models/note.dart';
 import '../providers/note_provider.dart';
 import '../screens/note_detail_screen.dart';
 import '../services/auth_service.dart';
-import '../pandora_ui/toolbar_button.dart';
 import 'note_card.dart';
 
 
@@ -96,6 +95,23 @@ class _NotesListState extends State<NotesList> {
     super.dispose();
   }
 
+  void _deleteNote(
+      BuildContext context, Note note, NoteProvider provider, AppLocalizations l10n) {
+    final idx = provider.notes.indexWhere((n) => n.id == note.id);
+    if (idx != -1) {
+      provider.removeNoteAt(idx);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.noteDeleted),
+          action: SnackBarAction(
+            label: l10n.undo,
+            onPressed: () => provider.addNote(note),
+          ),
+        ),
+      );
+    }
+  }
+
   Widget _buildNoteTile(
       BuildContext context, Note note, NoteProvider provider) {
     final l10n = AppLocalizations.of(context)!;
@@ -116,22 +132,8 @@ class _NotesListState extends State<NotesList> {
             label: l10n.share,
           ),
           SlidableAction(
-            backgroundColor: Colors.red,
-            onPressed: (_) {
-              final idx = provider.notes.indexWhere((n) => n.id == note.id);
-              if (idx != -1) {
-                provider.removeNoteAt(idx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(l10n.noteDeleted),
-                    action: SnackBarAction(
-                      label: l10n.undo,
-                      onPressed: () => provider.addNote(note),
-                    ),
-                  ),
-                );
-              }
-            },
+            backgroundColor: Theme.of(context).colorScheme.error,
+            onPressed: (_) => _deleteNote(context, note, provider, l10n),
             icon: Icons.delete,
             label: l10n.delete,
           ),
@@ -221,6 +223,17 @@ class _NotesListState extends State<NotesList> {
                       Share.share('${note.title}\n${note.content}');
                     },
                   ),
+                  ListTile(
+                    leading: Icon(
+                      Icons.delete,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                    title: Text(l10n.delete),
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      _deleteNote(context, note, provider, l10n);
+                    },
+                  ),
                 ],
               ),
             ),
@@ -232,20 +245,10 @@ class _NotesListState extends State<NotesList> {
           children: [
             if (note.pinned) const Icon(Icons.push_pin, size: 20),
             if (!provider.isSynced(note.id))
-              const Icon(Icons.sync_problem, color: Colors.orange),
-            ToolbarButton(
-              icon: const Icon(Icons.delete),
-              label: l10n.delete,
-              onPressed: () {
-
-                final idx =
-                    provider.notes.indexWhere((n) => n.id == note.id);
-
-                if (idx != -1) {
-                  provider.removeNoteAt(idx);
-                }
-              },
-            ),
+              Icon(
+                Icons.sync_problem,
+                color: Theme.of(context).colorScheme.tertiary,
+              ),
           ],
         ),
 

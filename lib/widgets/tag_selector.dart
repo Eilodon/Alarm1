@@ -43,6 +43,7 @@ class _TagSelectorState extends State<TagSelector> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final chips = widget.availableTags.map((t) {
       final selected = widget.selectedTags.contains(t);
       return Padding(
@@ -65,8 +66,8 @@ class _TagSelectorState extends State<TagSelector> {
 
     final colorOptions = <Color>[
       Colors.white,
-      Colors.red,
-      Colors.orange,
+      colorScheme.error,
+      colorScheme.tertiary,
       Colors.yellow,
       Colors.green,
       Colors.blue,
