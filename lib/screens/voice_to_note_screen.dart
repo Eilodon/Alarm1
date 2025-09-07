@@ -108,7 +108,9 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
                     child: Icon(
                       _isListening ? Icons.mic : Icons.mic_none,
                       key: ValueKey(_isListening),
-                      color: _isListening ? Colors.red : null,
+                      color: _isListening
+                          ? Theme.of(context).colorScheme.error
+                          : null,
                     ),
                   ),
                   label: Text(_isListening
