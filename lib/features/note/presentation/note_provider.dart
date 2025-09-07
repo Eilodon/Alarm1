@@ -6,12 +6,14 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     show Time;
 
+
 import '../domain/domain.dart';
 import 'package:alarm_data/alarm_data.dart';
 import '../data/calendar_service.dart';
 import '../data/notification_service.dart';
 import '../data/home_widget_service.dart';
 import '../../backup/data/note_sync_service.dart';
+
 
 int _noteComparator(Note a, Note b) {
   if (a.pinned != b.pinned) {
@@ -38,21 +40,16 @@ class NoteProvider extends ChangeNotifier {
   bool isSynced(String id) => _syncService.isSynced(id);
 
   NoteProvider({
-    NoteRepository? repository,
-    CalendarService? calendarService,
-    NotificationService? notificationService,
-    HomeWidgetService? homeWidgetService,
-    NoteSyncService? syncService,
-  }) : _repository = repository ?? NoteRepositoryImpl(),
-       _calendarService =
-            calendarService ?? CalendarServiceImpl.instance,
-       _notificationService =
-            notificationService ?? NotificationServiceImpl(),
-       _homeWidgetService =
-            homeWidgetService ?? const HomeWidgetServiceImpl(),
-       _syncService =
-           syncService ??
-           NoteSyncService(repository: repository ?? NoteRepositoryImpl()) {
+    required NoteRepository repository,
+    required CalendarService calendarService,
+    required NotificationService notificationService,
+    required HomeWidgetService homeWidgetService,
+    required NoteSyncService syncService,
+  })  : _repository = repository,
+        _calendarService = calendarService,
+        _notificationService = notificationService,
+        _homeWidgetService = homeWidgetService,
+        _syncService = syncService {
     unawaited(
       _init().catchError((e) {
         /* log or set error state */

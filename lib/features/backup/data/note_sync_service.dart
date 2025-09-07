@@ -10,11 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../note/domain/domain.dart';
 import 'package:alarm_data/alarm_data.dart';
 
-enum SyncStatus { idle, syncing, error }
-
-typedef NoteGetter = Note? Function(String id);
-
-class NoteSyncService {
+class NoteSyncServiceImpl implements NoteSyncService {
   final NoteRepository _repository;
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
@@ -26,12 +22,13 @@ class NoteSyncService {
   static const _unsyncedKey = 'unsyncedNoteIds';
 
   final Set<String> _unsyncedNoteIds = {};
+  @override
   final ValueNotifier<SyncStatus> syncStatus =
       ValueNotifier<SyncStatus>(SyncStatus.idle);
 
   NoteGetter? _noteGetter;
 
-  NoteSyncService({
+  NoteSyncServiceImpl({
     NoteRepository? repository,
     FirebaseFirestore? firestore,
     FirebaseAuth? auth,
@@ -41,9 +38,12 @@ class NoteSyncService {
         _auth = auth ?? FirebaseAuth.instance,
         _connectivity = connectivity ?? Connectivity();
 
+  @override
   Set<String> get unsyncedNoteIds => Set.unmodifiable(_unsyncedNoteIds);
+  @override
   bool isSynced(String id) => !_unsyncedNoteIds.contains(id);
 
+  @override
   Future<void> init(NoteGetter noteGetter) async {
     _noteGetter = noteGetter;
     _prefs = await SharedPreferences.getInstance();
@@ -60,6 +60,7 @@ class NoteSyncService {
     });
   }
 
+  @override
   Future<void> dispose() async {
     await _connectivitySubscription?.cancel();
   }
@@ -68,11 +69,13 @@ class NoteSyncService {
     await _prefs!.setStringList(_unsyncedKey, _unsyncedNoteIds.toList());
   }
 
+  @override
   Future<void> markUnsynced(String id) async {
     _unsyncedNoteIds.add(id);
     await _saveUnsyncedNoteIds();
   }
 
+  @override
   Future<void> syncNote(Note note) async {
     if (Firebase.apps.isEmpty) {
       await markUnsynced(note.id);
@@ -90,6 +93,7 @@ class NoteSyncService {
     }
   }
 
+  @override
   Future<void> deleteNote(String id) async {
     if (Firebase.apps.isEmpty) {
       await markUnsynced(id);
@@ -104,6 +108,7 @@ class NoteSyncService {
     }
   }
 
+  @override
   Future<void> syncUnsyncedNotes() async {
     if (_unsyncedNoteIds.isEmpty || Firebase.apps.isEmpty) return;
     syncStatus.value = SyncStatus.syncing;
@@ -131,6 +136,7 @@ class NoteSyncService {
     }
   }
 
+  @override
   Future<bool> loadFromRemote(Set<Note> notes) async {
     final existingUnsynced = Set<String>.from(_unsyncedNoteIds);
     _unsyncedNoteIds.clear();
