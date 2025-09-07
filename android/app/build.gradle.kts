@@ -12,8 +12,8 @@ android {
 
     defaultConfig {
         applicationId = "com.example.notes_reminder_app"
-        minSdk = 23
-        targetSdk = 34
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
         versionCode = 1
         versionName = "1.0"
     }
