@@ -9,8 +9,10 @@ environment:
 resolution: workspace
 
 dependencies:
-  json_annotation: ^workspace
+
+  json_annotation: 4.9.0
 
 dev_dependencies:
-  build_runner: ^workspace
-  json_serializable: ^workspace
+  build_runner: 2.8.0
+  json_serializable: 6.11.1
+
