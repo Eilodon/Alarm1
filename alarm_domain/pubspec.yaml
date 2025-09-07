@@ -1,0 +1,14 @@
+name: alarm_domain
+description: Domain models and interfaces for the alarm application.
+version: 0.0.1
+author: ""
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  json_annotation: ^4.9.0
+
+dev_dependencies:
+  build_runner: ^2.8.0
+  json_serializable: ^6.11.1

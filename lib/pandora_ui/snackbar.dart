@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../models/security_cue.dart';
+import 'package:alarm_domain/alarm_domain.dart';
+import '../utils/flutter_haptic_feedback_driver.dart';
 
 /// Simple snackbar that slides in with a custom easing and triggers haptics.
 class SimpleSnackBar extends StatefulWidget {
@@ -35,7 +36,7 @@ class _SimpleSnackBarState extends State<SimpleSnackBar>
       begin: const Offset(0, 1),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _controller, curve: widget.curve));
-    widget.securityCue.triggerHaptic();
+    widget.securityCue.triggerHaptic(hapticFeedbackDriver);
   }
 
   @override

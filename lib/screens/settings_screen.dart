@@ -5,7 +5,8 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'dart:math' as math;
 
 import '../services/settings_service.dart';
-import '../services/note_repository.dart';
+import '../services/note_repository_impl.dart';
+import 'package:alarm_domain/alarm_domain.dart';
 import '../services/backup_service.dart';
 import 'package:provider/provider.dart';
 import '../providers/note_provider.dart';
@@ -28,7 +29,7 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final SettingsService _settings = SettingsService();
-  final NoteRepository _noteRepository = NoteRepository();
+  final NoteRepository _noteRepository = NoteRepositoryImpl();
   bool _requireAuth = false;
 
   ThemeMode _themeMode = ThemeMode.system;

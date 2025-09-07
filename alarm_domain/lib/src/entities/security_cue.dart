@@ -1,18 +1,23 @@
-import 'package:flutter/services.dart';
-
 /// Describes where data is processed and which haptic feedback to use.
 enum SecurityCue { onDevice, hybrid, cloud }
 
+/// Abstraction for triggering haptic feedback.
+abstract class HapticFeedbackDriver {
+  Future<void> selectionClick();
+  Future<void> lightImpact();
+  Future<void> heavyImpact();
+}
+
 extension SecurityCueHaptics on SecurityCue {
   /// Triggers a haptic feedback associated with the security cue.
-  Future<void> triggerHaptic() {
+  Future<void> triggerHaptic(HapticFeedbackDriver driver) {
     switch (this) {
       case SecurityCue.onDevice:
-        return HapticFeedback.selectionClick();
+        return driver.selectionClick();
       case SecurityCue.hybrid:
-        return HapticFeedback.lightImpact();
+        return driver.lightImpact();
       case SecurityCue.cloud:
-        return HapticFeedback.heavyImpact();
+        return driver.heavyImpact();
     }
   }
 }

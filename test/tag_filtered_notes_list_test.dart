@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:notes_reminder_app/providers/note_provider.dart';
 import 'package:notes_reminder_app/widgets/tag_filtered_notes_list.dart';
-import 'package:notes_reminder_app/models/note.dart';
+import 'package:alarm_domain/alarm_domain.dart';
 
 void main() {
   testWidgets('filters notes by tag', (tester) async {

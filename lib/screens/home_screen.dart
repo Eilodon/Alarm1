@@ -6,7 +6,7 @@ import 'chat_screen.dart';
 import 'note_list_for_day_screen.dart';
 import 'settings_screen.dart';
 import 'voice_to_note_screen.dart';
-import '../models/command.dart';
+import 'package:alarm_domain/alarm_domain.dart';
 import '../pandora_ui/palette_bottom_sheet.dart';
 import '../pandora_ui/teach_ai_modal.dart';
 

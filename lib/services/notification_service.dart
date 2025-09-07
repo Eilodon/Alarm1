@@ -1,31 +1,33 @@
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart'
+    as fln;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/foundation.dart';
+import 'package:alarm_domain/alarm_domain.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  final FlutterLocalNotificationsPlugin _fln =
-      FlutterLocalNotificationsPlugin();
+  final fln.FlutterLocalNotificationsPlugin _fln =
+      fln.FlutterLocalNotificationsPlugin();
 
   Future<void> init({
-    Future<void> Function(NotificationResponse)?
+    Future<void> Function(fln.NotificationResponse)?
         onDidReceiveNotificationResponse,
   }) async {
     tzdata.initializeTimeZones();
     final tzName = await FlutterNativeTimezone.getLocalTimezone();
     tz.setLocalLocation(tz.getLocation(tzName));
 
-    const androidSettings = AndroidInitializationSettings(
+    const androidSettings = fln.AndroidInitializationSettings(
       '@mipmap/ic_launcher',
     );
-    const iosSettings = DarwinInitializationSettings();
-    const settings = InitializationSettings(
+    const iosSettings = fln.DarwinInitializationSettings();
+    const settings = fln.InitializationSettings(
       android: androidSettings,
       iOS: iosSettings,
     );
@@ -37,13 +39,13 @@ class NotificationService {
 
     final androidImpl = _fln
         .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
+          fln.AndroidFlutterLocalNotificationsPlugin
         >();
     await androidImpl?.requestNotificationsPermission();
 
     await _fln
         .resolvePlatformSpecificImplementation<
-          IOSFlutterLocalNotificationsPlugin
+          fln.IOSFlutterLocalNotificationsPlugin
         >()
         ?.requestPermissions(alert: true, badge: true, sound: true);
   }
@@ -60,20 +62,20 @@ class NotificationService {
       throw ArgumentError('scheduledDate must be in the future');
     }
 
-    final androidDetails = AndroidNotificationDetails(
+    final androidDetails = fln.AndroidNotificationDetails(
       'scheduled_channel',
       l10n.scheduled,
       channelDescription: l10n.scheduledDesc,
       importance: Importance.max,
       priority: Priority.high,
       actions: [
-        AndroidNotificationAction(
+        fln.AndroidNotificationAction(
           'done',
           l10n.done,
           showsUserInterface: false,
           cancelNotification: true,
         ),
-        AndroidNotificationAction(
+        fln.AndroidNotificationAction(
           'snooze',
           l10n.snooze,
           showsUserInterface: false,
@@ -82,7 +84,7 @@ class NotificationService {
       ],
     );
 
-    final details = NotificationDetails(android: androidDetails);
+    final details = fln.NotificationDetails(android: androidDetails);
 
     try {
       await _fln.zonedSchedule(
@@ -91,7 +93,7 @@ class NotificationService {
         body,
         tz.TZDateTime.from(scheduledDate, tz.local),
         details,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        androidScheduleMode: fln.AndroidScheduleMode.exactAllowWhileIdle,
         matchDateTimeComponents:
             null, // Không còn dùng uiLocalNotificationDateInterpretation
         payload: payload,
@@ -108,7 +110,7 @@ class NotificationService {
     required RepeatInterval repeatInterval,
     required AppLocalizations l10n,
   }) async {
-    final androidDetails = AndroidNotificationDetails(
+    final androidDetails = fln.AndroidNotificationDetails(
       'recurring_channel',
       l10n.recurring,
       channelDescription: l10n.recurringDesc,
@@ -116,8 +118,8 @@ class NotificationService {
       priority: Priority.high,
     );
 
-    const iosDetails = DarwinNotificationDetails();
-    final details = NotificationDetails(
+    const iosDetails = fln.DarwinNotificationDetails();
+    final details = fln.NotificationDetails(
       android: androidDetails,
       iOS: iosDetails,
     );
@@ -127,9 +129,9 @@ class NotificationService {
         id,
         title,
         body,
-        repeatInterval,
+        _mapRepeatInterval(repeatInterval),
         details,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        androidScheduleMode: fln.AndroidScheduleMode.exactAllowWhileIdle,
       );
     } catch (e) {
       debugPrint('Error scheduling recurring notification: $e');
@@ -140,10 +142,10 @@ class NotificationService {
     required int id,
     required String title,
     required String body,
-    required Time time,
+    required fln.Time time,
     required AppLocalizations l10n,
   }) async {
-    final androidDetails = AndroidNotificationDetails(
+    final androidDetails = fln.AndroidNotificationDetails(
       'daily_channel',
       l10n.daily,
       channelDescription: l10n.dailyDesc,
@@ -151,8 +153,8 @@ class NotificationService {
       priority: Priority.high,
     );
 
-    const iosDetails = DarwinNotificationDetails();
-    final details = NotificationDetails(
+    const iosDetails = fln.DarwinNotificationDetails();
+    final details = fln.NotificationDetails(
       android: androidDetails,
       iOS: iosDetails,
     );
@@ -169,8 +171,8 @@ class NotificationService {
         body,
         scheduledDate,
         details,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        matchDateTimeComponents: DateTimeComponents.time,
+        androidScheduleMode: fln.AndroidScheduleMode.exactAllowWhileIdle,
+        matchDateTimeComponents: fln.DateTimeComponents.time,
       );
     } catch (e) {
       debugPrint('Error scheduling daily notification: $e');
@@ -178,7 +180,7 @@ class NotificationService {
   }
 
   /// Finds the next instance of [time] in the local timezone.
-  tz.TZDateTime _nextInstanceOfTime(Time time) {
+  tz.TZDateTime _nextInstanceOfTime(fln.Time time) {
     final now = tz.TZDateTime.now(tz.local);
     var scheduledDate = tz.TZDateTime(
       tz.local,
@@ -197,6 +199,19 @@ class NotificationService {
     return scheduledDate;
   }
 
+  fln.RepeatInterval _mapRepeatInterval(RepeatInterval interval) {
+    switch (interval) {
+      case RepeatInterval.everyMinute:
+        return fln.RepeatInterval.everyMinute;
+      case RepeatInterval.hourly:
+        return fln.RepeatInterval.hourly;
+      case RepeatInterval.daily:
+        return fln.RepeatInterval.daily;
+      case RepeatInterval.weekly:
+        return fln.RepeatInterval.weekly;
+    }
+  }
+
   Future<void> snoozeNotification({
     required int id,
     required String title,
@@ -211,20 +226,20 @@ class NotificationService {
       tz.local,
     ).add(Duration(minutes: minutes));
 
-    final androidDetails = AndroidNotificationDetails(
+    final androidDetails = fln.AndroidNotificationDetails(
       'snooze_channel',
       l10n.snooze,
       channelDescription: l10n.snoozeDesc,
       importance: Importance.max,
       priority: Priority.high,
       actions: [
-        AndroidNotificationAction(
+        fln.AndroidNotificationAction(
           'done',
           l10n.done,
           showsUserInterface: false,
           cancelNotification: true,
         ),
-        AndroidNotificationAction(
+        fln.AndroidNotificationAction(
           'snooze',
           l10n.snooze,
           showsUserInterface: false,
@@ -233,7 +248,7 @@ class NotificationService {
       ],
     );
 
-    final details = NotificationDetails(android: androidDetails);
+    final details = fln.NotificationDetails(android: androidDetails);
 
     await _fln.zonedSchedule(
       id,
@@ -241,7 +256,7 @@ class NotificationService {
       body,
       scheduledDate,
       details,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      androidScheduleMode: fln.AndroidScheduleMode.exactAllowWhileIdle,
       matchDateTimeComponents: null,
       payload: payload,
     );

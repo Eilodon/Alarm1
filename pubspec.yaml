@@ -55,6 +55,9 @@ dependencies:
   google_fonts: 6.2.1
   fuse: 0.0.99
 
+  alarm_domain:
+    path: alarm_domain
+
 
 dev_dependencies:
   flutter_test:

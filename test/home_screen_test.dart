@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:notes_reminder_app/providers/note_provider.dart';
 import 'package:notes_reminder_app/screens/home_screen.dart';
-import 'package:notes_reminder_app/models/note.dart';
+import 'package:alarm_domain/alarm_domain.dart';
 
 void main() {
   testWidgets('add and delete notes', (tester) async {
