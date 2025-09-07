@@ -8,6 +8,23 @@ class _ToolbarButtonStyle {
   final Color foreground;
   final bool enabled;
 
+
+  const _ToolbarButtonStyle({
+    required this.background,
+    required this.foreground,
+    required this.enabled,
+  });
+}
+
+const _touchTarget = 48.0;
+
+class ToolbarButton extends StatelessWidget {
+  final Widget icon;
+  final String label;
+  final VoidCallback onPressed;
+  final String state;
+
+
   const _ToolbarButtonStyle({
     required this.background,
     required this.foreground,
@@ -34,8 +51,28 @@ class ToolbarButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final tokens = Theme.of(context).extension<Tokens>()!;
+    final toolbarStyles = {
+      'default': _ToolbarButtonStyle(
+        background: tokens.colors.primary,
+        foreground: tokens.colors.neutral100,
+        enabled: true,
+      ),
+      'active': _ToolbarButtonStyle(
+        background: tokens.colors.secondary,
+        foreground: tokens.colors.neutral100,
+        enabled: true,
+      ),
+      'disabled': _ToolbarButtonStyle(
+        background: tokens.colors.neutral300,
+        foreground: tokens.colors.neutral100,
+        enabled: false,
+      ),
+    };
+
+    final style = toolbarStyles[state] ?? toolbarStyles['default']!;
+
+
     final toolbarStyles = {
       'default': _ToolbarButtonStyle(
         background: tokens.colors.primary,
@@ -70,7 +107,9 @@ class ToolbarButton extends StatelessWidget {
               }
             : null,
         icon: icon,
-        label: Text(label, style: textStyle),
+
+        label: Text(label),
+
         style: ElevatedButton.styleFrom(
           backgroundColor: style.background,
           foregroundColor: style.foreground,
@@ -82,13 +121,9 @@ class ToolbarButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(tokens.radii.m),
           ),
           elevation: tokens.elevation.low,
-          minimumSize: const Size(
-            _touchTarget,
-            _touchTarget,
-          ),
+
         ),
       ),
     );
   }
 }
-
