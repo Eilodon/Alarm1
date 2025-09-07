@@ -17,15 +17,16 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: '3.22.0'
       - name: Cache pub packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.pub-cache
           key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
           restore-keys: |
             ${{ runner.os }}-pub-
       - name: Cache Android SDK
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.android
@@ -33,5 +34,6 @@ jobs:
           key: ${{ runner.os }}-android-${{ hashFiles('android/**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-android-
+      - run: flutter clean
       - run: flutter pub get
       - run: flutter build apk --debug
