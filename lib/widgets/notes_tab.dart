@@ -12,6 +12,7 @@ import '../screens/settings_screen.dart';
 import '../pandora_ui/toolbar_button.dart';
 import 'add_note_dialog.dart';
 import 'tag_filtered_notes_list.dart';
+import 'route_transitions.dart';
 
 class NotesTab extends StatefulWidget {
   final Function(Color) onThemeChanged;
@@ -101,22 +102,7 @@ class _NotesTabState extends State<NotesTab> {
             onPressed: () async {
               await Navigator.push(
                 context,
-                PageRouteBuilder(
-                  pageBuilder: (_, __, ___) => const VoiceToNoteScreen(),
-                  transitionsBuilder: (_, animation, __, child) {
-                    final offsetAnimation = Tween<Offset>(
-                      begin: const Offset(1, 0),
-                      end: Offset.zero,
-                    ).animate(animation);
-                    return FadeTransition(
-                      opacity: animation,
-                      child: SlideTransition(
-                        position: offsetAnimation,
-                        child: child,
-                      ),
-                    );
-                  },
-                ),
+                buildSlideFadeRoute(const VoiceToNoteScreen()),
               );
             },
           ),
@@ -126,25 +112,12 @@ class _NotesTabState extends State<NotesTab> {
             onPressed: () async {
               await Navigator.push(
                 context,
-                PageRouteBuilder(
-                  pageBuilder: (_, __, ___) => SettingsScreen(
+                buildSlideFadeRoute(
+                  SettingsScreen(
                     onThemeChanged: widget.onThemeChanged,
                     onFontScaleChanged: widget.onFontScaleChanged,
                     onThemeModeChanged: widget.onThemeModeChanged,
                   ),
-                  transitionsBuilder: (_, animation, __, child) {
-                    final offsetAnimation = Tween<Offset>(
-                      begin: const Offset(1, 0),
-                      end: Offset.zero,
-                    ).animate(animation);
-                    return FadeTransition(
-                      opacity: animation,
-                      child: SlideTransition(
-                        position: offsetAnimation,
-                        child: child,
-                      ),
-                    );
-                  },
                 ),
               );
               _loadMascot();

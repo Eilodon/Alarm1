@@ -3,6 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../models/note.dart';
 import 'note_detail_screen.dart';
 import '../services/auth_service.dart';
+import '../widgets/route_transitions.dart';
 
 class NoteSearchDelegate extends SearchDelegate {
   final List<Note> notes;
@@ -61,22 +62,7 @@ class NoteSearchDelegate extends SearchDelegate {
                   }
                   Navigator.push(
                     context,
-                    PageRouteBuilder(
-                      pageBuilder: (_, __, ___) => NoteDetailScreen(note: n),
-                      transitionsBuilder: (_, animation, __, child) {
-                        final offsetAnimation = Tween<Offset>(
-                          begin: const Offset(1, 0),
-                          end: Offset.zero,
-                        ).animate(animation);
-                        return FadeTransition(
-                          opacity: animation,
-                          child: SlideTransition(
-                            position: offsetAnimation,
-                            child: child,
-                          ),
-                        );
-                      },
-                    ),
+                    buildSlideFadeRoute(NoteDetailScreen(note: n)),
                   );
                 },
               ))

@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../pandora_ui/result_card.dart';
 import '../pandora_ui/toolbar_button.dart';
+import 'route_transitions.dart';
 
 import '../models/note.dart';
 import '../providers/note_provider.dart';
@@ -137,22 +138,7 @@ class _NotesListState extends State<NotesList> {
               }
               Navigator.push(
                 context,
-                PageRouteBuilder(
-                  pageBuilder: (_, __, ___) => NoteDetailScreen(note: note),
-                  transitionsBuilder: (_, animation, __, child) {
-                    final offsetAnimation = Tween<Offset>(
-                      begin: const Offset(1, 0),
-                      end: Offset.zero,
-                    ).animate(animation);
-                    return FadeTransition(
-                      opacity: animation,
-                      child: SlideTransition(
-                        position: offsetAnimation,
-                        child: child,
-                      ),
-                    );
-                  },
-                ),
+                buildSlideFadeRoute(NoteDetailScreen(note: note)),
               );
             },
             trailing: Row(
