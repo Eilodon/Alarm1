@@ -27,6 +27,7 @@ class NoteProvider extends ChangeNotifier {
   final SaveNotes _saveNotes;
   final UpdateNote _updateNote;
   final AutoBackup _autoBackup;
+  final NoteRepository _repository;
 
   final CalendarService _calendarService;
   final NotificationService _notificationService;
@@ -52,12 +53,16 @@ class NoteProvider extends ChangeNotifier {
     required NotificationService notificationService,
     required HomeWidgetService homeWidgetService,
     required NoteSyncService syncService,
+    required NoteRepository repository,
 
     CreateNote? createNote,
     DeleteNote? deleteNote,
     SnoozeNote? snoozeNote,
-  }) : _repository = repository,
-
+  })  : _getNotes = getNotes,
+       _saveNotes = saveNotes,
+       _updateNote = updateNote,
+       _autoBackup = autoBackup,
+       _repository = repository,
        _calendarService = calendarService,
        _notificationService = notificationService,
        _homeWidgetService = homeWidgetService,
@@ -107,6 +112,7 @@ class NoteProvider extends ChangeNotifier {
         notificationService: notificationService,
         homeWidgetService: homeWidgetService,
         syncService: syncService,
+        repository: getNotes.repository,
       );
     }
     final repo = NoteRepositoryImpl();
@@ -119,6 +125,7 @@ class NoteProvider extends ChangeNotifier {
       notificationService: notificationService ?? NotificationServiceImpl(),
       homeWidgetService: homeWidgetService ?? const HomeWidgetServiceImpl(),
       syncService: syncService ?? NoteSyncServiceImpl(repository: repo),
+      repository: repo,
     );
   }
 
