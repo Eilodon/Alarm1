@@ -4,11 +4,11 @@ import 'package:lottie/lottie.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'dart:math' as math;
 
-import '../services/settings_service.dart';
+import '../../../services/settings_service.dart';
 import 'package:alarm_data/alarm_data.dart';
 import 'package:alarm_domain/alarm_domain.dart';
 import 'package:provider/provider.dart';
-import '../providers/note_provider.dart';
+import '../../../providers/note_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
