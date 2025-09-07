@@ -48,6 +48,7 @@ class _ResultCardState extends State<ResultCard>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     if (_result == null) {
       // Show a simple shimmer while waiting for stream data.
       return AnimatedBuilder(
@@ -59,9 +60,9 @@ class _ResultCardState extends State<ResultCard>
               borderRadius: BorderRadius.circular(8),
               gradient: LinearGradient(
                 colors: [
-                  Colors.grey.shade300,
-                  Colors.grey.shade100,
-                  Colors.grey.shade300,
+                  colorScheme.surfaceVariant,
+                  colorScheme.surface,
+                  colorScheme.surfaceVariant,
                 ],
                 stops: [
                   (_controller.value - 0.3).clamp(0.0, 1.0),
@@ -84,9 +85,14 @@ class _ResultCardState extends State<ResultCard>
         curve: const Cubic(0.65, 0, 0.35, 1), // custom easing
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(8),
-          boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.shadow.withOpacity(0.25),
+              blurRadius: 4,
+            ),
+          ],
         ),
         child: Text(_result!),
       ),
