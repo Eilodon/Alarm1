@@ -34,7 +34,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final messengerKey = GlobalKey<ScaffoldMessengerState>();
-  Color _themeColor = Colors.blue;
+  Color _themeColor = Tokens.light.colors.primary;
   double _fontScale = 1.0;
   ThemeMode _themeMode = ThemeMode.system;
   bool _hasSeenOnboarding = true;
