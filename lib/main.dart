@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 import 'app.dart';
 import 'app_providers.dart';
 import 'package:alarm_domain/alarm_domain.dart';
-import 'providers/note_provider.dart';
+import 'features/note/note.dart';
 import 'services/app_initializer.dart';
 import 'services/connectivity_service.dart';
 import 'screens/error_screen.dart';

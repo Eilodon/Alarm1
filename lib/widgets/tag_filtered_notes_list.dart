@@ -4,8 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'package:alarm_domain/alarm_domain.dart';
-import '../providers/note_provider.dart';
-import '../screens/note_list_for_day_screen.dart';
+import '../features/note/note.dart';
 import 'notes_list.dart';
 import 'tag_filter_menu.dart';
 import 'route_transitions.dart';

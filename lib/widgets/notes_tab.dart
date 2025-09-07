@@ -4,11 +4,8 @@ import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
-import '../providers/note_provider.dart';
-import '../services/settings_service.dart';
-import '../screens/note_search_delegate.dart';
-import '../screens/voice_to_note_screen.dart';
-import '../screens/settings_screen.dart';
+import '../features/note/note.dart';
+import '../features/settings/settings.dart';
 import '../pandora_ui/palette_bottom_sheet.dart';
 import '../pandora_ui/teach_ai_modal.dart';
 import 'package:alarm_domain/alarm_domain.dart';

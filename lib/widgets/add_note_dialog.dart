@@ -3,7 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/note_provider.dart';
+import '../features/note/note.dart';
 import 'tag_selector.dart';
 import '../l10n/localization_extensions.dart';
 

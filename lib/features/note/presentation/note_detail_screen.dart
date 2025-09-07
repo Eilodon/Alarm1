@@ -6,16 +6,15 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'package:alarm_domain/alarm_domain.dart';
-import '../providers/note_provider.dart';
-import '../services/tts_service.dart';
-import '../widgets/tag_selector.dart';
-import '../l10n/localization_extensions.dart';
-import '../services/gemini_service.dart';
-import '../widgets/attachment_section.dart';
-import '../widgets/reminder_controls.dart';
-import '../widgets/ai_suggestions_dialog.dart';
-import 'chat_screen.dart';
-import '../widgets/route_transitions.dart';
+import 'note_provider.dart';
+import '../../services/tts_service.dart';
+import '../../widgets/tag_selector.dart';
+import '../../l10n/localization_extensions.dart';
+import '../../chat/chat.dart';
+import '../../widgets/attachment_section.dart';
+import '../../widgets/reminder_controls.dart';
+import '../../widgets/ai_suggestions_dialog.dart';
+import '../../widgets/route_transitions.dart';
 
 class NoteDetailScreen extends StatefulWidget {
   final Note note;

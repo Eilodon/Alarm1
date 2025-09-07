@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../theme/tokens.dart';
-import 'backup_service.dart';
+import '../../../theme/tokens.dart';
+import '../../backup/data/backup_service.dart';
 
 class SettingsService {
   SettingsService({SharedPreferences? sharedPreferences})

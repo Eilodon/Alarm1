@@ -3,8 +3,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
-import '../providers/note_provider.dart';
-import '../services/gemini_service.dart';
+import 'note_provider.dart';
+import '../../chat/chat.dart';
 
 class VoiceToNoteScreen extends StatefulWidget {
   final stt.SpeechToText speech;

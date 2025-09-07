@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../widgets/notes_tab.dart';
-import 'chat_screen.dart';
-import 'note_list_for_day_screen.dart';
-import 'settings_screen.dart';
-import 'voice_to_note_screen.dart';
+import '../features/chat/chat.dart';
+import '../features/note/note.dart';
+import '../features/settings/settings.dart';
 import 'package:alarm_domain/alarm_domain.dart';
 import '../pandora_ui/palette_bottom_sheet.dart';
 import '../pandora_ui/teach_ai_modal.dart';

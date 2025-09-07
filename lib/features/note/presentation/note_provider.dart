@@ -8,11 +8,11 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     show Time;
 
 import 'package:alarm_domain/alarm_domain.dart';
-import '../services/note_repository_impl.dart';
-import '../services/calendar_service.dart';
-import '../services/notification_service.dart';
-import '../services/home_widget_service.dart';
-import '../services/note_sync_service.dart';
+import '../data/note_repository_impl.dart';
+import '../data/calendar_service.dart';
+import '../data/notification_service.dart';
+import '../data/home_widget_service.dart';
+import '../data/note_sync_service.dart';
 
 
 int _noteComparator(Note a, Note b) {

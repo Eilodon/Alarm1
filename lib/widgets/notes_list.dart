@@ -7,8 +7,7 @@ import 'package:share_plus/share_plus.dart';
 
 import 'package:alarm_domain/alarm_domain.dart';
 
-import '../providers/note_provider.dart';
-import '../screens/note_detail_screen.dart';
+import '../features/note/note.dart';
 import '../services/auth_service.dart';
 import 'note_card.dart';
 

@@ -3,8 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:alarm_domain/alarm_domain.dart';
-import 'package:notes_reminder_app/providers/note_provider.dart';
-import 'package:notes_reminder_app/screens/note_detail_screen.dart';
+import 'package:notes_reminder_app/features/note/note.dart';
 
 void main() {
   testWidgets('display note details', (tester) async {

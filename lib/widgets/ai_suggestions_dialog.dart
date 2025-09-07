@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../services/gemini_service.dart';
+import '../features/chat/chat.dart';
 
 class AISuggestionsResult {
   final String summary;

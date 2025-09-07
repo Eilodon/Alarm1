@@ -11,7 +11,7 @@ import 'package:uuid/uuid.dart';
 
 
 import 'package:alarm_domain/alarm_domain.dart';
-import 'db_service.dart';
+import '../../note/data/db_service.dart';
 
 enum BackupFormat { json, pdf, md }
 
