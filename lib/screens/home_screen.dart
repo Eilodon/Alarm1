@@ -10,8 +10,6 @@ import '../models/command.dart';
 import '../pandora_ui/palette_bottom_sheet.dart';
 import '../pandora_ui/teach_ai_modal.dart';
 
-enum _MenuAction { palette, teachAi }
-
 class HomeScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
   final Function(double) onFontScaleChanged;
@@ -66,27 +64,15 @@ class _HomeScreenState extends State<HomeScreen> {
           return Scaffold(
             appBar: AppBar(
               actions: [
-                PopupMenuButton<_MenuAction>(
-                  onSelected: (value) {
-                    switch (value) {
-                      case _MenuAction.palette:
-                        _showPalette();
-                        break;
-                      case _MenuAction.teachAi:
-                        _openTeachAi();
-                        break;
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: _MenuAction.palette,
-                      child: Text(l10n.palette),
-                    ),
-                    PopupMenuItem(
-                      value: _MenuAction.teachAi,
-                      child: Text(l10n.teachAi),
-                    ),
-                  ],
+                IconButton(
+                  onPressed: _showPalette,
+                  tooltip: l10n.palette,
+                  icon: const Icon(Icons.color_lens),
+                ),
+                IconButton(
+                  onPressed: _openTeachAi,
+                  tooltip: l10n.teachAi,
+                  icon: const Icon(Icons.psychology),
                 ),
               ],
             ),
@@ -137,27 +123,15 @@ class _HomeScreenState extends State<HomeScreen> {
         return Scaffold(
           appBar: AppBar(
             actions: [
-              PopupMenuButton<_MenuAction>(
-                onSelected: (value) {
-                  switch (value) {
-                    case _MenuAction.palette:
-                      _showPalette();
-                      break;
-                    case _MenuAction.teachAi:
-                      _openTeachAi();
-                      break;
-                  }
-                },
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    value: _MenuAction.palette,
-                    child: Text(l10n.palette),
-                  ),
-                  PopupMenuItem(
-                    value: _MenuAction.teachAi,
-                    child: Text(l10n.teachAi),
-                  ),
-                ],
+              IconButton(
+                onPressed: _showPalette,
+                tooltip: l10n.palette,
+                icon: const Icon(Icons.color_lens),
+              ),
+              IconButton(
+                onPressed: _openTeachAi,
+                tooltip: l10n.teachAi,
+                icon: const Icon(Icons.psychology),
               ),
             ],
           ),
