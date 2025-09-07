@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../note/domain/domain.dart';
@@ -95,8 +96,10 @@ class NoteSyncServiceImpl implements NoteSyncService {
       await _firestore.collection('notes').doc(note.id).set(data);
       _unsyncedNoteIds.remove(note.id);
       await _saveUnsyncedNoteIds();
-    } catch (_) {
+    } catch (e, st) {
+      debugPrint('Failed to sync note ${note.id}: $e\n$st');
       await markUnsynced(note.id);
+      setSyncStatus(SyncStatus.error);
     }
   }
 
@@ -110,8 +113,10 @@ class NoteSyncServiceImpl implements NoteSyncService {
       await _firestore.collection('notes').doc(id).delete();
       _unsyncedNoteIds.remove(id);
       await _saveUnsyncedNoteIds();
-    } catch (_) {
+    } catch (e, st) {
+      debugPrint('Failed to delete note $id: $e\n$st');
       await markUnsynced(id);
+      setSyncStatus(SyncStatus.error);
     }
   }
 
@@ -138,7 +143,8 @@ class NoteSyncServiceImpl implements NoteSyncService {
       await batch.commit();
       await _saveUnsyncedNoteIds();
       setSyncStatus(SyncStatus.idle);
-    } catch (_) {
+    } catch (e, st) {
+      debugPrint('Failed to sync unsynced notes: $e\n$st');
       setSyncStatus(SyncStatus.error);
     }
   }
@@ -193,11 +199,13 @@ class NoteSyncServiceImpl implements NoteSyncService {
           }
           _unsyncedNoteIds.clear();
         }
-      } catch (_) {
+      } catch (e, st) {
+        debugPrint('Failed to load notes from remote: $e\n$st');
         notes
           ..clear()
           ..addAll(originalNotes);
         success = false;
+        setSyncStatus(SyncStatus.error);
       }
     } else {
       _unsyncedNoteIds.addAll(existingUnsynced);
