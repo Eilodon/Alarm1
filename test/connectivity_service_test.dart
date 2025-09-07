@@ -25,6 +25,9 @@ class FakeConnectivity extends ConnectivityPlatform {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  final original = ConnectivityPlatform.instance;
+  addTearDown(() => ConnectivityPlatform.instance = original);
+
   testWidgets('shows SnackBar when connection lost', (tester) async {
     final fake = FakeConnectivity();
     ConnectivityPlatform.instance = fake;
