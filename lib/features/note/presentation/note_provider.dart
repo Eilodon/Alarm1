@@ -34,6 +34,9 @@ class NoteProvider extends ChangeNotifier {
   final NotificationService _notificationService;
   final HomeWidgetService _homeWidgetService;
   final NoteSyncService _syncService;
+  final CreateNote _createNote;
+  final DeleteNote _deleteNote;
+  final SnoozeNote _snoozeNote;
 
   final SplayTreeSet<Note> _notes = SplayTreeSet<Note>(_noteComparator);
   String _draft = '';
@@ -51,14 +54,26 @@ class NoteProvider extends ChangeNotifier {
     required NotificationService notificationService,
     required HomeWidgetService homeWidgetService,
     required NoteSyncService syncService,
-  })  : _getNotes = getNotes,
-        _saveNotes = saveNotes,
-        _updateNote = updateNote,
-        _autoBackup = autoBackup,
+
+    CreateNote? createNote,
+    DeleteNote? deleteNote,
+    SnoozeNote? snoozeNote,
+  })  : _repository = repository,
+
         _calendarService = calendarService,
         _notificationService = notificationService,
         _homeWidgetService = homeWidgetService,
-        _syncService = syncService {
+        _syncService = syncService,
+        _createNote = createNote ?? CreateNote(repository, syncService),
+        _deleteNote = deleteNote ??
+            DeleteNote(
+              repository,
+              calendarService,
+              notificationService,
+              homeWidgetService,
+              syncService,
+            ),
+        _snoozeNote = snoozeNote ?? SnoozeNote(notificationService) {
     unawaited(
       _init().catchError((e) {
         /* log or set error state */
@@ -246,9 +261,10 @@ class NoteProvider extends ChangeNotifier {
 
   Future<void> addNote(Note note) async {
     _notes.add(note);
-    await _saveNotes(_notes.toList());
+
+    await _createNote(note, _notes.toList());
+
     notifyListeners();
-    await _syncService.syncNote(note);
   }
 
   Future<bool> updateNote(Note note, AppLocalizations l10n) async {
@@ -345,15 +361,7 @@ class NoteProvider extends ChangeNotifier {
   }
 
   Future<void> snoozeNote(Note note, AppLocalizations l10n) async {
-    if (note.notificationId == null) return;
-    await _notificationService.snoozeNotification(
-      id: note.notificationId!,
-      title: note.title,
-      body: note.content,
-      minutes: note.snoozeMinutes,
-      l10n: l10n,
-      payload: note.id,
-    );
+    await _snoozeNote(note, l10n);
   }
 
   Future<bool> saveNote(Note note, AppLocalizations l10n) {
@@ -363,16 +371,10 @@ class NoteProvider extends ChangeNotifier {
   Future<void> removeNoteAt(int index) async {
     final note = _notes.elementAt(index);
     _notes.remove(note);
-    if (note.notificationId != null) {
-      await _notificationService.cancel(note.notificationId!);
-    }
-    if (note.eventId != null) {
-      await _calendarService.deleteEvent(note.eventId!);
-    }
-    await _saveNotes(_notes.toList());
-    await _homeWidgetService.update(_notes.toList());
+
+    await _deleteNote(note, _notes.toList());
+
     notifyListeners();
-    await _syncService.deleteNote(note.id);
   }
 
   void setDraft(String value) {

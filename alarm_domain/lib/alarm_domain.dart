@@ -8,10 +8,15 @@ export 'src/repositories/note_repository.dart';
 export 'src/usecases/get_notes.dart';
 export 'src/usecases/save_notes.dart';
 export 'src/usecases/update_note.dart';
-export 'src/usecases/auto_backup.dart';
+
+export 'src/usecases/create_note.dart';
+export 'src/usecases/delete_note.dart';
+export 'src/usecases/snooze_note.dart';
+
 export 'src/services/notification_service.dart';
 export 'src/services/calendar_service.dart';
 export 'src/services/home_widget_service.dart';
+export 'src/services/note_sync_service.dart';
 
 export 'src/services/backup_service.dart';
 export 'src/services/note_sync_service.dart';
