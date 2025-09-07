@@ -10,7 +10,7 @@ import '../features/settings/data/settings_service.dart';
 
 import '../screens/note_search_delegate.dart';
 import '../screens/voice_to_note_screen.dart';
-import '../screens/settings_screen.dart';
+import '../features/settings/presentation/settings_screen.dart';
 import '../pandora_ui/palette_bottom_sheet.dart';
 import '../pandora_ui/teach_ai_modal.dart';
 import 'package:alarm_domain/alarm_domain.dart';
