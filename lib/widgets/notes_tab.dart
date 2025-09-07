@@ -31,13 +31,13 @@ class NotesTab extends StatefulWidget {
 }
 
 class _NotesTabState extends State<NotesTab> {
-  String _mascotPath = 'assets/lottie/mascot.json';
+  late Future<String> _mascotFuture;
   static const _platform = MethodChannel('notes_reminder_app/actions');
 
   @override
   void initState() {
     super.initState();
-    _loadMascot();
+    _mascotFuture = _loadMascot();
     _platform.setMethodCallHandler((call) async {
       if (call.method == 'voiceToNote') {
         await Navigator.push(
@@ -50,9 +50,8 @@ class _NotesTabState extends State<NotesTab> {
     });
   }
 
-  Future<void> _loadMascot() async {
-    _mascotPath = await SettingsService().loadMascotPath();
-    if (mounted) setState(() {});
+  Future<String> _loadMascot() async {
+    return SettingsService().loadMascotPath();
   }
 
   void _addNote() {
@@ -120,7 +119,11 @@ class _NotesTabState extends State<NotesTab> {
                   ),
                 ),
               );
-              _loadMascot();
+              if (mounted) {
+                setState(() {
+                  _mascotFuture = _loadMascot();
+                });
+              }
             },
           ),
           PopupMenuButton<String>(
@@ -148,7 +151,24 @@ class _NotesTabState extends State<NotesTab> {
       body: Column(
         children: [
           const SizedBox(height: 8),
-          SizedBox(width: 140, height: 140, child: Lottie.asset(_mascotPath)),
+          SizedBox(
+            width: 140,
+            height: 140,
+            child: FutureBuilder<String>(
+              future: _mascotFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState != ConnectionState.done ||
+                    !snapshot.hasData) {
+                  return const SizedBox.shrink();
+                }
+                final path = snapshot.data!;
+                if (!path.endsWith('.json')) {
+                  return Image.asset(path);
+                }
+                return RepaintBoundary(child: Lottie.asset(path));
+              },
+            ),
+          ),
           const SizedBox(height: 8),
           const Expanded(child: TagFilteredNotesList()),
         ],
