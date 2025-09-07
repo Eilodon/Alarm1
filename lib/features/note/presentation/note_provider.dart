@@ -197,8 +197,8 @@ class NoteProvider extends ChangeNotifier {
     bool pinned = false,
     required AppLocalizations l10n,
   }) async {
+    final id = DateTime.now().microsecondsSinceEpoch.toString();
     try {
-      final id = DateTime.now().microsecondsSinceEpoch.toString();
       int? notificationId;
       String? eventId;
       if (alarmTime != null) {
@@ -258,7 +258,10 @@ class NoteProvider extends ChangeNotifier {
 
       await addNote(note);
       return true;
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('Failed to create note $id: $e\n$st');
+      await _syncService.markUnsynced(id);
+      notifyListeners();
       return false;
     }
   }
@@ -357,7 +360,8 @@ class NoteProvider extends ChangeNotifier {
       notifyListeners();
       await _syncService.syncNote(updated);
       return true;
-    } catch (e) {
+    } catch (e, st) {
+      debugPrint('Failed to update note ${note.id}: $e\n$st');
       await _syncService.markUnsynced(note.id);
       notifyListeners();
       return false;
