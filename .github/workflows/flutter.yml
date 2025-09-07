@@ -22,6 +22,12 @@ jobs:
           key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.lock') }}
       - run: flutter clean
       - run: flutter pub get
+      - name: Ensure flutter_native_timezone is absent
+        run: |
+          if flutter pub deps | grep -q flutter_native_timezone; then
+            echo 'flutter_native_timezone found in dependency tree'
+            exit 1
+          fi
       - run: flutter gen-l10n
       - name: Check for outdated dependencies
         run: flutter pub outdated
