@@ -40,10 +40,9 @@ class StartupService {
       await FirebaseAnalytics.instance.logAppOpen();
     } catch (e, st) {
       authFailed = true;
-      debugPrint('Error during Firebase initialization: $e');
-      debugPrint('$st');
-      // Rethrow if upper layers should handle the error.
-      // rethrow;
+
+      debugPrint('Firebase initialization error: $e\n$st');
+
     }
 
     try {
@@ -52,10 +51,9 @@ class StartupService {
       );
     } catch (e, st) {
       notificationFailed = true;
-      debugPrint('Error initializing notifications: $e');
-      debugPrint('$st');
-      // Rethrow if upper layers should handle the error.
-      // rethrow;
+
+      debugPrint('Notification initialization error: $e\n$st');
+
     }
 
     return StartupResult(
