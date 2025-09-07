@@ -4,11 +4,13 @@ import 'package:lottie/lottie.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'dart:math' as math;
 
-import '../data/settings_service.dart';
+
+import '../../../services/settings_service.dart';
 import 'package:alarm_data/alarm_data.dart';
 import 'package:alarm_domain/alarm_domain.dart';
 import 'package:provider/provider.dart';
-import '../../note/presentation/note_provider.dart';
+import '../../../providers/note_provider.dart';
+
 
 class SettingsScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
@@ -92,17 +94,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _warnIfLowContrast(Color color) {
     final brightness = ThemeData.estimateBrightnessForColor(color);
-    final foreground = brightness == Brightness.dark
-        ? Colors.white
-        : Colors.black;
+
+    final foreground =
+        brightness == Brightness.dark ? Colors.white : Colors.black;
+
     final l1 = color.computeLuminance();
     final l2 = foreground.computeLuminance();
     final ratio = (math.max(l1, l2) + 0.05) / (math.min(l1, l2) + 0.05);
     if (ratio < 4.5) {
       final l10n = AppLocalizations.of(context)!;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.lowContrastWarning)));
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l10n.lowContrastWarning)));
+
     }
   }
 
