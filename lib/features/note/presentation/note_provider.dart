@@ -6,7 +6,14 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     show Time;
 
-import 'package:alarm_domain/alarm_domain.dart';
+
+import '../domain/domain.dart';
+import 'package:alarm_data/alarm_data.dart';
+import '../data/calendar_service.dart';
+import '../data/notification_service.dart';
+import '../data/home_widget_service.dart';
+import '../../backup/data/note_sync_service.dart';
+
 
 int _noteComparator(Note a, Note b) {
   if (a.pinned != b.pinned) {

@@ -1,6 +1,6 @@
 import 'package:home_widget/home_widget.dart';
 
-import 'package:alarm_domain/alarm_domain.dart';
+import '../domain/domain.dart';
 
 /// Service to update the native home screen widget with the next upcoming note.
 class HomeWidgetServiceImpl implements HomeWidgetService {

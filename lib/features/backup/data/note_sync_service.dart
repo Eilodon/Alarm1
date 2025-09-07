@@ -7,7 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:alarm_domain/alarm_domain.dart';
+import '../../note/domain/domain.dart';
 import 'package:alarm_data/alarm_data.dart';
 
 class NoteSyncServiceImpl implements NoteSyncService {

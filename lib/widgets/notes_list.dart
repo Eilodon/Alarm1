@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-import 'package:alarm_domain/alarm_domain.dart';
+import '../features/note/domain/domain.dart';
 
 import '../features/note/presentation/note_provider.dart';
 import '../features/note/presentation/note_detail_screen.dart';
