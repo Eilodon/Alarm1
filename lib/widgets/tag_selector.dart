@@ -66,26 +66,31 @@ class _TagSelectorState extends State<TagSelector> {
     }).toList();
 
     final tokens = Theme.of(context).extension<Tokens>()!;
-    final colorOptions = <Color>[
-      scheme.primary,
-      scheme.secondary,
-      scheme.tertiary,
-      scheme.error,
-      tokens.colors.warning,
-      tokens.colors.info,
-      tokens.colors.neutral700,
-      tokens.colors.neutral300,
-    ];
-    final colorChips = colorOptions.map((c) {
-      final selected = widget.selectedColor == c.value;
+    final colorOptions = <Color, String>{
+      scheme.primary: AppLocalizations.of(context)!.primary,
+      scheme.secondary: AppLocalizations.of(context)!.secondary,
+      scheme.tertiary: 'Tertiary',
+      scheme.error: 'Error',
+      tokens.colors.warning: 'Warning',
+      tokens.colors.info: 'Info',
+      tokens.colors.neutral700: 'Neutral dark',
+      tokens.colors.neutral300: 'Neutral light',
+    };
+    final colorChips = colorOptions.entries.map((entry) {
+      final color = entry.key;
+      final label = entry.value;
+      final selected = widget.selectedColor == color.value;
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4),
-        child: ChoiceChip(
-          label: const SizedBox(width: 24, height: 24),
-          selectedColor: c,
-          backgroundColor: c,
-          selected: selected,
-          onSelected: (_) => widget.onColorChanged(c.value),
+        child: Tooltip(
+          message: label,
+          child: ChoiceChip(
+            label: const SizedBox(width: 24, height: 24),
+            selectedColor: color,
+            backgroundColor: color,
+            selected: selected,
+            onSelected: (_) => widget.onColorChanged(color.value),
+          ),
         ),
       );
     }).toList();
