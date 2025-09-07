@@ -9,11 +9,12 @@ class ConnectivityService {
   StreamSubscription<ConnectivityResult>? _subscription;
   ConnectivityResult? _lastResult;
 
-  void initialize(BuildContext context, GlobalKey<ScaffoldMessengerState> messengerKey) {
+  void initialize(
+    AppLocalizations l10n,
+    GlobalKey<ScaffoldMessengerState> messengerKey,
+  ) {
     try {
       _subscription = Connectivity().onConnectivityChanged.listen((result) {
-        if (!context.mounted) return;
-        final l10n = AppLocalizations.of(context)!;
         if (_lastResult != null) {
           if (_lastResult == ConnectivityResult.none && result != ConnectivityResult.none) {
             messengerKey.currentState?.showSnackBar(
