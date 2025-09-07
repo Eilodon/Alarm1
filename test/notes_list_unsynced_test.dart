@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -32,7 +33,11 @@ void main() {
     final sync = MockSyncService();
     when(() => repo.saveNotes(any())).thenAnswer((_) async {});
     when(() => sync.init(any())).thenAnswer((_) async {});
-    when(() => sync.syncStatus).thenReturn(ValueNotifier(SyncStatus.idle));
+    final controller = StreamController<SyncStatus>.broadcast();
+    when(() => sync.syncStatus).thenAnswer((_) => controller.stream);
+    when(() => sync.setSyncStatus(any())).thenAnswer((invocation) {
+      controller.add(invocation.positionalArguments.first as SyncStatus);
+    });
     when(() => sync.loadFromRemote(any())).thenAnswer((_) async => true);
     when(() => homeWidget.update(any())).thenAnswer((_) async {});
     final provider = NoteProvider(

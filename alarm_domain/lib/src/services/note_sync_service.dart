@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 import '../entities/note.dart';
 
 /// Represents the current synchronization status.
@@ -10,7 +8,12 @@ typedef NoteGetter = Note? Function(String id);
 
 /// Contract for synchronizing notes with a remote backend.
 abstract class NoteSyncService {
-  ValueNotifier<SyncStatus> get syncStatus;
+  /// Stream of synchronization status updates.
+  Stream<SyncStatus> get syncStatus;
+
+  /// Set a new synchronization status.
+  void setSyncStatus(SyncStatus status);
+
   Set<String> get unsyncedNoteIds;
   bool isSynced(String id);
 

@@ -75,9 +75,11 @@ class _NotesTabState extends State<NotesTab> {
           appBar: AppBar(
             title: Text(AppLocalizations.of(context)!.appTitle),
             actions: [
-              ValueListenableBuilder<SyncStatus>(
-                valueListenable: provider.syncStatus,
-                builder: (context, status, _) {
+              StreamBuilder<SyncStatus>(
+                stream: provider.syncStatus,
+                initialData: SyncStatus.idle,
+                builder: (context, snapshot) {
+                  final status = snapshot.data ?? SyncStatus.idle;
                   final l10n = AppLocalizations.of(context)!;
                   String text;
                   switch (status) {

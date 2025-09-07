@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../note/domain/domain.dart';
@@ -22,9 +21,9 @@ class NoteSyncServiceImpl implements NoteSyncService {
   static const _unsyncedKey = 'unsyncedNoteIds';
 
   final Set<String> _unsyncedNoteIds = {};
+  final _statusController = StreamController<SyncStatus>.broadcast();
   @override
-  final ValueNotifier<SyncStatus> syncStatus =
-      ValueNotifier<SyncStatus>(SyncStatus.idle);
+  Stream<SyncStatus> get syncStatus => _statusController.stream;
 
   NoteGetter? _noteGetter;
 
@@ -42,6 +41,13 @@ class NoteSyncServiceImpl implements NoteSyncService {
   Set<String> get unsyncedNoteIds => Set.unmodifiable(_unsyncedNoteIds);
   @override
   bool isSynced(String id) => !_unsyncedNoteIds.contains(id);
+
+  @override
+  void setSyncStatus(SyncStatus status) {
+    if (!_statusController.isClosed) {
+      _statusController.add(status);
+    }
+  }
 
   @override
   Future<void> init(NoteGetter noteGetter) async {
@@ -63,6 +69,7 @@ class NoteSyncServiceImpl implements NoteSyncService {
   @override
   Future<void> dispose() async {
     await _connectivitySubscription?.cancel();
+    await _statusController.close();
   }
 
   Future<void> _saveUnsyncedNoteIds() async {
@@ -111,7 +118,7 @@ class NoteSyncServiceImpl implements NoteSyncService {
   @override
   Future<void> syncUnsyncedNotes() async {
     if (_unsyncedNoteIds.isEmpty || Firebase.apps.isEmpty) return;
-    syncStatus.value = SyncStatus.syncing;
+    setSyncStatus(SyncStatus.syncing);
     try {
       final user = _auth.currentUser ?? await _auth.signInAnonymously();
       final ids = List<String>.from(_unsyncedNoteIds);
@@ -130,9 +137,9 @@ class NoteSyncServiceImpl implements NoteSyncService {
       }
       await batch.commit();
       await _saveUnsyncedNoteIds();
-      syncStatus.value = SyncStatus.idle;
+      setSyncStatus(SyncStatus.idle);
     } catch (_) {
-      syncStatus.value = SyncStatus.error;
+      setSyncStatus(SyncStatus.error);
     }
   }
 
