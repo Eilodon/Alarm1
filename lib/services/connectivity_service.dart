@@ -12,6 +12,7 @@ class ConnectivityService {
   void initialize(BuildContext context, GlobalKey<ScaffoldMessengerState> messengerKey) {
     try {
       _subscription = Connectivity().onConnectivityChanged.listen((result) {
+        if (!context.mounted) return;
         final l10n = AppLocalizations.of(context)!;
         if (_lastResult != null) {
           if (_lastResult == ConnectivityResult.none && result != ConnectivityResult.none) {
