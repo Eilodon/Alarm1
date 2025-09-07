@@ -10,6 +10,7 @@ import 'package:mocktail/mocktail.dart';
 
 import 'package:alarm_domain/alarm_domain.dart' hide Note;
 import 'package:notes_reminder_app/features/note/note.dart';
+import 'package:notes_reminder_app/features/backup/data/note_sync_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
@@ -19,6 +20,11 @@ class MockRepo extends Mock implements NoteRepository {}
 class MockCalendar extends Mock implements CalendarService {}
 
 class MockNotification extends Mock implements NotificationService {}
+
+class DummyHomeWidget extends Fake implements HomeWidgetService {
+  @override
+  Future<void> update(List<Note> notes) async {}
+}
 
 class FakeConnectivityPlatform extends Fake implements ConnectivityPlatform {
   final _controller = StreamController<ConnectivityResult>.broadcast();
@@ -112,6 +118,8 @@ void main() {
       repository: repo,
       calendarService: calendar,
       notificationService: notification,
+      homeWidgetService: DummyHomeWidget(),
+      syncService: NoteSyncServiceImpl(repository: repo),
     );
 
     await provider.loadNotes();

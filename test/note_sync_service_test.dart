@@ -16,7 +16,7 @@ void main() {
 
   test('syncNote marks unsynced when offline', () async {
     SharedPreferences.setMockInitialValues({});
-    final service = NoteSyncService(
+    final service = NoteSyncServiceImpl(
       repository: DummyRepo(),
       connectivity: FakeConnectivity(),
     );

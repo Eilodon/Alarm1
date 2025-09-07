@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:notes_reminder_app/features/note/note.dart';
-import 'package:notes_reminder_app/features/backup/backup.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MockRepo extends Mock implements NoteRepository {}
@@ -12,6 +11,8 @@ class MockCalendar extends Mock implements CalendarService {}
 class MockNotification extends Mock implements NotificationService {}
 
 class MockSyncService extends Mock implements NoteSyncService {}
+
+class MockHomeWidget extends Mock implements HomeWidgetService {}
 
 class FakeL10n extends Fake implements AppLocalizations {}
 
@@ -40,6 +41,7 @@ void main() {
     final calendar = MockCalendar();
     final notification = MockNotification();
     final sync = MockSyncService();
+    final homeWidget = MockHomeWidget();
     when(() => repo.getNotes()).thenAnswer(
       (_) async => [
         const Note(
@@ -61,12 +63,14 @@ void main() {
     when(() => sync.syncStatus).thenReturn(ValueNotifier(SyncStatus.idle));
     when(() => sync.loadFromRemote(any())).thenAnswer((_) async => true);
     when(() => sync.deleteNote(any())).thenAnswer((_) async {});
+    when(() => homeWidget.update(any())).thenAnswer((_) async {});
 
     final provider = NoteProvider(
       repository: repo,
       calendarService: calendar,
       notificationService: notification,
       syncService: sync,
+      homeWidgetService: homeWidget,
     );
 
     await provider.loadNotes();
@@ -82,6 +86,7 @@ void main() {
     final calendar = MockCalendar();
     final notification = MockNotification();
     final sync = MockSyncService();
+    final homeWidget = MockHomeWidget();
     final l10n = FakeL10n();
     when(() => repo.saveNotes(any())).thenAnswer((_) async {});
     when(
@@ -105,12 +110,14 @@ void main() {
     when(() => sync.syncStatus).thenReturn(ValueNotifier(SyncStatus.idle));
     when(() => sync.loadFromRemote(any())).thenAnswer((_) async => true);
     when(() => sync.syncNote(any())).thenAnswer((_) async {});
+    when(() => homeWidget.update(any())).thenAnswer((_) async {});
 
     final provider = NoteProvider(
       repository: repo,
       calendarService: calendar,
       notificationService: notification,
       syncService: sync,
+      homeWidgetService: homeWidget,
     );
 
     final ok = await provider.createNote(
@@ -200,6 +207,7 @@ void main() {
   test('fetchNotesPage paginates using stored order', () async {
     final repo = MockRepo();
     final sync = MockSyncService();
+    final homeWidget = MockHomeWidget();
     when(() => repo.getNotes()).thenAnswer(
       (_) async => [
         Note(
@@ -226,12 +234,14 @@ void main() {
     when(() => sync.init(any())).thenAnswer((_) async {});
     when(() => sync.syncStatus).thenReturn(ValueNotifier(SyncStatus.idle));
     when(() => sync.loadFromRemote(any())).thenAnswer((_) async => true);
+    when(() => homeWidget.update(any())).thenAnswer((_) async {});
 
     final provider = NoteProvider(
       repository: repo,
       calendarService: MockCalendar(),
       notificationService: MockNotification(),
       syncService: sync,
+      homeWidgetService: homeWidget,
     );
 
     final firstPage = await provider.fetchNotesPage(null, 2);
@@ -250,6 +260,7 @@ void main() {
     final calendar = MockCalendar();
     final notification = MockNotification();
     final sync = MockSyncService();
+    final homeWidget = MockHomeWidget();
     final l10n = FakeL10n();
     when(() => repo.getNotes()).thenAnswer(
       (_) async => [
@@ -279,12 +290,14 @@ void main() {
     when(() => sync.init(any())).thenAnswer((_) async {});
     when(() => sync.syncStatus).thenReturn(ValueNotifier(SyncStatus.idle));
     when(() => sync.loadFromRemote(any())).thenAnswer((_) async => true);
+    when(() => homeWidget.update(any())).thenAnswer((_) async {});
 
     final provider = NoteProvider(
       repository: repo,
       calendarService: calendar,
       notificationService: notification,
       syncService: sync,
+      homeWidgetService: homeWidget,
     );
 
     await provider.loadNotes();
