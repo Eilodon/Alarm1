@@ -3,7 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
-import '../providers/note_provider.dart';
+import '../features/note/presentation/note_provider.dart';
 import '../services/gemini_service.dart';
 
 class VoiceToNoteScreen extends StatefulWidget {
@@ -61,9 +61,7 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
         if (!mounted) return;
         final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.microphonePermissionMessage),
-          ),
+          SnackBar(content: Text(l10n.microphonePermissionMessage)),
         );
       }
     } else {
@@ -76,9 +74,7 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
         if (!mounted) return;
         final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.speechNotRecognizedMessage),
-          ),
+          SnackBar(content: Text(l10n.speechNotRecognizedMessage)),
         );
       }
     }
@@ -87,8 +83,9 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
   Future<void> _convertToNote() async {
     if (_recognized.isEmpty) return;
     setState(() => _isProcessing = true);
-    final prompt = AppLocalizations.of(context)!
-        .convertSpeechPrompt(_recognized);
+    final prompt = AppLocalizations.of(
+      context,
+    )!.convertSpeechPrompt(_recognized);
     final l10n = AppLocalizations.of(context)!;
     final reply = await GeminiService().chat(prompt, l10n);
     if (!mounted) return;
@@ -106,15 +103,12 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:
-          AppBar(title: Text(AppLocalizations.of(context)!.voiceToNote)),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.voiceToNote)),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Expanded(
-              child: SingleChildScrollView(child: Text(_recognized)),
-            ),
+            Expanded(child: SingleChildScrollView(child: Text(_recognized))),
             if (_isProcessing) const CircularProgressIndicator(),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,9 +128,11 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
                               : null,
                         ),
                       ),
-                      label: Text(_isListening
-                          ? AppLocalizations.of(context)!.stop
-                          : AppLocalizations.of(context)!.speak),
+                      label: Text(
+                        _isListening
+                            ? AppLocalizations.of(context)!.stop
+                            : AppLocalizations.of(context)!.speak,
+                      ),
                     ),
                     if (_isListening)
                       Padding(
@@ -158,7 +154,7 @@ class _VoiceToNoteScreenState extends State<VoiceToNoteScreen> {
                   child: Text(AppLocalizations.of(context)!.convertToNote),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
