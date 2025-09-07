@@ -93,4 +93,14 @@ class SettingsService {
       orElse: () => ThemeMode.system,
     );
   }
+
+  Future<void> saveHasSeenOnboarding(bool value) async {
+    final sp = await _sp;
+    await sp.setBool(_kHasSeenOnboarding, value);
+  }
+
+  Future<bool> loadHasSeenOnboarding() async {
+    final sp = await _sp;
+    return sp.getBool(_kHasSeenOnboarding) ?? false;
+  }
 }

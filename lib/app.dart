@@ -1,14 +1,11 @@
-import 'dart:async';
-
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'screens/home_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'services/settings_service.dart';
+import 'services/connectivity_service.dart';
 import 'theme/tokens.dart';
 
 final messengerKey = GlobalKey<ScaffoldMessengerState>();
@@ -20,12 +17,14 @@ class MyApp extends StatefulWidget {
   final bool authFailed;
   final bool notificationFailed;
   final bool hasSeenOnboarding;
+  final ConnectivityService connectivityService;
   const MyApp({
     super.key,
     required this.themeColor,
     required this.fontScale,
     required this.themeMode,
     required this.hasSeenOnboarding,
+    required this.connectivityService,
     this.authFailed = false,
     this.notificationFailed = false,
   });
@@ -38,7 +37,6 @@ class _MyAppState extends State<MyApp> {
   Color _themeColor = Colors.blue;
   double _fontScale = 1.0;
   ThemeMode _themeMode = ThemeMode.system;
-  StreamSubscription<ConnectivityResult>? _connSub;
   bool _hasSeenOnboarding = true;
 
   @override
@@ -66,20 +64,7 @@ class _MyAppState extends State<MyApp> {
         );
       }
     });
-    try {
-      _connSub = Connectivity().onConnectivityChanged.listen((result) {
-        if (result == ConnectivityResult.none) {
-          final l10n = AppLocalizations.of(context)!;
-          messengerKey.currentState?.showSnackBar(
-            SnackBar(
-              content: Text(l10n.noInternetConnection),
-            ),
-          );
-        }
-      });
-    } on MissingPluginException {
-      // Ignore if connectivity plugin is not available (e.g., tests)
-    }
+    widget.connectivityService.initialize(context, messengerKey);
   }
 
   void updateTheme(Color newColor) async {
@@ -103,7 +88,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void dispose() {
-    _connSub?.cancel();
+    widget.connectivityService.dispose();
     super.dispose();
   }
 
