@@ -238,14 +238,14 @@ class NotificationServiceImpl implements NotificationService {
 
   fln.RepeatInterval _mapRepeatInterval(RepeatInterval interval) {
     switch (interval) {
+      case RepeatInterval.everyMinute:
+        return fln.RepeatInterval.everyMinute;
       case RepeatInterval.hourly:
         return fln.RepeatInterval.hourly;
       case RepeatInterval.daily:
         return fln.RepeatInterval.daily;
       case RepeatInterval.weekly:
         return fln.RepeatInterval.weekly;
-      case RepeatInterval.monthly:
-        return fln.RepeatInterval.everyMinute; // closest
     }
   }
 }
