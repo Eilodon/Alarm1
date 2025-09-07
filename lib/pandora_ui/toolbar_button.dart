@@ -79,33 +79,11 @@ class ToolbarButton extends StatelessWidget {
           padding: EdgeInsets.symmetric(
             vertical: tokens.spacing.s,
             horizontal: tokens.spacing.m,
-
           ),
-          child: ElevatedButton.icon(
-            onPressed: style.enabled
-                ? () {
-                    HapticFeedback.selectionClick();
-                    onPressed();
-                  }
-                : null,
-            icon: icon,
-            label: Text(label),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: style.background,
-              foregroundColor: style.foreground,
-              padding: EdgeInsets.symmetric(
-                vertical: tokens.spacing.s,
-                horizontal: tokens.spacing.m,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(tokens.radii.m),
-              ),
-              elevation: tokens.elevation.low,
-            ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(tokens.radii.m),
           ),
-
           elevation: tokens.elevation.low,
-
         ),
       ),
     );

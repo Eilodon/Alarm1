@@ -63,6 +63,9 @@ class _TagFilteredNotesListState extends State<TagFilteredNotesList> {
               final d = weekDays[i];
               final hasNotes = _notesForDay(d, filteredNotes).isNotEmpty;
               final theme = Theme.of(context);
+              final textColor = hasNotes
+                  ? theme.colorScheme.onSecondary
+                  : theme.colorScheme.onSurface;
               return GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -79,7 +82,7 @@ class _TagFilteredNotesListState extends State<TagFilteredNotesList> {
                     color: hasNotes
                         ? theme.colorScheme.secondary
                         : theme.colorScheme.surface,
-                    border: Border.all(color: theme.colorScheme.onSurface),
+                    border: Border.all(color: textColor),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(
@@ -89,8 +92,12 @@ class _TagFilteredNotesListState extends State<TagFilteredNotesList> {
                         DateFormat.E(
                           Localizations.localeOf(context).toString(),
                         ).format(d),
+                        style: TextStyle(color: textColor),
                       ),
-                      Text('${d.day}'),
+                      Text(
+                        '${d.day}',
+                        style: TextStyle(color: textColor),
+                      ),
                     ],
                   ),
                 ),

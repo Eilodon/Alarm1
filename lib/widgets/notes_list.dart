@@ -6,11 +6,13 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../models/note.dart';
+
 import '../providers/note_provider.dart';
 import '../screens/note_detail_screen.dart';
 import '../services/auth_service.dart';
 import '../pandora_ui/toolbar_button.dart';
 import 'note_card.dart';
+
 
 /// Displays a scrollable list of notes. When [gridCount] is greater than 1 a
 /// grid layout is used instead of a traditional list.
@@ -19,6 +21,7 @@ class NotesList extends StatefulWidget {
 
   /// Notes to display.
   final List<Note> notes;
+
 
   /// Number of columns to show. A value greater than 1 enables a grid layout.
   final int gridCount;
@@ -70,9 +73,11 @@ class _NotesListState extends State<NotesList> {
 
   Future<void> _loadMore() async {
     setState(() => _isLoadingMore = true);
+
     final notes = await context
         .read<NoteProvider>()
         .fetchNotesPage(_lastFetched, _pageSize);
+
     if (!mounted) return;
     setState(() {
       _isLoadingMore = false;
@@ -153,6 +158,7 @@ class _NotesListState extends State<NotesList> {
           }
           Navigator.push(
             context,
+
             MaterialPageRoute(
               builder: (_) => NoteDetailScreen(note: note),
             ),
@@ -220,6 +226,7 @@ class _NotesListState extends State<NotesList> {
             ),
           );
         },
+
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -230,8 +237,10 @@ class _NotesListState extends State<NotesList> {
               icon: const Icon(Icons.delete),
               label: l10n.delete,
               onPressed: () {
+
                 final idx =
                     provider.notes.indexWhere((n) => n.id == note.id);
+
                 if (idx != -1) {
                   provider.removeNoteAt(idx);
                 }
@@ -239,6 +248,7 @@ class _NotesListState extends State<NotesList> {
             ),
           ],
         ),
+
       ),
     );
   }
@@ -279,7 +289,9 @@ class _NotesListState extends State<NotesList> {
     return ListView.builder(
       controller: _scrollController,
       itemCount: itemCount,
+
       itemBuilder: builder,
+
     );
   }
 }
