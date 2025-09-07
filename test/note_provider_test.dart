@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -60,7 +61,11 @@ void main() {
     when(() => calendar.deleteEvent(any())).thenAnswer((_) async {});
     when(() => notification.cancel(any())).thenAnswer((_) async {});
     when(() => sync.init(any())).thenAnswer((_) async {});
-    when(() => sync.syncStatus).thenReturn(ValueNotifier(SyncStatus.idle));
+    final controller1 = StreamController<SyncStatus>.broadcast();
+    when(() => sync.syncStatus).thenAnswer((_) => controller1.stream);
+    when(() => sync.setSyncStatus(any())).thenAnswer((invocation) {
+      controller1.add(invocation.positionalArguments.first as SyncStatus);
+    });
     when(() => sync.loadFromRemote(any())).thenAnswer((_) async => true);
     when(() => sync.deleteNote(any())).thenAnswer((_) async {});
     when(() => homeWidget.update(any())).thenAnswer((_) async {});
@@ -110,7 +115,11 @@ void main() {
       ),
     ).thenAnswer((_) async => 'e1');
     when(() => sync.init(any())).thenAnswer((_) async {});
-    when(() => sync.syncStatus).thenReturn(ValueNotifier(SyncStatus.idle));
+    final controller2 = StreamController<SyncStatus>.broadcast();
+    when(() => sync.syncStatus).thenAnswer((_) => controller2.stream);
+    when(() => sync.setSyncStatus(any())).thenAnswer((invocation) {
+      controller2.add(invocation.positionalArguments.first as SyncStatus);
+    });
     when(() => sync.loadFromRemote(any())).thenAnswer((_) async => true);
     when(() => sync.syncNote(any())).thenAnswer((_) async {});
     when(() => homeWidget.update(any())).thenAnswer((_) async {});
@@ -179,7 +188,11 @@ void main() {
         ),
       ).thenAnswer((_) async => 'e1');
       when(() => sync.init(any())).thenAnswer((_) async {});
-      when(() => sync.syncStatus).thenReturn(ValueNotifier(SyncStatus.idle));
+      final controller3 = StreamController<SyncStatus>.broadcast();
+      when(() => sync.syncStatus).thenAnswer((_) => controller3.stream);
+      when(() => sync.setSyncStatus(any())).thenAnswer((invocation) {
+        controller3.add(invocation.positionalArguments.first as SyncStatus);
+      });
       when(() => sync.loadFromRemote(any())).thenAnswer((_) async => true);
       when(() => sync.syncNote(any())).thenAnswer((_) async {});
 
@@ -241,7 +254,11 @@ void main() {
     );
     when(() => repo.saveNotes(any())).thenAnswer((_) async {});
     when(() => sync.init(any())).thenAnswer((_) async {});
-    when(() => sync.syncStatus).thenReturn(ValueNotifier(SyncStatus.idle));
+    final controller4 = StreamController<SyncStatus>.broadcast();
+    when(() => sync.syncStatus).thenAnswer((_) => controller4.stream);
+    when(() => sync.setSyncStatus(any())).thenAnswer((invocation) {
+      controller4.add(invocation.positionalArguments.first as SyncStatus);
+    });
     when(() => sync.loadFromRemote(any())).thenAnswer((_) async => true);
     when(() => homeWidget.update(any())).thenAnswer((_) async {});
 
@@ -300,7 +317,11 @@ void main() {
       ),
     ).thenAnswer((_) async {});
     when(() => sync.init(any())).thenAnswer((_) async {});
-    when(() => sync.syncStatus).thenReturn(ValueNotifier(SyncStatus.idle));
+    final controller5 = StreamController<SyncStatus>.broadcast();
+    when(() => sync.syncStatus).thenAnswer((_) => controller5.stream);
+    when(() => sync.setSyncStatus(any())).thenAnswer((invocation) {
+      controller5.add(invocation.positionalArguments.first as SyncStatus);
+    });
     when(() => sync.loadFromRemote(any())).thenAnswer((_) async => true);
     when(() => homeWidget.update(any())).thenAnswer((_) async {});
 

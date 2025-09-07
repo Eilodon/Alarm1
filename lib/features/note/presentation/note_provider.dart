@@ -41,7 +41,7 @@ class NoteProvider extends ChangeNotifier {
   final SplayTreeSet<Note> _notes = SplayTreeSet<Note>(_noteComparator);
   String _draft = '';
 
-  ValueNotifier<SyncStatus> get syncStatus => _syncService.syncStatus;
+  Stream<SyncStatus> get syncStatus => _syncService.syncStatus;
   Set<String> get unsyncedNoteIds => _syncService.unsyncedNoteIds;
   bool isSynced(String id) => _syncService.isSynced(id);
 
@@ -146,15 +146,14 @@ class NoteProvider extends ChangeNotifier {
   }
 
   Future<bool> loadNotes() async {
-    _syncService.syncStatus.value = SyncStatus.syncing;
+    _syncService.setSyncStatus(SyncStatus.syncing);
     _notes..clear();
     _notes.addAll(await _getNotes());
     final success = await _syncService.loadFromRemote(_notes);
     await _homeWidgetService.update(_notes.toList());
     notifyListeners();
-    _syncService.syncStatus.value = success
-        ? SyncStatus.idle
-        : SyncStatus.error;
+    _syncService.setSyncStatus(
+        success ? SyncStatus.idle : SyncStatus.error);
     return success;
   }
 
