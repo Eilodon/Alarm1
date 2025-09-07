@@ -1,57 +1,74 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../models/security_cue.dart';
+import '../theme/tokens.dart';
 
-/// Modal dialog that lets user "teach" the AI with custom easing.
+/// Simple modal dialog allowing the user to provide feedback to improve the AI.
 class TeachAiModal extends StatefulWidget {
-  const TeachAiModal({super.key, this.securityCue = SecurityCue.onDevice});
+  const TeachAiModal({super.key, this.onSubmit, this.securityCue = SecurityCue.onDevice});
 
+  final void Function(String)? onSubmit;
   final SecurityCue securityCue;
+
+  /// Convenience method to show the modal.
+  static Future<void> show(
+    BuildContext context, {
+    void Function(String)? onSubmit,
+    SecurityCue securityCue = SecurityCue.onDevice,
+  }) {
+    return showDialog<void>(
+      context: context,
+      builder: (_) => TeachAiModal(onSubmit: onSubmit, securityCue: securityCue),
+    );
+  }
 
   @override
   State<TeachAiModal> createState() => _TeachAiModalState();
 }
 
-class _TeachAiModalState extends State<TeachAiModal>
-    with SingleTickerProviderStateMixin {
-  late final TextEditingController _ctrl;
-  late final AnimationController _anim;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = TextEditingController();
-    _anim = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 400),
-    )..forward();
-  }
+class _TeachAiModalState extends State<TeachAiModal> {
+  final TextEditingController _controller = TextEditingController();
 
   @override
   void dispose() {
-    _ctrl.dispose();
-    _anim.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final curved = CurvedAnimation(parent: _anim, curve: Curves.easeOutQuart);
-    return ScaleTransition(
-      scale: curved,
-      child: AlertDialog(
-        title: const Text('Teach AI'),
-        content: TextField(controller: _ctrl),
-        actions: [
-          TextButton(
-            onPressed: () {
-              widget.securityCue.triggerHaptic();
-              Navigator.pop(context, _ctrl.text);
-            },
-            child: const Text('Send'),
-          ),
-        ],
+    final l10n = AppLocalizations.of(context)!;
+    final tokens = Theme.of(context).extension<Tokens>()!;
+    return AlertDialog(
+      contentPadding: EdgeInsets.all(tokens.spacing.m),
+      title: Text(l10n.teachAi),
+      content: TextField(
+        controller: _controller,
+        maxLines: 5,
+        decoration: InputDecoration(
+          hintText: l10n.teachAiHint,
+        ),
       ),
+      actionsPadding: EdgeInsets.symmetric(
+        horizontal: tokens.spacing.m,
+        vertical: tokens.spacing.s,
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.cancel),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            widget.securityCue.triggerHaptic();
+            widget.onSubmit?.call(_controller.text);
+            Navigator.of(context).pop();
+          },
+          child: Text(l10n.submit),
+        ),
+      ],
     );
   }
 }
+
