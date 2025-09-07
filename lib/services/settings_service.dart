@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../theme/tokens.dart';
 import 'backup_service.dart';
 
 class SettingsService {
@@ -31,7 +32,7 @@ class SettingsService {
   Future<Color> loadThemeColor() async {
     final sp = await _sp;
     final v = sp.getInt(_kThemeColor);
-    return v != null ? Color(v) : Colors.blue;
+    return v != null ? Color(v) : Tokens.light.colors.primary;
   }
 
   Future<void> saveMascotPath(String path) async {
