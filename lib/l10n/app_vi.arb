@@ -10,6 +10,7 @@
   "noNotes": "Không có ghi chú",
   "settings": "Cài đặt",
   "chooseThemeColor": "Chọn màu chủ đề",
+  "lowContrastWarning": "Màu đã chọn có độ tương phản thấp với chữ",
   "changeThemeColor": "Đổi màu giao diện",
   "chooseMascot": "Chọn mascot",
   "changeMascot": "Thay mascot",
@@ -38,6 +39,7 @@
   "networkError": "Lỗi mạng. Vui lòng thử lại.",
   "noInternetConnection": "Mất kết nối mạng.",
   "microphonePermissionMessage": "Yêu cầu quyền micro. Vui lòng bật trong Cài đặt.",
+  "speechNotRecognizedMessage": "Không nhận được giọng nói. Vui lòng thử lại.",
   "readNote": "Đọc Note",
   "scheduleForDate": "Lịch ngày {date}",
   "@scheduleForDate": {
@@ -144,5 +146,13 @@
   "themeUpdated": "Đã cập nhật chủ đề",
   "notes": "Ghi chú",
   "reminders": "Nhắc nhở",
-  "palette": "Bảng màu"
+  "palette": "Bảng màu",
+  "onboardingTakeNotes": "Ghi chú",
+  "onboardingTakeNotesDesc": "Ghi lại suy nghĩ và ý tưởng của bạn.",
+  "onboardingSetReminders": "Đặt nhắc nhở",
+  "onboardingSetRemindersDesc": "Lên lịch báo cho các công việc quan trọng.",
+  "onboardingCustomize": "Tùy chỉnh",
+  "onboardingCustomizeDesc": "Điều chỉnh chủ đề và cỡ chữ theo ý bạn.",
+  "onboardingSkip": "Bỏ qua",
+  "onboardingGetStarted": "Bắt đầu"
 }

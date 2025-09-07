@@ -43,14 +43,20 @@ void main() {
   runApp(
     ChangeNotifierProvider.value(
       value: noteProvider,
-      child: FutureBuilder<AppInitializationData?>(
+      child: FutureBuilder<AppInitializationData>(
         future: AppInitializer().initialize(
           onDidReceiveNotificationResponse: (response) =>
               _onNotificationResponse(response, noteProvider),
         ),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return const SizedBox.shrink();
+            return const MaterialApp(
+              home: Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            );
           }
           final data = snapshot.data!;
           return MyApp(

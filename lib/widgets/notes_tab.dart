@@ -10,8 +10,12 @@ import '../screens/note_search_delegate.dart';
 import '../screens/voice_to_note_screen.dart';
 import '../screens/settings_screen.dart';
 import '../pandora_ui/toolbar_button.dart';
+import '../pandora_ui/palette_bottom_sheet.dart';
+import '../pandora_ui/teach_ai_modal.dart';
+import '../models/command.dart';
 import 'add_note_dialog.dart';
 import 'tag_filtered_notes_list.dart';
+import 'route_transitions.dart';
 
 class NotesTab extends StatefulWidget {
   final Function(Color) onThemeChanged;
@@ -30,13 +34,13 @@ class NotesTab extends StatefulWidget {
 }
 
 class _NotesTabState extends State<NotesTab> {
-  String _mascotPath = 'assets/lottie/mascot.json';
+  late Future<String> _mascotFuture;
   static const _platform = MethodChannel('notes_reminder_app/actions');
 
   @override
   void initState() {
     super.initState();
-    _loadMascot();
+    _mascotFuture = _loadMascot();
     _platform.setMethodCallHandler((call) async {
       if (call.method == 'voiceToNote') {
         await Navigator.push(
@@ -49,9 +53,8 @@ class _NotesTabState extends State<NotesTab> {
     });
   }
 
-  Future<void> _loadMascot() async {
-    _mascotPath = await SettingsService().loadMascotPath();
-    if (mounted) setState(() {});
+  Future<String> _loadMascot() async {
+    return SettingsService().loadMascotPath();
   }
 
   void _addNote() {
@@ -104,22 +107,7 @@ class _NotesTabState extends State<NotesTab> {
             onPressed: () async {
               await Navigator.push(
                 context,
-                PageRouteBuilder(
-                  pageBuilder: (_, __, ___) => const VoiceToNoteScreen(),
-                  transitionsBuilder: (_, animation, __, child) {
-                    final offsetAnimation = Tween<Offset>(
-                      begin: const Offset(1, 0),
-                      end: Offset.zero,
-                    ).animate(animation);
-                    return FadeTransition(
-                      opacity: animation,
-                      child: SlideTransition(
-                        position: offsetAnimation,
-                        child: child,
-                      ),
-                    );
-                  },
-                ),
+                buildSlideFadeRoute(const VoiceToNoteScreen()),
               );
             },
           ),
@@ -129,47 +117,73 @@ class _NotesTabState extends State<NotesTab> {
             onPressed: () async {
               await Navigator.push(
                 context,
-                PageRouteBuilder(
-                  pageBuilder: (_, __, ___) => SettingsScreen(
+                buildSlideFadeRoute(
+                  SettingsScreen(
                     onThemeChanged: widget.onThemeChanged,
                     onFontScaleChanged: widget.onFontScaleChanged,
                     onThemeModeChanged: widget.onThemeModeChanged,
                   ),
-                  transitionsBuilder: (_, animation, __, child) {
-                    final offsetAnimation = Tween<Offset>(
-                      begin: const Offset(1, 0),
-                      end: Offset.zero,
-                    ).animate(animation);
-                    return FadeTransition(
-                      opacity: animation,
-                      child: SlideTransition(
-                        position: offsetAnimation,
-                        child: child,
-                      ),
-                    );
-                  },
                 ),
               );
-              _loadMascot();
+              if (mounted) {
+                setState(() {
+                  _mascotFuture = _loadMascot();
+                });
+              }
             },
           ),
           PopupMenuButton<String>(
             onSelected: (value) async {
+              final l10n = AppLocalizations.of(context)!;
               if (value == 'backup') {
                 final ok = await context.read<NoteProvider>().backupNow();
                 if (!mounted) return;
-                final l10n = AppLocalizations.of(context)!;
                 if (ok) {
                   ScaffoldMessenger.of(
                     context,
                   ).showSnackBar(SnackBar(content: Text(l10n.notesExported)));
                 }
+              } else if (value == 'palette') {
+                await showPaletteBottomSheet(context, commands: [
+                  Command(
+                    title: l10n.voiceToNote,
+                    action: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const VoiceToNoteScreen(),
+                      ),
+                    ),
+                  ),
+                  Command(
+                    title: l10n.settings,
+                    action: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => SettingsScreen(
+                          onThemeChanged: widget.onThemeChanged,
+                          onFontScaleChanged: widget.onFontScaleChanged,
+                          onThemeModeChanged: widget.onThemeModeChanged,
+                        ),
+                      ),
+                    ),
+                  ),
+                ]);
+              } else if (value == 'teachAi') {
+                await TeachAiModal.show(context);
               }
             },
             itemBuilder: (context) => [
               PopupMenuItem(
                 value: 'backup',
                 child: Text(AppLocalizations.of(context)!.backupNow),
+              ),
+              PopupMenuItem(
+                value: 'palette',
+                child: Text(AppLocalizations.of(context)!.palette),
+              ),
+              PopupMenuItem(
+                value: 'teachAi',
+                child: Text(AppLocalizations.of(context)!.teachAi),
               ),
             ],
           ),
@@ -178,7 +192,24 @@ class _NotesTabState extends State<NotesTab> {
       body: Column(
         children: [
           const SizedBox(height: 8),
-          SizedBox(width: 140, height: 140, child: Lottie.asset(_mascotPath)),
+          SizedBox(
+            width: 140,
+            height: 140,
+            child: FutureBuilder<String>(
+              future: _mascotFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState != ConnectionState.done ||
+                    !snapshot.hasData) {
+                  return const SizedBox.shrink();
+                }
+                final path = snapshot.data!;
+                if (!path.endsWith('.json')) {
+                  return Image.asset(path);
+                }
+                return RepaintBoundary(child: Lottie.asset(path));
+              },
+            ),
+          ),
           const SizedBox(height: 8),
           Expanded(child: TagFilteredNotesList(gridCount: gridCount)),
         ],

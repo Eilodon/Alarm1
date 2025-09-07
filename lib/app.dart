@@ -7,6 +7,7 @@ import 'screens/onboarding_screen.dart';
 import 'services/settings_service.dart';
 import 'services/connectivity_service.dart';
 import 'theme/tokens.dart';
+import 'widgets/route_transitions.dart';
 
 final messengerKey = GlobalKey<ScaffoldMessengerState>();
 
@@ -49,13 +50,6 @@ class _MyAppState extends State<MyApp> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final l10n = AppLocalizations.of(context)!;
-      if (widget.authFailed) {
-        messengerKey.currentState?.showSnackBar(
-          SnackBar(
-            content: Text(l10n.authFailedMessage),
-          ),
-        );
-      }
       if (widget.notificationFailed) {
         messengerKey.currentState?.showSnackBar(
           SnackBar(
@@ -113,6 +107,16 @@ class _MyAppState extends State<MyApp> {
         fontFamily: Tokens.light.typography.fontFamily,
         useMaterial3: true,
         extensions: const [Tokens.light],
+        pageTransitionsTheme: const PageTransitionsTheme(
+          builders: {
+            TargetPlatform.android: SlideFadePageTransitionsBuilder(),
+            TargetPlatform.iOS: SlideFadePageTransitionsBuilder(),
+            TargetPlatform.linux: SlideFadePageTransitionsBuilder(),
+            TargetPlatform.macOS: SlideFadePageTransitionsBuilder(),
+            TargetPlatform.windows: SlideFadePageTransitionsBuilder(),
+            TargetPlatform.fuchsia: SlideFadePageTransitionsBuilder(),
+          },
+        ),
       ),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -124,19 +128,36 @@ class _MyAppState extends State<MyApp> {
         fontFamily: Tokens.dark.typography.fontFamily,
         useMaterial3: true,
         extensions: const [Tokens.dark],
+        pageTransitionsTheme: const PageTransitionsTheme(
+          builders: {
+            TargetPlatform.android: SlideFadePageTransitionsBuilder(),
+            TargetPlatform.iOS: SlideFadePageTransitionsBuilder(),
+            TargetPlatform.linux: SlideFadePageTransitionsBuilder(),
+            TargetPlatform.macOS: SlideFadePageTransitionsBuilder(),
+            TargetPlatform.windows: SlideFadePageTransitionsBuilder(),
+            TargetPlatform.fuchsia: SlideFadePageTransitionsBuilder(),
+          },
+        ),
       ),
       themeMode: _themeMode,
       builder: (context, child) => MediaQuery(
         data: MediaQuery.of(context).copyWith(textScaleFactor: _fontScale),
         child: child!,
       ),
-      home: _hasSeenOnboarding
-          ? HomeScreen(
-              onThemeChanged: updateTheme,
-              onFontScaleChanged: updateFontScale,
-              onThemeModeChanged: updateThemeMode,
+      home: widget.authFailed
+          ? Scaffold(
+              body: Center(
+                child:
+                    Text(AppLocalizations.of(context)!.authFailedMessage),
+              ),
             )
-          : OnboardingScreen(onFinished: _completeOnboarding),
+          : _hasSeenOnboarding
+              ? HomeScreen(
+                  onThemeChanged: updateTheme,
+                  onFontScaleChanged: updateFontScale,
+                  onThemeModeChanged: updateThemeMode,
+                )
+              : OnboardingScreen(onFinished: _completeOnboarding),
     );
   }
 }

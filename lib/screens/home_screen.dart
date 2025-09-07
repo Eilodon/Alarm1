@@ -1,17 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
-
-import '../pandora_ui/bottom_sheet.dart';
-import '../pandora_ui/palette_list_item.dart';
-import '../pandora_ui/palette_bottom_sheet.dart';
-import '../pandora_ui/snackbar.dart';
-import '../pandora_ui/teach_ai_modal.dart';
-import '../pandora_ui/toolbar_button.dart';
-import '../models/command.dart';
-import '../models/security_cue.dart';
-import '../theme/tokens.dart';
 
 import '../widgets/notes_tab.dart';
 import 'chat_screen.dart';
@@ -36,33 +24,9 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _OpenPaletteIntent extends Intent {
-  const _OpenPaletteIntent();
-}
-
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   late final List<Widget> _screens;
-  late List<Command> _commands;
-
-  List<Command> _buildCommands(AppLocalizations l10n) {
-    return [
-      Command(
-        title: l10n.showNotes,
-        action: () => setState(() => _currentIndex = 0),
-      ),
-      Command(
-        title: l10n.showVoiceToNote,
-        action: () => setState(() => _currentIndex = 2),
-      ),
-      Command(
-        title: l10n.openSettings,
-        action: () => setState(() => _currentIndex = 4),
-      ),
-    ];
-  }
-
-
   @override
   void initState() {
     super.initState();
@@ -84,66 +48,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final l10n = AppLocalizations.of(context)!;
-    _commands = _buildCommands(l10n);
-  }
-
-  void _openPalette() {
-    showPaletteBottomSheet(context, commands: _commands);
-  }
-
-  void _showSnackbar(String text) {
-    showSimpleSnackBar(context, text, SecurityCue.onDevice);
-  }
-
-  void _showPalette() {
-    final l10n = AppLocalizations.of(context)!;
-    final tokens = Theme.of(context).extension<Tokens>()!;
-    PandoraBottomSheet.show(
-      context,
-      Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          PaletteListItem(
-            color: tokens.colors.primary,
-            label: l10n.primary,
-            onTap: () {
-              widget.onThemeChanged(tokens.colors.primary);
-              Navigator.pop(context);
-              _showSnackbar(l10n.themeUpdated);
-            },
-          ),
-          PaletteListItem(
-            color: tokens.colors.secondary,
-            label: l10n.secondary,
-            onTap: () {
-              widget.onThemeChanged(tokens.colors.secondary);
-              Navigator.pop(context);
-              _showSnackbar(l10n.themeUpdated);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _openTeachAi() {
-    TeachAiModal.show(
-      context,
-      onSubmit: (_) => _showSnackbar('Thanks for teaching!'),
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final tokens = Theme.of(context).extension<Tokens>()!;
 
     return LayoutBuilder(
       builder: (context, constraints) {
+
         // Wide layouts use a navigation rail with the content in a row.
+
         if (constraints.maxWidth >= 600) {
           return Scaffold(
             body: Row(
@@ -152,7 +64,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   selectedIndex: _currentIndex,
                   onDestinationSelected: (index) =>
                       setState(() => _currentIndex = index),
+
                   labelType: NavigationRailLabelType.all,
+
                   destinations: [
                     NavigationRailDestination(
                       icon: const Icon(Icons.note),
@@ -175,6 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       label: Text(l10n.settings),
                     ),
                   ],
+
                   trailing: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -257,6 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
+
               ),
             ],
           ),

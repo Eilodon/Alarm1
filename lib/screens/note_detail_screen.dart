@@ -16,6 +16,7 @@ import '../widgets/attachment_section.dart';
 import '../widgets/reminder_controls.dart';
 import '../widgets/ai_suggestions_dialog.dart';
 import 'chat_screen.dart';
+import '../widgets/route_transitions.dart';
 
 class NoteDetailScreen extends StatefulWidget {
   final Note note;
@@ -218,22 +219,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  PageRouteBuilder(
-                    pageBuilder: (_, __, ___) =>
-                        ChatScreen(initialMessage: _contentCtrl.text),
-                    transitionsBuilder: (_, animation, __, child) {
-                      final offsetAnimation = Tween<Offset>(
-                        begin: const Offset(1, 0),
-                        end: Offset.zero,
-                      ).animate(animation);
-                      return FadeTransition(
-                        opacity: animation,
-                        child: SlideTransition(
-                          position: offsetAnimation,
-                          child: child,
-                        ),
-                      );
-                    },
+                  buildSlideFadeRoute(
+                    ChatScreen(initialMessage: _contentCtrl.text),
                   ),
                 );
               },

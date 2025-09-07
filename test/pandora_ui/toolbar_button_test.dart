@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/rendering.dart';
 
 import 'package:notes_reminder_app/pandora_ui/toolbar_button.dart';
 import 'package:notes_reminder_app/theme/tokens.dart';
@@ -64,5 +65,33 @@ void main() {
       SystemChannels.platform,
       null,
     );
+  });
+
+  testWidgets('ToolbarButton shows tooltip and disabled state prevents taps',
+      (WidgetTester tester) async {
+    var pressed = false;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(extensions: const [Tokens.light]),
+        home: Scaffold(
+          body: ToolbarButton(
+            icon: const Icon(Icons.add),
+            label: 'Add',
+            onPressed: () {
+              pressed = true;
+            },
+            state: 'disabled',
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.byTooltip('Add'), findsOneWidget);
+
+    await tester.tap(find.byType(ToolbarButton));
+    expect(pressed, isFalse);
+
+    final semantics = tester.getSemantics(find.byType(ToolbarButton));
+    expect(semantics.hasFlag(SemanticsFlag.isEnabled), isFalse);
   });
 }
