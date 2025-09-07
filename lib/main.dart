@@ -14,6 +14,7 @@ import 'features/note/presentation/note_provider.dart';
 import 'services/app_initializer.dart';
 import 'services/connectivity_service.dart';
 import 'screens/error_screen.dart';
+import 'features/settings/domain/settings_service.dart';
 
 Future<void> _onNotificationResponse(
   fln.NotificationResponse response,
@@ -43,8 +44,10 @@ void main() {
   runApp(
     AppProviders(
       child: Builder(
-        builder: (context) => FutureBuilder<AppInitializationData>(
-          future: AppInitializer().initialize(
+        builder: (context) {
+          final settingsService = context.read<SettingsService>();
+          return FutureBuilder<AppInitializationData>(
+          future: AppInitializer(settingsService: settingsService).initialize(
             onDidReceiveNotificationResponse: (response) =>
                 _onNotificationResponse(response, context),
           ),
@@ -68,9 +71,11 @@ void main() {
               authFailed: data.authFailed,
               notificationFailed: data.notificationFailed,
               connectivityService: ConnectivityService(),
+              settingsService: settingsService,
             );
           },
-        ),
+        );
+        },
       ),
     ),
   );

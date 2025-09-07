@@ -4,7 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'screens/home_screen.dart';
 import 'screens/onboarding_screen.dart';
-import 'features/settings/data/settings_service.dart';
+import 'features/settings/domain/settings_service.dart';
 import 'services/connectivity_service.dart';
 import 'theme/tokens.dart';
 import 'widgets/route_transitions.dart';
@@ -17,6 +17,7 @@ class MyApp extends StatefulWidget {
   final bool notificationFailed;
   final bool hasSeenOnboarding;
   final ConnectivityService connectivityService;
+  final SettingsService settingsService;
   const MyApp({
     super.key,
     required this.themeColor,
@@ -24,6 +25,7 @@ class MyApp extends StatefulWidget {
     required this.themeMode,
     required this.hasSeenOnboarding,
     required this.connectivityService,
+    required this.settingsService,
     this.authFailed = false,
     this.notificationFailed = false,
   });
@@ -62,17 +64,17 @@ class _MyAppState extends State<MyApp> {
 
   void updateTheme(Color newColor) async {
     setState(() => _themeColor = newColor);
-    await SettingsService().saveThemeColor(newColor);
+    await widget.settingsService.saveThemeColor(newColor);
   }
 
   void updateFontScale(double newScale) async {
     setState(() => _fontScale = newScale);
-    await SettingsService().saveFontScale(newScale);
+    await widget.settingsService.saveFontScale(newScale);
   }
 
   void updateThemeMode(ThemeMode newMode) async {
     setState(() => _themeMode = newMode);
-    await SettingsService().saveThemeMode(newMode);
+    await widget.settingsService.saveThemeMode(newMode);
   }
 
   void _completeOnboarding() {

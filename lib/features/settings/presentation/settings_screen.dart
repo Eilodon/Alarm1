@@ -18,14 +18,12 @@ class SettingsScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;
   final Function(double) onFontScaleChanged;
   final Function(ThemeMode) onThemeModeChanged;
-  final SettingsService settingsService;
 
   const SettingsScreen({
     super.key,
     required this.onThemeChanged,
     required this.onFontScaleChanged,
     required this.onThemeModeChanged,
-    required this.settingsService,
   });
 
   @override
@@ -44,7 +42,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    _settings = widget.settingsService;
+    _settings = context.read<SettingsService>();
     _settings.loadRequireAuth().then((v) {
       if (mounted) {
         setState(() => _requireAuth = v);

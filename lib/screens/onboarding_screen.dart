@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:notes_reminder_app/generated/app_localizations.dart';
-import 'package:notes_reminder_app/features/settings/data/settings_service.dart';
+
+import '../features/settings/domain/settings_service.dart';
+import 'package:provider/provider.dart';
+
 
 class OnboardingScreen extends StatefulWidget {
   final VoidCallback onFinished;
@@ -33,7 +36,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   ];
 
   Future<void> _finish() async {
-    await SettingsService().saveHasSeenOnboarding(true);
+    await context.read<SettingsService>().saveHasSeenOnboarding(true);
     widget.onFinished();
   }
 

@@ -6,8 +6,11 @@ import 'features/note/data/calendar_service.dart';
 import 'features/note/data/notification_service.dart';
 import 'features/note/data/home_widget_service.dart';
 import 'features/backup/data/note_sync_service.dart';
-import 'package:alarm_data/alarm_data.dart' as data;
-import 'package:alarm_domain/alarm_domain.dart' as domain;
+
+import 'package:alarm_data/alarm_data.dart';
+import 'package:alarm_domain/alarm_domain.dart';
+import 'features/settings/domain/settings_service.dart';
+import 'features/settings/data/settings_service.dart';
 
 /// Wraps the given [child] with all application level providers.
 class AppProviders extends StatelessWidget {
@@ -51,6 +54,9 @@ class AppProviders extends StatelessWidget {
           create: (context) => NoteSyncServiceImpl(
             repository: context.read<domain.NoteRepository>(),
           ),
+        ),
+        Provider<SettingsService>(
+          create: (_) => SettingsServiceImpl(),
         ),
         ChangeNotifierProvider<NoteProvider>(
           create: (context) => NoteProvider(

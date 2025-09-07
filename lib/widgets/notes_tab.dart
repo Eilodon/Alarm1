@@ -5,8 +5,10 @@ import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
 
-import 'package:notes_reminder_app/features/note/presentation/note_provider.dart';
-import 'package:notes_reminder_app/features/settings/data/settings_service.dart';
+
+import '../features/note/presentation/note_provider.dart';
+import '../features/settings/domain/settings_service.dart';
+
 
 import 'package:notes_reminder_app/features/note/presentation/note_search_delegate.dart';
 import 'package:notes_reminder_app/features/note/presentation/voice_to_note_screen.dart';
@@ -54,7 +56,8 @@ class _NotesTabState extends State<NotesTab> {
     });
   }
 
-  Future<String> _loadMascot() => SettingsServiceImpl().loadMascotPath();
+  Future<String> _loadMascot() =>
+      context.read<SettingsService>().loadMascotPath();
 
   void _addNote() {
     showDialog(context: context, builder: (_) => const AddNoteDialog());
@@ -127,7 +130,6 @@ class _NotesTabState extends State<NotesTab> {
                         onThemeChanged: widget.onThemeChanged,
                         onFontScaleChanged: widget.onFontScaleChanged,
                         onThemeModeChanged: widget.onThemeModeChanged,
-                        settingsService: SettingsServiceImpl(),
                       ),
                     ),
                   );
@@ -171,7 +173,6 @@ class _NotesTabState extends State<NotesTab> {
                                 onThemeChanged: widget.onThemeChanged,
                                 onFontScaleChanged: widget.onFontScaleChanged,
                                 onThemeModeChanged: widget.onThemeModeChanged,
-                                settingsService: SettingsServiceImpl(),
                               ),
                             ),
                           ),

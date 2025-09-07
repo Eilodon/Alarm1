@@ -3,10 +3,12 @@ import 'package:notes_reminder_app/generated/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     as fln;
 
-import 'package:notes_reminder_app/services/auth_service.dart';
-import 'package:notes_reminder_app/features/settings/data/settings_service.dart';
-import 'package:notes_reminder_app/features/note/data/notification_service.dart';
-import 'package:notes_reminder_app/services/startup_service.dart';
+
+import 'auth_service.dart';
+import '../features/settings/domain/settings_service.dart';
+import '../features/note/data/notification_service.dart';
+import 'startup_service.dart';
+
 
 class AppInitializationData {
   final Color themeColor;
@@ -27,11 +29,14 @@ class AppInitializationData {
 }
 
 class AppInitializer {
+  final SettingsService settingsService;
+  AppInitializer({required this.settingsService});
+
   Future<AppInitializationData> initialize({
     Future<void> Function(fln.NotificationResponse)?
         onDidReceiveNotificationResponse,
   }) async {
-    final settings = SettingsService();
+    final settings = settingsService;
     final notificationService = NotificationServiceImpl();
     final futures = await Future.wait([
       StartupService(notificationService).initialize(
