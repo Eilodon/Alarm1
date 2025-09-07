@@ -1,6 +1,7 @@
-import 'package:flutter_local_notifications/flutter_local_notifications.dart' as fln;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart'
+    as fln;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/foundation.dart';
@@ -21,7 +22,7 @@ class NotificationServiceImpl implements NotificationService {
     Future<void> Function(dynamic response)? onDidReceiveNotificationResponse,
   }) async {
     tzdata.initializeTimeZones();
-    final tzName = await FlutterNativeTimezone.getLocalTimezone();
+    final tzName = await FlutterTimezone.getLocalTimezone();
     tz.setLocalLocation(tz.getLocation(tzName));
 
     const androidSettings = fln.AndroidInitializationSettings(
@@ -36,13 +37,15 @@ class NotificationServiceImpl implements NotificationService {
     await _fln.initialize(
       settings,
       onDidReceiveNotificationResponse:
-          onDidReceiveNotificationResponse as Future<void> Function(fln.NotificationResponse)?,
+          onDidReceiveNotificationResponse
+              as Future<void> Function(fln.NotificationResponse)?,
     );
 
-    final androidImpl = _fln
-        .resolvePlatformSpecificImplementation<
-          fln.AndroidFlutterLocalNotificationsPlugin
-        >();
+    final androidImpl =
+        _fln
+            .resolvePlatformSpecificImplementation<
+              fln.AndroidFlutterLocalNotificationsPlugin
+            >();
     await androidImpl?.requestNotificationsPermission();
 
     await _fln
