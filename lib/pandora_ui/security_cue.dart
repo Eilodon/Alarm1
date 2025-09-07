@@ -26,8 +26,9 @@ class SecurityCue extends StatelessWidget {
     };
 
     final tokens = Theme.of(context).extension<Tokens>()!;
+    final colorScheme = Theme.of(context).colorScheme;
     final color = switch (mode) {
-      SecurityMode.onDevice => Colors.green,
+      SecurityMode.onDevice => colorScheme.primary,
       SecurityMode.hybrid => tokens.colors.warning,
       SecurityMode.cloud => tokens.colors.info,
     };
