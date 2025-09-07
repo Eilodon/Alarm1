@@ -3,16 +3,15 @@ import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 import 'package:notes_reminder_app/generated/app_localizations.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart'
-    show Time;
+import 'package:flutter/material.dart' show TimeOfDay;
 import 'package:collection/collection.dart';
 
-import '../domain/domain.dart';
+import 'package:notes_reminder_app/features/note/domain/domain.dart';
 import 'package:alarm_data/alarm_data.dart';
-import '../data/calendar_service.dart';
-import '../data/notification_service.dart';
-import '../data/home_widget_service.dart';
-import '../../backup/data/note_sync_service.dart';
+import 'package:notes_reminder_app/features/note/data/calendar_service.dart';
+import 'package:notes_reminder_app/features/note/data/notification_service.dart';
+import 'package:notes_reminder_app/features/note/data/home_widget_service.dart';
+import 'package:notes_reminder_app/backup/data/note_sync_service.dart';
 
 int _noteComparator(Note a, Note b) {
   if (a.pinned != b.pinned) {
@@ -218,7 +217,7 @@ class NoteProvider extends ChangeNotifier {
             id: notificationId,
             title: title,
             body: content,
-            time: Time(alarmTime.hour, alarmTime.minute, alarmTime.second),
+            time: TimeOfDay(hour: alarmTime.hour, minute: alarmTime.minute),
             l10n: l10n,
           );
         } else {
@@ -331,10 +330,9 @@ class NoteProvider extends ChangeNotifier {
             id: nid,
             title: note.title,
             body: note.content,
-            time: Time(
-              note.alarmTime!.hour,
-              note.alarmTime!.minute,
-              note.alarmTime!.second,
+            time: TimeOfDay(
+              hour: note.alarmTime!.hour,
+              minute: note.alarmTime!.minute,
             ),
             l10n: l10n,
           );

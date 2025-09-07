@@ -1,5 +1,6 @@
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart' as fln;
+import 'package:flutter/material.dart' show TimeOfDay;
 import 'package:notes_reminder_app/generated/app_localizations.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 
@@ -7,7 +8,7 @@ import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/foundation.dart';
 
-import '../domain/domain.dart';
+import 'package:notes_reminder_app/features/note/domain/domain.dart';
 
 class NotificationServiceImpl implements NotificationService {
   static final NotificationServiceImpl _instance =
@@ -74,8 +75,8 @@ class NotificationServiceImpl implements NotificationService {
       'scheduled_channel',
       loc.scheduled,
       channelDescription: loc.scheduledDesc,
-      importance: Importance.max,
-      priority: Priority.high,
+      importance: fln.AndroidNotificationImportance.max,
+      priority: fln.AndroidNotificationPriority.high,
       actions: [
         fln.AndroidNotificationAction(
           'done',
@@ -123,8 +124,8 @@ class NotificationServiceImpl implements NotificationService {
       'recurring_channel',
       loc.recurring,
       channelDescription: loc.recurringDesc,
-      importance: Importance.max,
-      priority: Priority.high,
+      importance: fln.AndroidNotificationImportance.max,
+      priority: fln.AndroidNotificationPriority.high,
     );
 
     const iosDetails = fln.DarwinNotificationDetails();
@@ -155,14 +156,14 @@ class NotificationServiceImpl implements NotificationService {
     required dynamic time,
     required dynamic l10n,
   }) async {
-    final t = time as fln.Time;
+    final t = time as TimeOfDay;
     final loc = l10n as AppLocalizations;
     final androidDetails = fln.AndroidNotificationDetails(
       'daily_channel',
       loc.daily,
       channelDescription: loc.dailyDesc,
-      importance: Importance.max,
-      priority: Priority.high,
+      importance: fln.AndroidNotificationImportance.max,
+      priority: fln.AndroidNotificationPriority.high,
     );
 
     const iosDetails = fln.DarwinNotificationDetails();
@@ -217,7 +218,7 @@ class NotificationServiceImpl implements NotificationService {
     );
   }
 
-  tz.TZDateTime _nextInstanceOfTime(fln.Time time) {
+  tz.TZDateTime _nextInstanceOfTime(TimeOfDay time) {
     final now = tz.TZDateTime.now(tz.local);
     var scheduledDate = tz.TZDateTime(
       tz.local,
@@ -226,7 +227,7 @@ class NotificationServiceImpl implements NotificationService {
       now.day,
       time.hour,
       time.minute,
-      time.second,
+      0,
     );
 
     if (scheduledDate.isBefore(now)) {
@@ -238,14 +239,14 @@ class NotificationServiceImpl implements NotificationService {
 
   fln.RepeatInterval _mapRepeatInterval(RepeatInterval interval) {
     switch (interval) {
+      case RepeatInterval.everyMinute:
+        return fln.RepeatInterval.everyMinute;
       case RepeatInterval.hourly:
         return fln.RepeatInterval.hourly;
       case RepeatInterval.daily:
         return fln.RepeatInterval.daily;
       case RepeatInterval.weekly:
         return fln.RepeatInterval.weekly;
-      case RepeatInterval.monthly:
-        return fln.RepeatInterval.everyMinute; // closest
     }
   }
 }

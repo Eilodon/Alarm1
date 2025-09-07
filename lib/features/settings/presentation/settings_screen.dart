@@ -5,12 +5,13 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'dart:math' as math;
 
 
-import '../domain/settings_service.dart';
 
 import 'package:alarm_domain/alarm_domain.dart';
 
 import 'package:provider/provider.dart';
-import '../../note/presentation/note_provider.dart';
+import 'package:notes_reminder_app/features/settings/domain/settings_service.dart';
+
+import 'package:notes_reminder_app/features/note/presentation/note_provider.dart';
 
 
 class SettingsScreen extends StatefulWidget {

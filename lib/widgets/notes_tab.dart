@@ -5,18 +5,20 @@ import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
 
+
 import '../features/note/presentation/note_provider.dart';
 import '../features/settings/domain/settings_service.dart';
 
-import '../features/note/presentation/note_search_delegate.dart';
-import '../features/note/presentation/voice_to_note_screen.dart';
-import '../features/settings/presentation/settings_screen.dart';
-import '../pandora_ui/palette_bottom_sheet.dart';
-import '../pandora_ui/teach_ai_modal.dart';
-import '../features/note/domain/domain.dart';
-import 'add_note_dialog.dart';
-import 'tag_filtered_notes_list.dart';
-import 'route_transitions.dart';
+
+import 'package:notes_reminder_app/features/note/presentation/note_search_delegate.dart';
+import 'package:notes_reminder_app/features/note/presentation/voice_to_note_screen.dart';
+import 'package:notes_reminder_app/features/settings/presentation/settings_screen.dart';
+import 'package:notes_reminder_app/pandora_ui/palette_bottom_sheet.dart';
+import 'package:notes_reminder_app/pandora_ui/teach_ai_modal.dart';
+import 'package:notes_reminder_app/features/note/domain/domain.dart';
+import 'package:notes_reminder_app/widgets/add_note_dialog.dart';
+import 'package:notes_reminder_app/widgets/tag_filtered_notes_list.dart';
+import 'package:notes_reminder_app/widgets/route_transitions.dart';
 
 class NotesTab extends StatefulWidget {
   final Function(Color) onThemeChanged;

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../theme/tokens.dart';
+import 'package:notes_reminder_app/theme/tokens.dart';
 import 'package:alarm_domain/alarm_domain.dart';
-import '../domain/settings_service.dart';
+import 'package:notes_reminder_app/features/settings/domain/settings_service.dart';
 
 class SettingsServiceImpl implements SettingsService {
   SettingsServiceImpl({

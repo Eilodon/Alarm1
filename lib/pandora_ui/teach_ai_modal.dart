@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:notes_reminder_app/generated/app_localizations.dart';
 
 import 'package:alarm_domain/alarm_domain.dart';
-import '../theme/tokens.dart';
-import '../utils/flutter_haptic_feedback_driver.dart';
+import 'package:notes_reminder_app/theme/tokens.dart';
+import 'package:notes_reminder_app/utils/flutter_haptic_feedback_driver.dart';
 
 /// Simple modal dialog allowing the user to provide feedback to improve the AI.
 class TeachAiModal extends StatefulWidget {

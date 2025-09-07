@@ -7,18 +7,19 @@ import 'package:notes_reminder_app/generated/app_localizations.dart';
 import 'package:notes_reminder_app/services/connectivity_service.dart';
 
 class FakeConnectivity extends ConnectivityPlatform {
-  final _controller = StreamController<ConnectivityResult>();
+  final _controller = StreamController<List<ConnectivityResult>>();
 
   @override
-  Stream<ConnectivityResult> get onConnectivityChanged => _controller.stream;
+  Stream<List<ConnectivityResult>> get onConnectivityChanged =>
+      _controller.stream;
 
   @override
-  Future<ConnectivityResult> checkConnectivity() async {
-    return ConnectivityResult.wifi;
+  Future<List<ConnectivityResult>> checkConnectivity() async {
+    return [ConnectivityResult.wifi];
   }
 
   void emit(ConnectivityResult result) {
-    _controller.add(result);
+    _controller.add([result]);
   }
 }
 

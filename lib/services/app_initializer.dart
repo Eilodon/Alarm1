@@ -3,10 +3,12 @@ import 'package:notes_reminder_app/generated/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     as fln;
 
+
 import 'auth_service.dart';
 import '../features/settings/domain/settings_service.dart';
 import '../features/note/data/notification_service.dart';
 import 'startup_service.dart';
+
 
 class AppInitializationData {
   final Color themeColor;

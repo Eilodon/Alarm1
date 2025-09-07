@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:notes_reminder_app/generated/app_localizations.dart';
 
-import '../features/chat/domain/note_analysis.dart';
+import 'package:notes_reminder_app/features/chat/domain/note_analysis.dart';
 
 class AISuggestionsResult {
   final String summary;

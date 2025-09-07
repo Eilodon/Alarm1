@@ -5,12 +5,12 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../features/note/domain/domain.dart';
+import 'package:notes_reminder_app/features/note/domain/domain.dart';
 
-import '../features/note/presentation/note_provider.dart';
-import '../features/note/presentation/note_detail_screen.dart';
-import '../services/auth_service.dart';
-import 'note_card.dart';
+import 'package:notes_reminder_app/features/note/presentation/note_provider.dart';
+import 'package:notes_reminder_app/features/note/presentation/note_detail_screen.dart';
+import 'package:notes_reminder_app/services/auth_service.dart';
+import 'package:notes_reminder_app/widgets/note_card.dart';
 
 /// Displays a scrollable list of notes. When [gridCount] is greater than 1 a
 /// grid layout is used instead of a traditional list.

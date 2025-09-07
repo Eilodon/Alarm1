@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../theme/tokens.dart';
+import 'package:notes_reminder_app/theme/tokens.dart';
 
 /// Visual indicator of how a result was processed.
 ///

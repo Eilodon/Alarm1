@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:alarm_domain/alarm_domain.dart';
-import '../utils/flutter_haptic_feedback_driver.dart';
+import 'package:notes_reminder_app/utils/flutter_haptic_feedback_driver.dart';
 
 /// A card that listens to a [Stream] of text and shows a shimmer while loading.
 class ResultCard extends StatefulWidget {
