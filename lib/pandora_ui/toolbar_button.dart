@@ -50,21 +50,21 @@ class ToolbarButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final style = _toolbarStyles[state] ?? _toolbarStyles['default']!;
 
     return ElevatedButton.icon(
-      onPressed: disabled ? null : onPressed,
+      onPressed: style.enabled ? onPressed : null,
       icon: icon,
       label: Text(
         label,
-        style: Theme.of(
-          context,
-        ).textTheme.labelLarge?.copyWith(color: Colors.white),
+        style: Theme.of(context)
+            .textTheme
+            .labelLarge
+            ?.copyWith(color: style.foreground),
       ),
       style: ElevatedButton.styleFrom(
-        backgroundColor: disabled
-            ? PandoraTokens.neutral300
-            : PandoraTokens.primary,
-        foregroundColor: Colors.white,
+        backgroundColor: style.background,
+        foregroundColor: style.foreground,
         padding: const EdgeInsets.symmetric(
           vertical: PandoraTokens.spacingS,
           horizontal: PandoraTokens.spacingM,
@@ -76,8 +76,7 @@ class ToolbarButton extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(PandoraTokens.radiusM),
         ),
-        elevation: PandoraTokens.elevationLow,
-
+        elevation: style.enabled ? PandoraTokens.elevationLow : 0,
       ),
     );
   }
