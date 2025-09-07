@@ -10,6 +10,7 @@ import 'models/note.dart';
 import 'providers/note_provider.dart';
 import 'services/app_initializer.dart';
 import 'services/connectivity_service.dart';
+import 'screens/error_screen.dart';
 
 Future<void> _onNotificationResponse(
   NotificationResponse response,
@@ -49,6 +50,11 @@ void main() {
               _onNotificationResponse(response, noteProvider),
         ),
         builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return MaterialApp(
+              home: ErrorScreen(onRetry: main),
+            );
+          }
           if (!snapshot.hasData) {
             return const MaterialApp(
               home: Scaffold(
