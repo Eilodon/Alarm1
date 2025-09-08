@@ -3,13 +3,13 @@ import 'package:pandora/generated/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import 'package:notes_reminder_app/features/note/domain/domain.dart';
-import 'package:notes_reminder_app/features/note/presentation/note_provider.dart';
-import 'package:notes_reminder_app/services/auth_service.dart';
-import 'package:notes_reminder_app/features/note/presentation/note_detail_screen.dart';
-import 'package:notes_reminder_app/pandora_ui/hint_chip.dart';
-import 'package:notes_reminder_app/widgets/note_card.dart';
-import 'package:notes_reminder_app/widgets/route_transitions.dart';
+import 'package:pandora/features/note/domain/domain.dart';
+import 'package:pandora/features/note/presentation/note_provider.dart';
+import 'package:pandora/services/auth_service.dart';
+import 'package:pandora/features/note/presentation/note_detail_screen.dart';
+import 'package:pandora/pandora_ui/hint_chip.dart';
+import 'package:pandora/widgets/note_card.dart';
+import 'package:pandora/widgets/route_transitions.dart';
 
 class NoteListForDayScreen extends StatelessWidget {
   final DateTime date;

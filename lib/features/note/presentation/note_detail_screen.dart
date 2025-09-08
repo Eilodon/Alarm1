@@ -5,18 +5,18 @@ import 'package:pandora/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-import 'package:notes_reminder_app/features/note/domain/domain.dart';
-import 'package:notes_reminder_app/features/note/presentation/note_provider.dart';
-import 'package:notes_reminder_app/services/tts_service.dart';
-import 'package:notes_reminder_app/widgets/tag_selector.dart';
-import 'package:notes_reminder_app/l10n/localization_extensions.dart';
-import 'package:notes_reminder_app/features/chat/data/gemini_service.dart';
-import 'package:notes_reminder_app/features/chat/domain/note_analysis.dart';
-import 'package:notes_reminder_app/widgets/attachment_section.dart';
-import 'package:notes_reminder_app/widgets/reminder_controls.dart';
-import 'package:notes_reminder_app/widgets/ai_suggestions_dialog.dart';
-import 'package:notes_reminder_app/features/chat/presentation/chat_screen.dart';
-import 'package:notes_reminder_app/widgets/route_transitions.dart';
+import 'package:pandora/features/note/domain/domain.dart';
+import 'package:pandora/features/note/presentation/note_provider.dart';
+import 'package:pandora/services/tts_service.dart';
+import 'package:pandora/widgets/tag_selector.dart';
+import 'package:pandora/l10n/localization_extensions.dart';
+import 'package:pandora/features/chat/data/gemini_service.dart';
+import 'package:pandora/features/chat/domain/note_analysis.dart';
+import 'package:pandora/widgets/attachment_section.dart';
+import 'package:pandora/widgets/reminder_controls.dart';
+import 'package:pandora/widgets/ai_suggestions_dialog.dart';
+import 'package:pandora/features/chat/presentation/chat_screen.dart';
+import 'package:pandora/widgets/route_transitions.dart';
 
 class NoteDetailScreen extends StatefulWidget {
   final Note note;
