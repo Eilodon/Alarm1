@@ -22,14 +22,14 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     // Giữ nguyên namespace hiện có của bạn nếu đã có trong file cũ
-    namespace = "REPLACE_WITH_YOUR_NAMESPACE"
+    namespace = "pandora.a123"
 
     // Lấy SDK từ Flutter config (Flutter Gradle plugin)
     compileSdk = flutter.compileSdk
     ndkVersion = flutter.ndkVersion
 
     defaultConfig {
-        applicationId = "REPLACE_WITH_YOUR_APP_ID"
+    applicationId = "pandora.a123"
         minSdk = flutter.minSdk
         targetSdk = flutter.targetSdk
         versionCode = flutter.versionCode
