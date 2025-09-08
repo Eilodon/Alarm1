@@ -1,4 +1,4 @@
-package com.pandora.core
+package pandora.a123
 
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName

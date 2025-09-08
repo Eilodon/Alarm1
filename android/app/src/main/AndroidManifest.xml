@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.pandora.core">
+    package="pandora.a123">
 
     <!-- Quyền cho HTTP/API Gemini + FPT -->
     <uses-permission android:name="android.permission.INTERNET" />
