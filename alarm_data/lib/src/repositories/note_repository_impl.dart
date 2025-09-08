@@ -39,6 +39,7 @@ class NoteRepositoryImpl implements NoteRepository {
     return _dbService.decryptNote(data, password: password);
   }
 
+  @override
   Future<bool> exportNotes(
     AppLocalizations l10n, {
     String? password,
@@ -53,6 +54,7 @@ class NoteRepositoryImpl implements NoteRepository {
     );
   }
 
+  @override
   Future<List<Note>> importNotes(
     AppLocalizations l10n, {
     String? password,
