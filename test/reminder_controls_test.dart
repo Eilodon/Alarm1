@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:notes_reminder_app/generated/app_localizations.dart';
+import 'package:pandora/generated/app_localizations.dart';
 import 'package:alarm_domain/alarm_domain.dart';
-import 'package:notes_reminder_app/widgets/reminder_controls.dart';
+import 'package:pandora/widgets/reminder_controls.dart';
 
 void main() {
   testWidgets('ReminderControls updates repeat and snooze', (tester) async {

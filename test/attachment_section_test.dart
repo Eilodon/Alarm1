@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:notes_reminder_app/generated/app_localizations.dart';
-import 'package:notes_reminder_app/widgets/attachment_section.dart';
+import 'package:pandora/generated/app_localizations.dart';
+import 'package:pandora/widgets/attachment_section.dart';
 
 void main() {
   testWidgets('AttachmentSection deletes attachment', (tester) async {

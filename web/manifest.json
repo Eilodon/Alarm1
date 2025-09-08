@@ -1,6 +1,6 @@
 {
-    "name": "notes_reminder_app",
-    "short_name": "notes_reminder_app",
+    "name": "Pandora",
+    "short_name": "Pandora",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

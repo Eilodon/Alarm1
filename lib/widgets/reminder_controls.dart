@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:notes_reminder_app/generated/app_localizations.dart';
-import 'package:notes_reminder_app/features/note/domain/domain.dart';
+import 'package:pandora/generated/app_localizations.dart';
+import 'package:pandora/features/note/domain/domain.dart';
 
 class ReminderControls extends StatelessWidget {
   final DateTime? alarmTime;

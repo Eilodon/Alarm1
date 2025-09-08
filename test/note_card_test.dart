@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:notes_reminder_app/widgets/note_card.dart';
+import 'package:pandora/widgets/note_card.dart';
 
 void main() {
   testWidgets('NoteCard displays its child inside a Card', (tester) async {

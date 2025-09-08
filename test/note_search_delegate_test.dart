@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:alarm_domain/alarm_domain.dart';
-import 'package:notes_reminder_app/features/note/presentation/note_search_delegate.dart';
-import 'package:notes_reminder_app/generated/app_localizations.dart';
+import 'package:pandora/features/note/presentation/note_search_delegate.dart';
+import 'package:pandora/generated/app_localizations.dart';
 
 void main() {
   testWidgets('NoteSearchDelegate displays results', (tester) async {

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
-import 'package:notes_reminder_app/generated/app_localizations.dart';
-import 'package:notes_reminder_app/features/note/presentation/voice_to_note_screen.dart';
+import 'package:pandora/generated/app_localizations.dart';
+import 'package:pandora/features/note/presentation/voice_to_note_screen.dart';
 
 class MockSpeechToText extends Mock implements stt.SpeechToText {}
 

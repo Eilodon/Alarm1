@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'package:notes_reminder_app/pandora_ui/bottom_sheet.dart';
-import 'package:notes_reminder_app/pandora_ui/dismissible_wrapper.dart';
-import 'package:notes_reminder_app/pandora_ui/palette_list_item.dart';
-import 'package:notes_reminder_app/pandora_ui/result_card.dart';
-import 'package:notes_reminder_app/pandora_ui/security_cue.dart';
-import 'package:notes_reminder_app/pandora_ui/teach_ai_modal.dart';
-import 'package:notes_reminder_app/theme/tokens.dart';
+import 'package:pandora/pandora_ui/bottom_sheet.dart';
+import 'package:pandora/pandora_ui/dismissible_wrapper.dart';
+import 'package:pandora/pandora_ui/palette_list_item.dart';
+import 'package:pandora/pandora_ui/result_card.dart';
+import 'package:pandora/pandora_ui/security_cue.dart';
+import 'package:pandora/pandora_ui/teach_ai_modal.dart';
+import 'package:pandora/theme/tokens.dart';
 
 /// Demonstrates the Pandora UI widgets in a simple screen.
 class PandoraUiDemo extends StatelessWidget {

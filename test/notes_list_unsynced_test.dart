@@ -2,17 +2,17 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
-import 'package:notes_reminder_app/generated/app_localizations.dart';
+import 'package:pandora/generated/app_localizations.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:notes_reminder_app/features/note/presentation/note_provider.dart';
-import 'package:notes_reminder_app/widgets/notes_list.dart';
-import 'package:notes_reminder_app/features/note/note.dart';
-import 'package:notes_reminder_app/features/note/data/calendar_service.dart';
-import 'package:notes_reminder_app/features/note/data/notification_service.dart';
-import 'package:notes_reminder_app/features/note/data/home_widget_service.dart';
-import 'package:notes_reminder_app/features/backup/data/note_sync_service.dart';
+import 'package:pandora/features/note/presentation/note_provider.dart';
+import 'package:pandora/widgets/notes_list.dart';
+import 'package:pandora/features/note/note.dart';
+import 'package:pandora/features/note/data/calendar_service.dart';
+import 'package:pandora/features/note/data/notification_service.dart';
+import 'package:pandora/features/note/data/home_widget_service.dart';
+import 'package:pandora/features/backup/data/note_sync_service.dart';
 import 'package:alarm_domain/alarm_domain.dart';
 
 class MockRepo extends Mock implements NoteRepository {}

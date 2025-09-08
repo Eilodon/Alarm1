@@ -3,15 +3,15 @@ import 'dart:typed_data';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:notes_reminder_app/generated/app_localizations.dart';
+import 'package:pandora/generated/app_localizations.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:provider/provider.dart';
 import 'package:alarm_domain/alarm_domain.dart';
-import 'package:notes_reminder_app/features/note/presentation/note_provider.dart';
-import 'package:notes_reminder_app/features/note/presentation/note_detail_screen.dart';
-import 'package:notes_reminder_app/services/tts_service.dart';
+import 'package:pandora/features/note/presentation/note_provider.dart';
+import 'package:pandora/features/note/presentation/note_detail_screen.dart';
+import 'package:pandora/services/tts_service.dart';
 
 class MockTTS extends Mock implements TTSService {}
 

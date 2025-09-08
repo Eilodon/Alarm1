@@ -9,7 +9,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:alarm_domain/alarm_domain.dart' as domain;
 import 'package:alarm_data/alarm_data.dart';
-import 'package:notes_reminder_app/generated/app_localizations.dart';
+import 'package:pandora/generated/app_localizations.dart';
 
 const MethodChannel _channel = MethodChannel(
   'miguelruivo.flutter.plugins.filepicker',

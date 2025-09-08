@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import 'package:notes_reminder_app/features/note/note.dart';
-import 'package:notes_reminder_app/generated/app_localizations.dart';
+import 'package:pandora/features/note/note.dart';
+import 'package:pandora/generated/app_localizations.dart';
 
 class MockRepo extends Mock implements NoteRepository {}
 

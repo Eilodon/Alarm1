@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:notes_reminder_app/theme/tokens.dart';
-import 'package:notes_reminder_app/pandora_ui/tokens.dart';
+import 'package:pandora/theme/tokens.dart';
+import 'package:pandora/pandora_ui/tokens.dart';
 
 /// List item displaying a color swatch with an optional icon and label.
 class PaletteListItem extends StatelessWidget {

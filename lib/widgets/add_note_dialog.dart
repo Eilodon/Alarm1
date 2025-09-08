@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:notes_reminder_app/generated/app_localizations.dart';
+import 'package:pandora/generated/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import 'package:notes_reminder_app/features/note/presentation/note_provider.dart';
-import 'package:notes_reminder_app/widgets/tag_selector.dart';
-import 'package:notes_reminder_app/l10n/localization_extensions.dart';
+import 'package:pandora/features/note/presentation/note_provider.dart';
+import 'package:pandora/widgets/tag_selector.dart';
+import 'package:pandora/l10n/localization_extensions.dart';
 
 class AddNoteDialog extends StatefulWidget {
   const AddNoteDialog({super.key});
