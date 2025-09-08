@@ -77,6 +77,16 @@ class NoteSyncServiceImpl implements NoteSyncService {
     await _prefs!.setStringList(_unsyncedKey, _unsyncedNoteIds.toList());
   }
 
+  Future<User?> _getUser() async {
+    User? user = _auth.currentUser;
+    if (user != null) return user;
+    try {
+      return (await _auth.signInAnonymously()).user;
+    } catch (_) {
+      return null;
+    }
+  }
+
   @override
   Future<void> markUnsynced(String id) async {
     _unsyncedNoteIds.add(id);
@@ -90,7 +100,12 @@ class NoteSyncServiceImpl implements NoteSyncService {
       return;
     }
     try {
-      final user = _auth.currentUser ?? await _auth.signInAnonymously();
+      final user = await _getUser();
+      if (user == null) {
+        await markUnsynced(note.id);
+        setSyncStatus(SyncStatus.error);
+        return;
+      }
       final data = await _repository.encryptNote(note);
       data['userId'] = user.uid;
       await _firestore.collection('notes').doc(note.id).set(data);
@@ -125,7 +140,11 @@ class NoteSyncServiceImpl implements NoteSyncService {
     if (_unsyncedNoteIds.isEmpty || Firebase.apps.isEmpty) return;
     setSyncStatus(SyncStatus.syncing);
     try {
-      final user = _auth.currentUser ?? await _auth.signInAnonymously();
+      final user = await _getUser();
+      if (user == null) {
+        setSyncStatus(SyncStatus.error);
+        return;
+      }
       final ids = List<String>.from(_unsyncedNoteIds);
       final batch = _firestore.batch();
       for (final id in ids) {
@@ -157,7 +176,10 @@ class NoteSyncServiceImpl implements NoteSyncService {
     if (Firebase.apps.isNotEmpty) {
       final originalNotes = List<Note>.from(notes);
       try {
-        final user = _auth.currentUser ?? await _auth.signInAnonymously();
+        final user = await _getUser();
+        if (user == null) {
+          throw Exception('No user available');
+        }
         final snapshot = await _firestore
             .collection('notes')
             .where('userId', isEqualTo: user.uid)
