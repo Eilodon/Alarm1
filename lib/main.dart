@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:notes_reminder_app/generated/app_localizations.dart';
+import 'package:pandora/generated/app_localizations.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart'
     as fln;
 import 'package:provider/provider.dart';

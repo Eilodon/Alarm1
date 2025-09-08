@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:notes_reminder_app/generated/app_localizations.dart';
+import 'package:pandora/generated/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 

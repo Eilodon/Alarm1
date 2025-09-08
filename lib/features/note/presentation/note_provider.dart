@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
-import 'package:notes_reminder_app/generated/app_localizations.dart';
+import 'package:pandora/generated/app_localizations.dart';
 import 'package:flutter/material.dart' show TimeOfDay;
 import 'package:collection/collection.dart';
 

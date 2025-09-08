@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:notes_reminder_app/generated/app_localizations.dart';
+import 'package:pandora/generated/app_localizations.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'dart:math' as math;

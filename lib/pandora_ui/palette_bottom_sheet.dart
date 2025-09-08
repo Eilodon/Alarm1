@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fuzzy/fuzzy.dart';
-import 'package:notes_reminder_app/generated/app_localizations.dart';
+import 'package:pandora/generated/app_localizations.dart';
 
 import 'package:alarm_domain/alarm_domain.dart';
 

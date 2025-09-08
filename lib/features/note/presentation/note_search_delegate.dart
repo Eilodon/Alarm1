@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:notes_reminder_app/generated/app_localizations.dart';
+import 'package:pandora/generated/app_localizations.dart';
 import 'package:notes_reminder_app/features/note/domain/domain.dart';
 import 'package:notes_reminder_app/features/note/presentation/note_detail_screen.dart';
 import 'package:notes_reminder_app/services/auth_service.dart';
