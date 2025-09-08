@@ -49,7 +49,7 @@ class _NotesTabState extends State<NotesTab> {
         await Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => const VoiceToNoteScreen(autoStart: true),
+            builder: (_) => VoiceToNoteScreen(autoStart: true),
           ),
         );
       }
@@ -115,7 +115,7 @@ class _NotesTabState extends State<NotesTab> {
                 onPressed: () async {
                   await Navigator.push(
                     context,
-                    buildSlideFadeRoute(const VoiceToNoteScreen()),
+                    buildSlideFadeRoute(VoiceToNoteScreen()),
                   );
                 },
               ),
@@ -160,7 +160,7 @@ class _NotesTabState extends State<NotesTab> {
                           action: () => Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const VoiceToNoteScreen(),
+                              builder: (_) => VoiceToNoteScreen(),
                             ),
                           ),
                         ),

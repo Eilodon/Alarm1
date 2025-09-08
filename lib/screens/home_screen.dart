@@ -43,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
           onThemeModeChanged: widget.onThemeModeChanged,
         ),
         NoteListForDayScreen(date: DateTime.now()),
-        const VoiceToNoteScreen(),
+        VoiceToNoteScreen(),
         ChatScreen(initialMessage: '', service: GeminiServiceImpl()),
         SettingsScreen(
           onThemeChanged: widget.onThemeChanged,

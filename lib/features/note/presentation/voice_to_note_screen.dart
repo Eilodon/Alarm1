@@ -10,7 +10,7 @@ class VoiceToNoteScreen extends StatefulWidget {
   final stt.SpeechToText speech;
   final bool autoStart;
 
-  const VoiceToNoteScreen({
+  VoiceToNoteScreen({
     super.key,
     stt.SpeechToText? speech,
     this.autoStart = false,
