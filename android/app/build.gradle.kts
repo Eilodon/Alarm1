@@ -1,51 +1,106 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
-    id("kotlin-android")
+    id("org.jetbrains.kotlin.android") // tương đương kotlin-android
     id("dev.flutter.flutter-gradle-plugin")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
 }
 
+flutter {
+    // Trỏ về thư mục project Flutter
+    source = "../.."
+}
+
+// Load release keystore nếu có
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.reader(Charsets.UTF_8).use { keystoreProperties.load(it) }
+}
+
 android {
-    namespace = "com.pandora.core"
-    compileSdk = 36
-    ndkVersion = "27.0.12077973"
+    // Giữ nguyên namespace hiện có của bạn nếu đã có trong file cũ
+    namespace = "REPLACE_WITH_YOUR_NAMESPACE"
+
+    // Lấy SDK từ Flutter config (Flutter Gradle plugin)
+    compileSdk = flutter.compileSdk
+    ndkVersion = flutter.ndkVersion
 
     defaultConfig {
-        applicationId = "com.pandora.core"
-        minSdk = flutter.minSdkVersion
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        applicationId = "REPLACE_WITH_YOUR_APP_ID"
+        minSdk = flutter.minSdk
+        targetSdk = flutter.targetSdk
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
+        multiDexEnabled = true
     }
 
-    // bật core library desugaring
+    signingConfigs {
+        getByName("debug") {
+            // debug dùng keystore mặc định của Android Studio
+        }
+        create("release") {
+            // Nếu có key.properties thì dùng, không thì bỏ qua để cấu hình sau
+            if (keystoreProperties.isNotEmpty()) {
+                storeFile = keystoreProperties["storeFile"]?.let { file(it as String) }
+                storePassword = keystoreProperties["storePassword"] as String?
+                keyAlias = keystoreProperties["keyAlias"] as String?
+                keyPassword = keystoreProperties["keyPassword"] as String?
+            }
+        }
+    }
+
+    buildTypes {
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("debug")
+        }
+        getByName("release") {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+            // Chỉ set nếu release signing có đủ thông tin
+            if (signingConfigs.findByName("release")?.storeFile != null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
         isCoreLibraryDesugaringEnabled = true
     }
 
-    // dùng debug keystore có sẵn
-    signingConfigs {
-        getByName("debug")
+    kotlinOptions {
+        jvmTarget = "17"
     }
 
-    buildTypes {
-        release {
-            signingConfig = signingConfigs.getByName("debug")
-            isMinifyEnabled = false
-            isShrinkResources = false
-        }
+    packaging {
+        // Tuỳ chọn: loại trừ nếu gặp trùng lặp license/resources
+        resources.excludes += setOf(
+            "META-INF/AL2.0",
+            "META-INF/LGPL2.1",
+        )
     }
-}
-
-flutter {
-    source = "../.."
 }
 
 dependencies {
-    // thư viện desugar để hỗ trợ Java 8+ cho AAR
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
-    implementation("androidx.preference:preference-ktx:1.2.1")
+    // Desugaring cho Java 8+ APIs trên minSdk thấp
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+
+    // AndroidX cơ bản
+    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.activity:activity-ktx:1.9.2")
+    implementation("androidx.fragment:fragment-ktx:1.8.3")
+
+    // (Tuỳ nhu cầu) Firebase BOM + libs runtime nếu bạn dùng
+    // implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
+    // implementation("com.google.firebase:firebase-analytics-ktx")
+    // implementation("com.google.firebase:firebase-crashlytics-ktx")
 }
