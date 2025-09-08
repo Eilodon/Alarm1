@@ -21,7 +21,7 @@ import 'package:notes_reminder_app/widgets/route_transitions.dart';
 class NoteDetailScreen extends StatefulWidget {
   final Note note;
   final TTSService ttsService;
-  const NoteDetailScreen({
+  NoteDetailScreen({
     super.key,
     required this.note,
     TTSService? ttsService,
