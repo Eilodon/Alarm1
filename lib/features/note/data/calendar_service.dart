@@ -7,9 +7,9 @@ class CalendarServiceImpl implements CalendarService {
   CalendarServiceImpl._();
   static final CalendarServiceImpl instance = CalendarServiceImpl._();
 
-  final _signIn = GoogleSignIn(scopes: <String>[
-    calendar.CalendarApi.calendarScope,
-  ]);
+
+  final _signIn = GoogleSignIn.instance;
+
 
   bool _initialized = false;
 
