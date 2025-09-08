@@ -11,7 +11,7 @@ import 'package:alarm_data/alarm_data.dart';
 import 'package:notes_reminder_app/features/note/data/calendar_service.dart';
 import 'package:notes_reminder_app/features/note/data/notification_service.dart';
 import 'package:notes_reminder_app/features/note/data/home_widget_service.dart';
-import 'package:notes_reminder_app/backup/data/note_sync_service.dart';
+import 'package:notes_reminder_app/features/backup/data/note_sync_service.dart';
 
 int _noteComparator(Note a, Note b) {
   if (a.pinned != b.pinned) {
