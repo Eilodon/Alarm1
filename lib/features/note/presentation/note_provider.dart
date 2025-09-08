@@ -6,7 +6,7 @@ import 'package:pandora/generated/app_localizations.dart';
 import 'package:flutter/material.dart' show TimeOfDay;
 import 'package:collection/collection.dart';
 
-import 'package:pandora/features/note/domain/domain.dart';
+import 'package:alarm_domain/alarm_domain.dart';
 import 'package:alarm_data/alarm_data.dart';
 import 'package:pandora/features/note/data/calendar_service.dart';
 import 'package:pandora/features/note/data/notification_service.dart';

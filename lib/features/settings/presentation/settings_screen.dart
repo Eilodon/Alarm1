@@ -11,7 +11,9 @@ import 'package:alarm_domain/alarm_domain.dart';
 
 import 'package:provider/provider.dart';
 import 'package:pandora/features/settings/domain/settings_service.dart';
-import 'package:pandora/features/note/presentation/note_provider.dart';
+import 'package:alarm_domain/alarm_domain.dart';
+import 'package:alarm_data/alarm_data.dart';
+import 'package:pandora/generated/app_localizations.dart';
 
 
 class SettingsScreen extends StatefulWidget {

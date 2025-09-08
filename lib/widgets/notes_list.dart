@@ -5,8 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-import 'package:pandora/features/note/domain/domain.dart';
-
+import 'package:alarm_domain/alarm_domain.dart';
+import 'package:alarm_data/alarm_data.dart';
 import 'package:pandora/features/note/presentation/note_provider.dart';
 import 'package:pandora/features/note/presentation/note_detail_screen.dart';
 import 'package:pandora/services/auth_service.dart';
