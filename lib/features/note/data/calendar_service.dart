@@ -7,16 +7,30 @@ class CalendarServiceImpl implements CalendarService {
   CalendarServiceImpl._();
   static final CalendarServiceImpl instance = CalendarServiceImpl._();
 
-  GoogleSignIn? _googleSignIn;
-  GoogleSignIn get _signIn => _googleSignIn ??=
-      GoogleSignIn(scopes: <String>[calendar.CalendarApi.calendarScope]);
+  final _signIn = GoogleSignIn.instance;
+
+  bool _initialized = false;
 
   Future<calendar.CalendarApi?> _getApi() async {
     try {
-      var account = await _signIn.signInSilently();
-      account ??= await _signIn.signIn();
+      if (!_initialized) {
+        await _signIn.initialize();
+        _initialized = true;
+      }
+      GoogleSignInAccount? account;
+      final silentSignIn = _signIn.attemptLightweightAuthentication();
+      if (silentSignIn != null) {
+        account = await silentSignIn;
+      }
+      account ??= await _signIn.authenticate(
+        scopeHint: <String>[calendar.CalendarApi.calendarScope],
+      );
       if (account == null) return null;
-      final headers = await account.authHeaders;
+      final headers = await account.authorizationClient.authorizationHeaders(
+        <String>[calendar.CalendarApi.calendarScope],
+        promptIfNecessary: true,
+      );
+      if (headers == null) return null;
       final client = _AuthClient(headers);
       return calendar.CalendarApi(client);
     } catch (e) {
