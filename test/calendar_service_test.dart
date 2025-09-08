@@ -7,52 +7,114 @@ import 'package:notes_reminder_app/features/note/data/calendar_service.dart';
 
 class FakeSignInSuccess extends GoogleSignInPlatform {
   @override
-  Future<void> init({
-    List<String>? scopes,
-    String? signInOption,
-    String? clientId,
-    bool? forceCodeForRefreshToken,
-    String? hostedDomain,
-  }) async {}
+  Future<void> init(InitParameters params) async {}
 
   @override
-  Future<GoogleSignInUserData?> signInSilently() async =>
-      const GoogleSignInUserData(email: 'e', id: '1', displayName: 'd');
+  Future<AuthenticationResults?>? attemptLightweightAuthentication(
+      AttemptLightweightAuthenticationParameters params) async {
+    return AuthenticationResults(
+      user: const GoogleSignInUserData(
+        email: 'e',
+        id: '1',
+        displayName: 'd',
+      ),
+      authenticationTokens: const AuthenticationTokenData(
+        accessToken: 'token',
+        idToken: 'id',
+      ),
+    );
+  }
 
   @override
-  Future<GoogleSignInUserData?> signIn() async =>
-      const GoogleSignInUserData(email: 'e', id: '1', displayName: 'd');
+  Future<AuthenticationResults> authenticate(
+      AuthenticateParameters params) async {
+    return AuthenticationResults(
+      user: const GoogleSignInUserData(
+        email: 'e',
+        id: '1',
+        displayName: 'd',
+      ),
+      authenticationTokens: const AuthenticationTokenData(
+        accessToken: 'token',
+        idToken: 'id',
+      ),
+    );
+  }
 
   @override
-  Future<GoogleSignInTokenData> getTokens({
-    required String email,
-    bool? shouldRecoverAuth,
-  }) async =>
-      const GoogleSignInTokenData(accessToken: 'token', idToken: 'id');
+  Future<ClientAuthorizationTokenData?> clientAuthorizationTokensForScopes(
+      ClientAuthorizationTokensForScopesParameters params) async {
+    return const ClientAuthorizationTokenData(accessToken: 'token');
+  }
+
+  @override
+  Future<ServerAuthorizationTokenData?> serverAuthorizationTokensForScopes(
+      ServerAuthorizationTokensForScopesParameters params) async {
+    return null;
+  }
+
+  @override
+  bool supportsAuthenticate() => true;
+
+  @override
+  bool authorizationRequiresUserInteraction() => false;
+
+  @override
+  Future<void> signOut(SignOutParams params) async {}
+
+  @override
+  Future<void> disconnect(DisconnectParams params) async {}
+
+  @override
+  Stream<AuthenticationEvent>? get authenticationEvents =>
+      const Stream<AuthenticationEvent>.empty();
 }
 
 class FakeSignInFail extends GoogleSignInPlatform {
   @override
-  Future<void> init({
-    List<String>? scopes,
-    String? signInOption,
-    String? clientId,
-    bool? forceCodeForRefreshToken,
-    String? hostedDomain,
-  }) async {}
+  Future<void> init(InitParameters params) async {}
 
   @override
-  Future<GoogleSignInUserData?> signInSilently() async => null;
+  Future<AuthenticationResults?>? attemptLightweightAuthentication(
+      AttemptLightweightAuthenticationParameters params) async {
+    return null;
+  }
 
   @override
-  Future<GoogleSignInUserData?> signIn() async => null;
+  Future<AuthenticationResults> authenticate(
+      AuthenticateParameters params) async {
+    throw const GoogleSignInException(
+      code: GoogleSignInExceptionCode.canceled,
+    );
+  }
 
   @override
-  Future<GoogleSignInTokenData> getTokens({
-    required String email,
-    bool? shouldRecoverAuth,
-  }) async =>
-      const GoogleSignInTokenData(accessToken: '', idToken: '');
+  Future<ClientAuthorizationTokenData?> clientAuthorizationTokensForScopes(
+      ClientAuthorizationTokensForScopesParameters params) async {
+    return null;
+  }
+
+  @override
+  Future<ServerAuthorizationTokenData?> serverAuthorizationTokensForScopes(
+      ServerAuthorizationTokensForScopesParameters params) async {
+    return null;
+  }
+
+  @override
+  bool supportsAuthenticate() => true;
+
+  @override
+  bool authorizationRequiresUserInteraction() => false;
+
+  @override
+  Future<void> signOut(SignOutParams params) async {}
+
+  @override
+  Future<void> disconnect(DisconnectParams params) async {}
+
+  @override
+  Stream<AuthenticationEvent>? get authenticationEvents =>
+      const Stream<AuthenticationEvent>.empty();
 }
 
 class FakeHttpClient extends HttpClient {
