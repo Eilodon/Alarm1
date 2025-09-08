@@ -75,8 +75,8 @@ class NotificationServiceImpl implements NotificationService {
       'scheduled_channel',
       loc.scheduled,
       channelDescription: loc.scheduledDesc,
-      importance: fln.AndroidNotificationImportance.max,
-      priority: fln.AndroidNotificationPriority.high,
+      importance: fln.Importance.max,
+      priority: fln.Priority.high,
       actions: [
         fln.AndroidNotificationAction(
           'done',
@@ -124,8 +124,8 @@ class NotificationServiceImpl implements NotificationService {
       'recurring_channel',
       loc.recurring,
       channelDescription: loc.recurringDesc,
-      importance: fln.AndroidNotificationImportance.max,
-      priority: fln.AndroidNotificationPriority.high,
+      importance: fln.Importance.max,
+      priority: fln.Priority.high,
     );
 
     const iosDetails = fln.DarwinNotificationDetails();
@@ -162,8 +162,8 @@ class NotificationServiceImpl implements NotificationService {
       'daily_channel',
       loc.daily,
       channelDescription: loc.dailyDesc,
-      importance: fln.AndroidNotificationImportance.max,
-      priority: fln.AndroidNotificationPriority.high,
+      importance: fln.Importance.max,
+      priority: fln.Priority.high,
     );
 
     const iosDetails = fln.DarwinNotificationDetails();
