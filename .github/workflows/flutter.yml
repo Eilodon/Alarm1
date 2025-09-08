@@ -9,14 +9,23 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      ANDROID_SDK_ROOT: $HOME/android-sdk
     steps:
       - uses: actions/checkout@v5
       - uses: subosito/flutter-action@v2
         with:
           channel: beta
-      - name: Install Android SDK 36 and NDK 27
+      - name: Install Android cmdline-tools
         run: |
-          yes | sdkmanager "platforms;android-36" "build-tools;36.0.0" "ndk;27.0.12077973"
+          ANDROID_SDK_ROOT=$HOME/android-sdk
+          mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
+          curl -sSL https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip -o cmdtools.zip
+          unzip -q cmdtools.zip
+          mv cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest
+          echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> $GITHUB_PATH
+      - name: Install required SDK packages
+        run: yes | sdkmanager "platforms;android-36" "build-tools;36.0.0" "ndk;27.0.12077973"
       - uses: actions/cache@v4
         with:
           path: |
