@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fuzzy/fuzzy.dart';
+import 'package:fuse/fuse.dart';
 import 'package:notes_reminder_app/generated/app_localizations.dart';
 
 import 'package:alarm_domain/alarm_domain.dart';
@@ -26,15 +26,15 @@ class _PaletteBottomSheet extends StatefulWidget {
 }
 
 class _PaletteBottomSheetState extends State<_PaletteBottomSheet> {
-  late final Fuzzy<Command> _fuzzy;
+  late final Fuse<Command> _fuse;
   late List<Command> _results;
 
   @override
   void initState() {
     super.initState();
-    _fuzzy = Fuzzy(
+    _fuse = Fuse(
       widget.commands,
-      options: FuzzyOptions(
+      options: FuseOptions(
         keys: [
           WeightedKey<Command>(
             name: 'title',
@@ -58,7 +58,7 @@ class _PaletteBottomSheetState extends State<_PaletteBottomSheet> {
         _results = widget.commands;
       } else {
         _results =
-            _fuzzy.search(query).map((result) => result.item).toList();
+            _fuse.search(query).map((result) => result.item).toList();
       }
     });
   }
