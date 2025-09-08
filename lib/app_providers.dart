@@ -7,8 +7,8 @@ import 'features/note/data/notification_service.dart';
 import 'features/note/data/home_widget_service.dart';
 import 'features/backup/data/note_sync_service.dart';
 
-import 'package:alarm_data/alarm_data.dart';
-import 'package:alarm_domain/alarm_domain.dart';
+import 'package:alarm_data/alarm_data.dart' as data;
+import 'package:alarm_domain/alarm_domain.dart' as domain;
 import 'features/settings/domain/settings_service.dart';
 import 'features/settings/data/settings_service.dart';
 
