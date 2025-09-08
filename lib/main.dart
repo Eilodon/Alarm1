@@ -17,10 +17,11 @@ import 'screens/error_screen.dart';
 import 'features/settings/domain/settings_service.dart';
 
 Future<void> _onNotificationResponse(
-  fln.NotificationResponse response,
+  dynamic response,
   BuildContext context,
 ) async {
-  final id = response.payload;
+  final notificationResponse = response as fln.NotificationResponse;
+  final id = notificationResponse.payload;
   if (id == null || !context.mounted) return;
   final noteProvider = context.read<NoteProvider>();
   final note = noteProvider.notes.firstWhereOrNull((n) => n.id == id);
@@ -29,12 +30,12 @@ Future<void> _onNotificationResponse(
   final supported = AppLocalizations.delegate.isSupported(locale);
   final effectiveLocale = supported ? locale : const Locale('en');
   final l10n = await AppLocalizations.delegate.load(effectiveLocale);
-  if (response.actionId == 'done') {
+  if (notificationResponse.actionId == 'done') {
     await noteProvider.updateNote(
       note.copyWith(alarmTime: null, notificationId: null, active: false),
       l10n,
     );
-  } else if (response.actionId == 'snooze') {
+  } else if (notificationResponse.actionId == 'snooze') {
     await noteProvider.snoozeNote(note, l10n);
   }
 }
