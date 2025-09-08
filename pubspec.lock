@@ -655,14 +655,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  fuse:
+  fuzzy:
     dependency: "direct main"
     description:
-      name: fuse
-      sha256: d4bec57bec0280ce37957ca8f894dd53f3c8757cdd8f6c0a78f73183d9d54c2c
+      name: fuzzy
+      sha256: af5fbd36f2f8de0663a5b562ef5ca209aea957e81a2f0e97f97475cfbed044ec
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.99"
+    version: "0.5.1"
   glob:
     dependency: transitive
     description:
