@@ -35,5 +35,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "notes_reminder_app"
+rootProject.name = "pandora"
 include(":app")

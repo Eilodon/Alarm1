@@ -1,4 +1,4 @@
-package com.example.notes_reminder_app
+package com.pandora.core
 
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
@@ -10,7 +10,7 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
-    private val CHANNEL = "notes_reminder_app/actions"
+    private val CHANNEL = "pandora/actions"
     private var methodChannel: MethodChannel? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {

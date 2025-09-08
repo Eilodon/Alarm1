@@ -1,4 +1,4 @@
-package com.example.notes_reminder_app
+package com.pandora.core
 
 import android.appwidget.AppWidgetManager
 import android.content.Context

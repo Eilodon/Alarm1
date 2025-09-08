@@ -7,12 +7,12 @@ plugins {
 }
 
 android {
-    namespace = "com.example.notes_reminder_app"
+    namespace = "com.pandora.core"
     compileSdk = 36
     ndkVersion = "27.0.12077973"
 
     defaultConfig {
-        applicationId = "com.example.notes_reminder_app"
+        applicationId = "com.pandora.core"
         minSdk = flutter.minSdkVersion
         targetSdk = 36
         versionCode = 1
