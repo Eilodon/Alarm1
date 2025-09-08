@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:notes_reminder_app/theme/tokens.dart';
+import 'package:pandora/theme/tokens.dart';
 
 class _ToolbarButtonStyle {
 

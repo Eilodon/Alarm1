@@ -11,8 +11,8 @@ import '../features/note/presentation/voice_to_note_screen.dart';
 
 import 'package:alarm_domain/alarm_domain.dart';
 
-import 'package:notes_reminder_app/pandora_ui/palette_bottom_sheet.dart';
-import 'package:notes_reminder_app/pandora_ui/teach_ai_modal.dart';
+import 'package:pandora/pandora_ui/palette_bottom_sheet.dart';
+import 'package:pandora/pandora_ui/teach_ai_modal.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(Color) onThemeChanged;

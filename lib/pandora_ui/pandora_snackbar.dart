@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pandora/generated/app_localizations.dart';
 
-import 'package:notes_reminder_app/theme/tokens.dart';
+import 'package:pandora/theme/tokens.dart';
 
 const _animationDuration = Duration(milliseconds: 150);
 

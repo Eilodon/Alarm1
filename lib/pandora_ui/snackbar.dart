@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:alarm_domain/alarm_domain.dart';
-import 'package:notes_reminder_app/utils/flutter_haptic_feedback_driver.dart';
+import 'package:pandora/utils/flutter_haptic_feedback_driver.dart';
 
 /// Simple snackbar that slides in with a custom easing and triggers haptics.
 class SimpleSnackBar extends StatefulWidget {

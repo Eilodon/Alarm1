@@ -38,7 +38,7 @@ class NotesTab extends StatefulWidget {
 
 class _NotesTabState extends State<NotesTab> {
   late Future<String> _mascotFuture;
-  static const _platform = MethodChannel('notes_reminder_app/actions');
+  static const _platform = MethodChannel('pandora/actions');
 
   @override
   void initState() {

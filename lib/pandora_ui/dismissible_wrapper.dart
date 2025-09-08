@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:notes_reminder_app/theme/tokens.dart';
+import 'package:pandora/theme/tokens.dart';
 
 /// Wrapper adding swipe-to-dismiss behaviour to any widget.
 class DismissibleWrapper extends StatelessWidget {
