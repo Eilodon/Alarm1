@@ -1,6 +1,6 @@
 import 'package:home_widget/home_widget.dart';
 
-import 'package:notes_reminder_app/features/note/domain/domain.dart';
+import 'package:pandora/features/note/domain/domain.dart';
 
 /// Service to update the native home screen widget with the next upcoming note.
 class HomeWidgetServiceImpl implements HomeWidgetService {

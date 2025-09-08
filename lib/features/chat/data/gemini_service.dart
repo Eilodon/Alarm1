@@ -6,8 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:pandora/generated/app_localizations.dart';
 
-import 'package:notes_reminder_app/features/chat/domain/chat_service.dart';
-import 'package:notes_reminder_app/features/chat/domain/note_analysis.dart';
+import 'package:pandora/features/chat/domain/chat_service.dart';
+import 'package:pandora/features/chat/domain/note_analysis.dart';
 
 class GeminiServiceImpl implements ChatService {
   final http.Client _client;

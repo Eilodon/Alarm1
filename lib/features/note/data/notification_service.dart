@@ -8,7 +8,7 @@ import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/foundation.dart';
 
-import 'package:notes_reminder_app/features/note/domain/domain.dart';
+import 'package:pandora/features/note/domain/domain.dart';
 
 class NotificationServiceImpl implements NotificationService {
   static final NotificationServiceImpl _instance =
