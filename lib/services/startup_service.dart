@@ -24,8 +24,7 @@ class StartupService {
   StartupService(this._notificationService);
 
   Future<StartupResult> initialize({
-    Future<void> Function(fln.NotificationResponse)?
-        onDidReceiveNotificationResponse,
+    Future<void> Function(dynamic)? onDidReceiveNotificationResponse,
   }) async {
     bool authFailed = false;
     bool notificationFailed = false;

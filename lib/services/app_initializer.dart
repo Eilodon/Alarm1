@@ -33,8 +33,7 @@ class AppInitializer {
   AppInitializer({required this.settingsService});
 
   Future<AppInitializationData> initialize({
-    Future<void> Function(fln.NotificationResponse)?
-        onDidReceiveNotificationResponse,
+    Future<void> Function(dynamic)? onDidReceiveNotificationResponse,
   }) async {
     final settings = settingsService;
     final notificationService = NotificationServiceImpl();
