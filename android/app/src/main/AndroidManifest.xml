@@ -2,11 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.pandora.core">
 
-    <!-- Quyền cho HTTP/API Gemini + FPT -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- Quyền thông báo Android 13+ -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <!-- Quyền báo thức chính xác -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <application
@@ -32,7 +29,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Bắt buộc cho Flutter embedding v2 -->
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
@@ -44,7 +40,6 @@
             android:name="firebase_analytics_collection_enabled"
             android:value="true" />
 
-        <!-- App Widget Provider -->
         <receiver
             android:name="es.antonborri.home_widget.HomeWidgetBackgroundReceiver"
             android:exported="true">
