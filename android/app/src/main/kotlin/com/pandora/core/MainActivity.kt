@@ -21,10 +21,10 @@ class MainActivity : FlutterActivity() {
                 val note = call.argument<String>("latestNote") ?: ""
                 val prefs = PreferenceManager.getDefaultSharedPreferences(this)
                 prefs.edit().putString("latest_note", note).apply()
-                val intent = Intent(this, WidgetProvider::class.java).apply {
+                val intent = Intent(this, PandoraWidgetProvider::class.java).apply {
                     action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
                     val ids = AppWidgetManager.getInstance(this@MainActivity)
-                        .getAppWidgetIds(ComponentName(this@MainActivity, WidgetProvider::class.java))
+                        .getAppWidgetIds(ComponentName(this@MainActivity, PandoraWidgetProvider::class.java))
                     putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
                 }
                 sendBroadcast(intent)
