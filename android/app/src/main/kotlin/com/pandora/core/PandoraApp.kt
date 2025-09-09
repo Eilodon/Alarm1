@@ -1,4 +1,4 @@
-package pandora.a123
+package com.pandora.core
 
 import android.app.Application
 
