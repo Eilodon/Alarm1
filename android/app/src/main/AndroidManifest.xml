@@ -46,7 +46,7 @@
             android:name="firebase_analytics_collection_enabled"
             android:value="true" />
 
-        <receiver android:name=".WidgetProvider">
+    <receiver android:name=".WidgetProvider" android:exported="true">
 
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
