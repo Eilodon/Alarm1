@@ -46,8 +46,11 @@
             android:name="firebase_analytics_collection_enabled"
             android:value="true" />
 
-    <receiver android:name="com.pandora.core.WidgetProvider" android:exported="true">
-
+    <!-- Removed old WidgetProvider receiver, only PandoraWidgetProvider remains -->
+        
+        <receiver
+            android:name="com.pandora.core.PandoraWidgetProvider"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
