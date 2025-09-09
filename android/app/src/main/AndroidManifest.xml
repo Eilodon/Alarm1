@@ -51,8 +51,6 @@
         <receiver
             android:name="com.pandora.core.PandoraWidgetProvider"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <!-- Ensure no old WidgetProvider receiver remains -->
                 android:name="android.appwidget.provider"
