@@ -17,7 +17,7 @@ class HomeWidgetServiceImpl implements HomeWidgetService {
     } else {
       await HomeWidget.saveWidgetData<String>(_noteKey, upcoming.title);
     }
-    await HomeWidget.updateWidget(name: 'WidgetProvider', iOSName: 'NotesReminderWidget');
+  await HomeWidget.updateWidget(name: 'PandoraWidgetProvider', iOSName: 'NotesReminderWidget');
   }
 
   Note? _nextNote(List<Note> notes) {
