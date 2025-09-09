@@ -1,3 +1,4 @@
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.pandora.core">
 
@@ -26,10 +27,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             <intent-filter>
-
                 <action android:name="android.intent.action.ASSIST"/>
                 <category android:name="android.intent.category.DEFAULT"/>
-
             </intent-filter>
         </activity>
 
@@ -38,7 +37,6 @@
             android:name="flutterEmbedding"
             android:value="2" />
 
-
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"
             android:value="true" />
@@ -46,9 +44,7 @@
             android:name="firebase_analytics_collection_enabled"
             android:value="true" />
 
-
         <!-- App Widget Provider -->
-
         <receiver
             android:name="es.antonborri.home_widget.HomeWidgetBackgroundReceiver"
             android:exported="true">
