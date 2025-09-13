@@ -15,8 +15,8 @@ pluginManagement {
     }
 
     // Tìm Flutter SDK và include Flutter Gradle plugin
-    val localProperties = Properties()
-    val localPropertiesFile = File(rootDir, "local.properties")
+    val localProperties = java.util.Properties()
+    val localPropertiesFile = java.io.File(rootDir, "local.properties")
     if (localPropertiesFile.exists()) {
         localPropertiesFile.reader(Charsets.UTF_8).use { localProperties.load(it) }
     }
@@ -39,8 +39,8 @@ dependencyResolutionManagement {
         mavenCentral()
         maven { url = uri("https://storage.googleapis.com/download.flutter.io") }
         maven {
-            val p = Properties()
-            val f = File(rootDir, "local.properties")
+            val p = java.util.Properties()
+            val f = java.io.File(rootDir, "local.properties")
             if (f.exists()) f.inputStream().use { p.load(it) }
             val sdk = p.getProperty("flutter.sdk") ?: System.getenv("FLUTTER_SDK")
             url = uri("${sdk}/bin/cache/artifacts/engine")
