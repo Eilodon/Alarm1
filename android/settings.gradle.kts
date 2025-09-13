@@ -9,14 +9,15 @@ pluginManagement {
 
     plugins {
         id("com.android.application") version "8.6.1" apply false
+    id("org.jetbrains.kotlin.android") version "2.1.0" apply false
         // Note: using 'com.google.gms.google-services' (correct id) instead of the typo in the request
         id("com.google.gms.google-services") version "4.4.2" apply false
         id("com.google.firebase.crashlytics") version "3.0.2" apply false
     }
 
     // Tìm Flutter SDK và include Flutter Gradle plugin
-    val localProperties = Properties()
-    val localPropertiesFile = File(rootDir, "local.properties")
+    val localProperties = java.util.Properties()
+    val localPropertiesFile = java.io.File(rootDir, "local.properties")
     if (localPropertiesFile.exists()) {
         localPropertiesFile.reader(Charsets.UTF_8).use { localProperties.load(it) }
     }
@@ -39,8 +40,8 @@ dependencyResolutionManagement {
         mavenCentral()
         maven { url = uri("https://storage.googleapis.com/download.flutter.io") }
         maven {
-            val p = Properties()
-            val f = File(rootDir, "local.properties")
+            val p = java.util.Properties()
+            val f = java.io.File(rootDir, "local.properties")
             if (f.exists()) f.inputStream().use { p.load(it) }
             val sdk = p.getProperty("flutter.sdk") ?: System.getenv("FLUTTER_SDK")
             url = uri("${sdk}/bin/cache/artifacts/engine")

@@ -1,16 +1,14 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pandora/features/note/note.dart';
 import 'package:pandora/features/backup/data/note_sync_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class DummyRepo extends Fake implements NoteRepository {}
 
-class FakeConnectivity extends Connectivity {
-  @override
-  Stream<List<ConnectivityResult>> get onConnectivityChanged =>
-      const Stream.empty();
-}
+class DummyFirestore extends Fake implements FirebaseFirestore {}
+class DummyAuth extends Fake implements FirebaseAuth {}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -19,7 +17,8 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     final service = NoteSyncServiceImpl(
       repository: DummyRepo(),
-      connectivity: FakeConnectivity(),
+      firestore: DummyFirestore(),
+      auth: DummyAuth(),
     );
     await service.init((_) => null);
     await service.syncNote(const Note(
