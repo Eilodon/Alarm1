@@ -9,10 +9,10 @@ import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:alarm_domain/alarm_domain.dart' hide Note;
-import 'package:notes_reminder_app/features/note/note.dart';
-import 'package:notes_reminder_app/features/backup/data/note_sync_service.dart';
+import 'package:pandora/features/note/note.dart';
+import 'package:pandora/features/backup/data/note_sync_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:notes_reminder_app/generated/app_localizations.dart';
+import 'package:pandora/generated/app_localizations.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 
 class MockRepo extends Mock implements NoteRepository {}

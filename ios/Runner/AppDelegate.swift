@@ -25,7 +25,7 @@ import Intents
   override func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
     if userActivity.activityType == "CreateNoteIntent" {
       if let controller = window?.rootViewController as? FlutterViewController {
-        let channel = FlutterMethodChannel(name: "notes_reminder_app/actions", binaryMessenger: controller.binaryMessenger)
+        let channel = FlutterMethodChannel(name: "pandora/actions", binaryMessenger: controller.binaryMessenger)
         channel.invokeMethod("voiceToNote", arguments: nil)
       }
       return true

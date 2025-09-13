@@ -23,7 +23,7 @@ struct Provider: TimelineProvider {
     }
 
     private func loadNote() -> String {
-        let defaults = UserDefaults(suiteName: "group.com.example.notes_reminder_app")
+        let defaults = UserDefaults(suiteName: "group.com.example.pandora")
         return defaults?.string(forKey: "note") ?? "No notes"
     }
 }

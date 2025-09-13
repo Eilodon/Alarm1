@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:notes_reminder_app/pandora_ui/hint_chip.dart';
-import 'package:notes_reminder_app/pandora_ui/palette_list_item.dart';
-import 'package:notes_reminder_app/pandora_ui/toolbar_button.dart';
-import 'package:notes_reminder_app/pandora_ui/tokens.dart';
+import 'package:pandora/pandora_ui/hint_chip.dart';
+import 'package:pandora/pandora_ui/palette_list_item.dart';
+import 'package:pandora/pandora_ui/toolbar_button.dart';
+import 'package:pandora/pandora_ui/tokens.dart';
 
 void main() {
   testWidgets('HintChip scales with textScaleFactor', (

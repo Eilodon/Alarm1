@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:notes_reminder_app/generated/app_localizations.dart';
-import 'package:notes_reminder_app/app.dart';
-import 'package:notes_reminder_app/features/note/presentation/note_provider.dart';
+import 'package:pandora/generated/app_localizations.dart';
+import 'package:pandora/app.dart';
+import 'package:pandora/features/note/presentation/note_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() {
