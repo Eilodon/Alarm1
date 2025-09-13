@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:file_picker/file_picker.dart';
@@ -51,6 +52,8 @@ class _MockFilePicker extends FilePicker {
     String? initialDirectory,
     FileType type = FileType.any,
     List<String>? allowedExtensions,
+    Uint8List? bytes,
+    String? bytesName,
     bool lockParentWindow = false,
   }) {
     return _channel.invokeMethod<String>('saveFile', {

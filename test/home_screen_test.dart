@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +12,7 @@ void main() {
     final l10n = await AppLocalizations.delegate.load(const Locale('vi'));
     await tester.pumpWidget(
       ChangeNotifierProvider(
-        create: (_) => NoteProvider(),
+        create: (_) => NoteProvider(syncService: DummySyncService()),
         child: MaterialApp(
           locale: const Locale('vi'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -45,7 +46,7 @@ void main() {
   });
 
   testWidgets('filter notes by tag', (tester) async {
-    final provider = NoteProvider();
+    final provider = NoteProvider(syncService: DummySyncService());
     final l10n = await AppLocalizations.delegate.load(const Locale('vi'));
     await tester.pumpWidget(
       ChangeNotifierProvider.value(
@@ -106,4 +107,44 @@ void main() {
     expect(find.text('n1'), findsOneWidget);
     expect(find.text('n2'), findsOneWidget);
   });
+}
+
+class DummySyncService extends Fake implements NoteSyncService {
+  final _controller = StreamController<SyncStatus>.broadcast();
+  final Set<String> _unsynced = {};
+
+  @override
+  Stream<SyncStatus> get syncStatus => _controller.stream;
+
+  @override
+  void setSyncStatus(SyncStatus status) {
+    if (!_controller.isClosed) _controller.add(status);
+  }
+
+  @override
+  Set<String> get unsyncedNoteIds => _unsynced;
+
+  @override
+  bool isSynced(String id) => !_unsynced.contains(id);
+
+  @override
+  Future<void> init(NoteGetter noteGetter) async {}
+
+  @override
+  Future<void> dispose() async => _controller.close();
+
+  @override
+  Future<void> markUnsynced(String id) async => _unsynced.add(id);
+
+  @override
+  Future<void> syncNote(Note note) async {}
+
+  @override
+  Future<void> deleteNote(String id) async {}
+
+  @override
+  Future<void> syncUnsyncedNotes() async {}
+
+  @override
+  Future<bool> loadFromRemote(Set<Note> notes) async => true;
 }
