@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:notes_reminder_app/generated/app_localizations.dart';
+import 'package:pandora/generated/app_localizations.dart';
 import 'package:alarm_domain/alarm_domain.dart';
-import 'package:notes_reminder_app/pandora_ui/teach_ai_modal.dart';
+import 'package:pandora/pandora_ui/teach_ai_modal.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

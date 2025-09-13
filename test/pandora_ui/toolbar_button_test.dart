@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/rendering.dart';
 
-import 'package:notes_reminder_app/pandora_ui/toolbar_button.dart';
-import 'package:notes_reminder_app/theme/tokens.dart';
+import 'package:pandora/pandora_ui/toolbar_button.dart';
+import 'package:pandora/theme/tokens.dart';
 
 void main() {
   testWidgets('ToolbarButton has minimum size', (WidgetTester tester) async {

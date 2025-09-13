@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:notes_reminder_app/features/settings/data/settings_service.dart';
+import 'package:pandora/features/settings/data/settings_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:alarm_domain/alarm_domain.dart';
-import 'package:notes_reminder_app/pandora_ui/snackbar.dart';
+import 'package:pandora/pandora_ui/snackbar.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

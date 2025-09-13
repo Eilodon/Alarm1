@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:notes_reminder_app/widgets/tag_selector.dart';
-import 'package:notes_reminder_app/theme/tokens.dart';
+import 'package:pandora/widgets/tag_selector.dart';
+import 'package:pandora/theme/tokens.dart';
 
 void main() {
   testWidgets('TagSelector uses themed colors in light and dark', (

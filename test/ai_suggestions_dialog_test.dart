@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:notes_reminder_app/generated/app_localizations.dart';
-import 'package:notes_reminder_app/widgets/ai_suggestions_dialog.dart';
-import 'package:notes_reminder_app/features/chat/domain/note_analysis.dart';
+import 'package:pandora/generated/app_localizations.dart';
+import 'package:pandora/widgets/ai_suggestions_dialog.dart';
+import 'package:pandora/features/chat/domain/note_analysis.dart';
 
 void main() {
   testWidgets('AISuggestionsDialog returns edited data', (tester) async {
