@@ -1,24 +1,31 @@
 package com.pandora.core
 
+import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetProvider
 import android.content.Context
+import android.content.Intent
 import android.widget.RemoteViews
-import es.antonborri.home_widget.HomeWidgetLaunchIntent
-import es.antonborri.home_widget.HomeWidgetProvider
+import androidx.preference.PreferenceManager
 
-class PandoraWidgetProvider : HomeWidgetProvider() {
-    override fun onUpdate(
-        context: Context,
-        appWidgetManager: AppWidgetManager,
-        appWidgetIds: IntArray,
-        widgetData: MutableMap<String, Any>
-    ) {
-        for (id in appWidgetIds) {
+class WidgetProvider : AppWidgetProvider() {
+    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
+
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        val latestNote = prefs.getString("latest_note", context.getString(R.string.no_notes))
+
+        appWidgetIds.forEach { id ->
             val views = RemoteViews(context.packageName, R.layout.widget_provider)
-            val note = widgetData["note"] as? String ?: context.getString(R.string.no_notes)
-            views.setTextViewText(R.id.widget_note, note)
+            views.setTextViewText(R.id.widget_note, latestNote)
 
-            val pendingIntent = HomeWidgetLaunchIntent.getActivity(context, MainActivity::class.java)
+            val intent = Intent(context, MainActivity::class.java)
+            val pendingIntent = PendingIntent.getActivity(
+                context,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
             views.setOnClickPendingIntent(R.id.widget_note, pendingIntent)
 
             appWidgetManager.updateAppWidget(id, views)

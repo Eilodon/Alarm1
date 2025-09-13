@@ -1,23 +1,24 @@
-import 'package:home_widget/home_widget.dart';
-
+import 'package:flutter/services.dart';
 import 'package:pandora/features/note/domain/domain.dart';
 
 /// Service to update the native home screen widget with the next upcoming note.
 class HomeWidgetServiceImpl implements HomeWidgetService {
-  static const _noteKey = 'note';
-
   const HomeWidgetServiceImpl();
 
-  /// Save note data and trigger a widget update.
+  static const MethodChannel _channel = MethodChannel('pandora/actions');
+
+  /// Compute the next upcoming note and ask the native layer to update the widget.
   @override
   Future<void> update(List<Note> notes) async {
     final upcoming = _nextNote(notes);
-    if (upcoming == null) {
-      await HomeWidget.saveWidgetData<String>(_noteKey, '');
-    } else {
-      await HomeWidget.saveWidgetData<String>(_noteKey, upcoming.title);
+    final latestTitle = upcoming?.title ?? '';
+    try {
+      await _channel.invokeMethod('updateWidget', {
+        'latestNote': latestTitle,
+      });
+    } catch (_) {
+      // No-op on platforms without an implementation.
     }
-  await HomeWidget.updateWidget(name: 'PandoraWidgetProvider', iOSName: 'NotesReminderWidget');
   }
 
   Note? _nextNote(List<Note> notes) {

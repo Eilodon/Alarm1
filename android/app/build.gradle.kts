@@ -2,7 +2,7 @@ import java.util.Properties
 
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android") // tương đương kotlin-android
+    id("org.jetbrains.kotlin.android")
     id("dev.flutter.flutter-gradle-plugin")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
@@ -21,19 +21,15 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    // Giữ nguyên namespace hiện có của bạn nếu đã có trong file cũ
-    namespace = "com.pandora.core"
-
-    // Lấy SDK từ Flutter config (Flutter Gradle plugin)
+    namespace = "pandora.a123"
     compileSdk = flutter.compileSdk
-    ndkVersion = flutter.ndkVersion
 
     defaultConfig {
-    applicationId = "com.pandora.core"
-        minSdk = flutter.minSdk
-        targetSdk = flutter.targetSdk
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+    applicationId = "pandora.a123"
+    minSdk = flutter.minSdk
+    targetSdk = flutter.targetSdk
+        versionCode = (project.findProperty("flutter.versionCode") as String?)?.toInt() ?: 1
+        versionName = (project.findProperty("flutter.versionName") as String?) ?: "1.0.0"
         multiDexEnabled = true
     }
 
@@ -54,25 +50,24 @@ android {
 
     buildTypes {
         getByName("debug") {
-            signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
         getByName("release") {
             isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            // Chỉ set nếu release signing có đủ thông tin
-            if (signingConfigs.findByName("release")?.storeFile != null) {
-                signingConfig = signingConfigs.getByName("release")
-            }
         }
     }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-        isCoreLibraryDesugaringEnabled = true
+        @Suppress("UnstableApiUsage")
+        coreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -98,6 +93,7 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.activity:activity-ktx:1.9.2")
     implementation("androidx.fragment:fragment-ktx:1.8.3")
+    implementation("androidx.preference:preference-ktx:1.2.1")
 
     // (Tuỳ nhu cầu) Firebase BOM + libs runtime nếu bạn dùng
     // implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
