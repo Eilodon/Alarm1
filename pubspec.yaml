@@ -7,12 +7,6 @@ workspace:
   - alarm_domain
   - alarm_data
 
-melos:
-  packages:
-    - .
-    - alarm_domain
-    - alarm_data
-
 environment:
   sdk: ">=3.7.0 <4.0.0"
 
