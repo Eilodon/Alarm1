@@ -21,11 +21,11 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "pandora.a123"
+    namespace = "com.pandora.core"
     compileSdk = flutter.compileSdk
 
     defaultConfig {
-    applicationId = "pandora.a123"
+    applicationId = "com.pandora.core"
     minSdk = flutter.minSdk
     targetSdk = flutter.targetSdk
         versionCode = (project.findProperty("flutter.versionCode") as String?)?.toInt() ?: 1

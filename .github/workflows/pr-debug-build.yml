@@ -18,7 +18,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: beta
+          channel: stable
       - name: Install Android cmdline-tools
         run: |
           ANDROID_SDK_ROOT=$HOME/android-sdk
