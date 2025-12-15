@@ -26,7 +26,7 @@ jobs:
           echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> $GITHUB_PATH
       - name: Install required SDK packages
         run: yes | sdkmanager "platforms;android-36" "build-tools;36.0.0" "ndk;27.0.12077973"
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: |
             ~/.pub-cache
